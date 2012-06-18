@@ -106,20 +106,20 @@ void HSpatialDivision::addFace(HTripleIndex i3)
 
 void HSpatialDivision::divide(int target_count)
 {
-	HSDVertexCluster vc1, vc2, vc3, vc4, vc5, vc6, vc7, vc8;
+	HSDVertexCluster vc, vc1, vc2, vc3, vc4, vc5, vc6, vc7, vc8;
 	int i;
 
-	//init the first cluster
+	// init the first cluster
 	for (i = 0; i < this->vertices.size(); i ++)
 	{
-		vc1.addVertex(i, vertices[i].awQ, vertices[i].awN, vertices[i].area);
+		vc.addVertex(i, vertices[i].awQ, vertices[i].awN, vertices[i].area);
 	}
-	clusters.addElement(vc1);
+	clusters.addElement(vc);
 
 	// subdivide until the divided clusters reach the target count
 	while(clusters.count() < target_count)
 	{
-		
+		vc = clusters.getTop();
 	}
 }
 
