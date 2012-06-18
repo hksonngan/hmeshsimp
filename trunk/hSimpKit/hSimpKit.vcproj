@@ -182,6 +182,14 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\double_heap.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\double_heap.h"
+			>
+		</File>
+		<File
 			RelativePath=".\htime.h"
 			>
 		</File>
@@ -202,11 +210,27 @@
 			>
 		</File>
 		<File
+			RelativePath=".\spatial_division.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\spatial_division.h"
+			>
+		</File>
+		<File
 			RelativePath=".\tri_soup_stream.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\tri_soup_stream.h"
+			>
+		</File>
+		<File
+			RelativePath=".\util_common.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\util_common.h"
 			>
 		</File>
 		<File
