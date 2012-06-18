@@ -1,6 +1,7 @@
 /*
-	out-of-core algorithms implementation for hoocs
-	author: ht
+ *	out-of-core algorithms implementation for hoocs
+ *
+ *	author: ht
 */
 
 #ifndef __OOCSIMP__

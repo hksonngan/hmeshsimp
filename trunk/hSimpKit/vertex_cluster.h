@@ -1,5 +1,8 @@
 /*
  *	vertex cluster and some concerning classes
+ *  the algorithm presented here please refer to
+ *    [Lindstrom] Out-of-Core Simplification of Large Polygonal Models
+ *
  *	author: ht
  *  email : waytofall916@gmail.com
  */
@@ -15,6 +18,7 @@
 #include "math/vec4.h"
 #include "math/mat44.h"
 #include <boost/unordered_set.hpp>
+#include "util_common.h"
 
 
 
@@ -32,16 +36,13 @@ typedef int Integer;
 const int INIT_BUCKET_SIZE = 1024 * 1024;
 
 /* class defined */
-class HVertex;
 class HTripleIndex;
-class HFaceFormula;
-class HQEMatrix;
 class HVertexCluster;
 class HVertexClusterContainer;
 class HFaceIndex;
 class HSoupTriangle;
 //class HFaceIndexHash;
-class HOOCVertexClusterSimp;
+class HVertexClusterSimp;
 class HFaceIndexHash;
 
 class HFaceIndexHash;
@@ -54,44 +55,6 @@ typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEq
 
 
 /* =================== class definition ==================== */
-
-class HVertex
-{
-public:
-	HVertex() {}
-
-	HVertex(float _x, float _y, float _z) {
-		x = _x; y = _y; z = _z; }
-
-	void set(float _x, float _y, float _z) {
-		x = _x; y = _y; z = _z; }
-
-	HVertex& operator+= (const HVertex v) {
-		x += v.x; y += v.y; z += v.z; 
-		return *this;
-	}
-
-	HVertex operator* (float n) const {
-		HVertex v(x * n, y * n, z * n);		
-		return v;
-	}
-
-	HVertex operator+ (HVertex &vertex) const {
-		HVertex v(x + vertex.x, y + vertex.y, z + vertex.z);
-		return v;
-	}
-
-	bool operator== (const HVertex &vertex) const {
-		return x == vertex.x && y == vertex.y && z == vertex.z;
-	}
-
-	bool operator!= (const HVertex &vertex) const {
-		return !operator==(vertex);
-	}
-
-public:
-	float x, y, z;
-};
 
 class HTripleIndex
 {
@@ -137,46 +100,6 @@ public:
 
 public:
 	HVertex v1, v2, v3;
-};
-
-/* calculate face formula */
-class HFaceFormula
-{
-public:
-	static void calcTriangleFaceFormula(HVertex _v1, HVertex _v2, HVertex _v3);
-
-public:
-	// parameters of a plane
-	static float a, b, c, d;
-};
-
-/* quadric error metrics */
-class HQEMatrix
-{
-public:
-	HQEMatrix() {}
-
-	void setZero();
-
-	HQEMatrix(HSoupTriangle tri) {
-		calcQem(tri); }
-
-	HQEMatrix& operator+= (const HQEMatrix& m);
-
-	void calcQem(HSoupTriangle tri)
-	{
-		HFaceFormula::calcTriangleFaceFormula(tri.v1, tri.v2, tri.v3);
-		calcQem(HFaceFormula::a, HFaceFormula::b, HFaceFormula::c, HFaceFormula::d);
-	}
-
-	void calcQem(float a, float b, float c, float d);
-	bool calcRepresentativeVertex(HVertex& vertex);
-
-public:
-	float a11, a12, a13, a14;
-	float      a22, a23, a24;
-	float           a33, a34;
-	float                a44;
 };
 
 /* data structure depicting a vertex cluster */
@@ -319,28 +242,6 @@ public:
 public:
 	HTripleIndex v1CIndex, v2CIndex, v3CIndex;
 };
-
-/* --- definitions about hashing --- */
-
-/* class defining the hash function and equal function for hash map */
-//class _HFaceIndexHash
-//{
-//public:
-//
-//	static const size_t bucket_size = 3;    
-//	static const size_t min_buckets = INIT_BUCKET_SIZE;
-//
-//	/* the hash function */
-//	size_t operator()(const HFaceIndex& index) const
-//	{
-//		return size_t(h);
-//	}
-//
-//	/* the less than function, strict weak ordering */
-//	bool operator()(const HFaceIndex& i1, const HFaceIndex& i2) const{
-//		return i1 < i2;
-//	}
-//};
 
 /* the hash functor */
 class HFaceIndexHash
