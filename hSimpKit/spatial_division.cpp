@@ -1,12 +1,11 @@
 #include "spatial_division.h"
-#include "util_common.h"
-#include "math/vec3.h"
-#include "ply_stream.h"
-
 #include <Eigen/Eigenvalues>
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "util_common.h"
+#include "math/vec3.h"
+#include "ply_stream.h"
 
 using std::cerr;
 using std::endl;
@@ -14,8 +13,7 @@ using std::vector;
 
 /* -- spatial division vertex cluster -- */
 
-HSDVertexCluster::HSDVertexCluster()
-{
+HSDVertexCluster::HSDVertexCluster() {
 	weakClear();
 }
 
@@ -38,7 +36,7 @@ void HSDVertexCluster::addVertex(Integer i, HSDVertex v)
 
 bool HSDVertexCluster::operator< (const HSDVertexCluster &vc) const
 {
-	Vec3<float> n1(this->awN.x, this->awN.y, this->awN.z),
+	HNormal n1(this->awN.x, this->awN.y, this->awN.z),
 		n2(vc.awN.x, vc.awN.y, vc.awN.z);
 
 	n1 /= area;
@@ -50,7 +48,21 @@ bool HSDVertexCluster::operator< (const HSDVertexCluster &vc) const
 	return l1 < l2;
 }
 
-inline void HSDVertexCluster::weakClear()
+bool HSDVertexCluster::operator> (const HSDVertexCluster &vc) const
+{
+	HNormal n1(this->awN.x, this->awN.y, this->awN.z),
+		n2(vc.awN.x, vc.awN.y, vc.awN.z);
+
+	n1 /= area;
+	n2 /= area;
+
+	float l1 = 1 - n1.Length();
+	float l2 = 1 - n2.Length();
+
+	return l1 > l2;
+}
+
+void HSDVertexCluster::weakClear()
 {
 	awQ.setZero();
 	awN.Set(0.0, 0.0, 0.0);
@@ -59,7 +71,7 @@ inline void HSDVertexCluster::weakClear()
 	area = 0;
 }
 
-inline void HSDVertexCluster::strongClear()
+void HSDVertexCluster::strongClear()
 {
 	if (vIndices) {
 		delete[] vIndices;
@@ -81,7 +93,12 @@ HSpatialDivision::HSpatialDivision()
 
 }
 
-inline void HSpatialDivision::addVertex(HVertex v)
+HSpatialDivision::~HSpatialDivision()
+{
+
+}
+
+void HSpatialDivision::addVertex(HVertex v)
 {
 	HSDVertex sdv;
 	sdv.Set(v.x, v.y, v.z);
@@ -135,7 +152,6 @@ bool HSpatialDivision::readPly(char *filename)
 	if (plyStream.openForRead(filename) == false) {
 		return false;
 	}
-	
 	
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 		if (plyStream.nextVertex(v) == false) {

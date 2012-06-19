@@ -183,10 +183,6 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\double_heap.cpp"
-			>
-		</File>
-		<File
 			RelativePath=".\double_heap.h"
 			>
 		</File>
