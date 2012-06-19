@@ -7,9 +7,12 @@ using std::endl;
 template<class T>
 doubleHeap<T>::doubleHeap(int _size, int _type)
 {
-    max_size = 10;
-    if(_size >= 10)
+    max_size = DEFAULT_CAPACITY;
+	user_set_size = DEFAULT_CAPACITY;
+	if(_size >= DEFAULT_CAPACITY) {
         max_size = _size;
+		user_set_size = _size;
+	}
     data = new T[max_size];
     size = 0;
     type = 1; // default max heap
@@ -131,6 +134,18 @@ template<class T>
 bool doubleHeap<T>::full()
 {
     return max_size == size;
+}
+
+template<class T>
+void doubleHeap<T>::clear()
+{
+	size = 0;
+	
+	if (max_size > user_set_size) {
+		delete[] data;
+		data = new T[max_size / 2];
+		max_size /= 2;
+	}
 }
 
 template<class T>

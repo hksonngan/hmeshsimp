@@ -1,4 +1,7 @@
 #include "util_common.h"
+#include "math/vec3.h"
+#include "math/vec4.h"
+#include "math/mat44.h"
 
 
 /* --- HFaceFormula --- */
@@ -43,6 +46,25 @@ float HFaceFormula::calcTriangleFaceArea(HVertex _v1, HVertex _v2, HVertex _v3)
 	return normal.Length();
 }
 
+inline float HFaceFormula::calcD(HNormal nm, HVertex v)
+{
+	return - nm * v;
+}
+
+inline WhichSide HFaceFormula::sideOfPlane(HNormal nm, float d, HVertex v)
+{
+	if (nm.x < 0) {
+		nm = - nm;
+		d = - d;
+	}
+
+	float r = nm * v + d;
+
+	if (r > 0)
+		return Side1;
+	else
+		return Side2;
+}
 
 /* --- HQEMatrix --- */
 
@@ -86,7 +108,7 @@ bool HQEMatrix::calcRepresentativeVertex(HVertex& vertex)
 
 	mymath::Vec4<float> new_vertex = inv * mymath::Vec4<float>(0, 0, 0, 1);
 
-	vertex.set(new_vertex.x, new_vertex.y, new_vertex.z);
+	vertex.Set(new_vertex.x, new_vertex.y, new_vertex.z);
 
 	return true;
 }

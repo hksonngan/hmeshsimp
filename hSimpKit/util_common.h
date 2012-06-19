@@ -8,48 +8,69 @@
 #ifndef __UTIL_COMMON__
 #define __UTIL_COMMON__
 
+#include "math/vec3.h"
+
+/* -- types & constants -- */
+
+/* integer index type */
+typedef int Integer;
+
+enum WhichSide
+{ Side1, Side2 };
+
+
 /* class defined */
-class HVertex;
+template<class T> class HVec3;
 class HFaceFormula;
 class HQEMatrix;
+class HSoupTriangle;
+class HTripleIndex;
+class HFaceIndex;
 
-/* vertex */
-class HVertex
+typedef Vec3<float> HVertex;
+typedef Vec3<float> HNormal;
+
+/* 3 vector */
+template<class T>
+class HVec3
 {
 public:
-	HVertex() {}
+	HVec3() {}
 
-	HVertex(float _x, float _y, float _z) {
+	HVec3(T _x, T _y, T _z) {
 		x = _x; y = _y; z = _z; }
 
-	void set(float _x, float _y, float _z) {
+	void set(T _x, T _y, T _z) {
 		x = _x; y = _y; z = _z; }
 
-	HVertex& operator+= (const HVertex v) {
+	void set(const HVec3 v) {
+		x = v.x; y = v.y; z = v.z; }
+
+	HVec3& operator+= (const HVec3 v) {
 		x += v.x; y += v.y; z += v.z; 
 		return *this;
 	}
 
-	HVertex operator* (float n) const {
-		HVertex v(x * n, y * n, z * n);		
+	HVec3 operator* (T n) const {
+		HVec3 v(x * n, y * n, z * n);		
 		return v;
 	}
 
-	HVertex operator+ (HVertex &vertex) const {
-		HVertex v(x + vertex.x, y + vertex.y, z + vertex.z);
+	HVec3 operator+ (HVec3 &vec) const {
+		HVec3 v(x + vec.x, y + vec.y, z + vec.z);
 		return v;
 	}
 
-	bool operator== (const HVertex &vertex) const {
-		return x == vertex.x && y == vertex.y && z == vertex.z;
+	bool operator== (const HVec3 &vec) const {
+		return x == vec.x && y == vec.y && z == vec.z;
 	}
 
-	bool operator!= (const HVertex &vertex) const {
-		return !operator==(vertex);
+	bool operator!= (const HVec3 &vec) const {
+		return !operator==(vec);
 	}
 
 public:
-	float x, y, z;
+	T x, y, z;
 };
 
 /* calculate face formula */
@@ -58,10 +79,23 @@ class HFaceFormula
 public:
 	static void calcTriangleFaceFormula(HVertex _v1, HVertex _v2, HVertex _v3);
 	static float calcTriangleFaceArea(HVertex _v1, HVertex _v2, HVertex _v3);
+	static float calcD(HNormal nm, HVertex v);
+	static WhichSide sideOfPlane(HNormal, float d, HVertex v);
 
 public:
 	// parameters of a plane
 	static float a, b, c, d;
+};
+
+/* triangle in a triangle soup */
+class HSoupTriangle
+{
+public:
+	void set(HVertex _v1, HVertex _v2, HVertex _v3) {
+		v1 = _v1; v2 = _v2; v3 = _v3; }
+
+public:
+	HVertex v1, v2, v3;
 };
 
 /* quadric error metrics */
@@ -94,6 +128,80 @@ public:
 	float      a22, a23, a24;
 	float           a33, a34;
 	float                a44;
+};
+
+class HTripleIndex
+{
+public:
+	HTripleIndex() {}
+
+	HTripleIndex(Integer _i, Integer _j, Integer _k) {
+		i = _i; j = _j; k = _k; }
+
+	void set(Integer _i, Integer _j, Integer _k) {
+		i = _i; j = _j; k = _k; }
+
+	bool operator!= (const HTripleIndex &trip_ind) const {
+		return i != trip_ind.i || j != trip_ind.j || k != trip_ind.k;
+	}
+
+	bool operator== (const HTripleIndex &trip_ind) const {
+		return i == trip_ind.i && j == trip_ind.j && k == trip_ind.k;
+	}
+
+	bool operator< (const HTripleIndex &trip_ind) const
+	{
+		if (this->i < trip_ind.i)
+			return true;
+		else if (this->j < trip_ind.j)
+			return true;
+		else if (this->k < trip_ind.k)
+			return true;
+
+		return false;
+	}
+
+public:
+	Integer i, j, k;
+};
+
+/* face index: three HTripleIndex as cluster index */
+class HFaceIndex
+{
+public:
+	HFaceIndex() {}
+
+	HFaceIndex(HTripleIndex& tr1, HTripleIndex& tr2, HTripleIndex& tr3) {
+		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
+	}
+
+	void set(HTripleIndex& tr1, HTripleIndex& tr2, HTripleIndex& tr3) {
+		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
+	}
+
+	bool operator== (const HFaceIndex &index) const {
+		return this->v1CIndex == index.v1CIndex && this->v2CIndex == index.v2CIndex 
+			&& this->v3CIndex == index.v3CIndex;
+	}
+
+	bool operator!= (const HFaceIndex &index) const {
+		return !operator==(index); }
+
+	// used for hash compare functor
+	bool operator< (const HFaceIndex &index) const
+	{
+		if (this->v1CIndex < index.v1CIndex)
+			return true;
+		else if (this->v2CIndex < index.v2CIndex)
+			return true;
+		else if (this->v3CIndex < index.v3CIndex)
+			return true;
+
+		return false;
+	}
+
+public:
+	HTripleIndex v1CIndex, v2CIndex, v3CIndex;
 };
 
 #endif //__UTIL_COMMON__

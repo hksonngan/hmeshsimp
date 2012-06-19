@@ -40,6 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -190,6 +191,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\getopt.c"
+			>
+		</File>
+		<File
+			RelativePath=".\getopt.h"
+			>
+		</File>
+		<File
 			RelativePath=".\htime.h"
 			>
 		</File>
@@ -207,6 +216,14 @@
 		</File>
 		<File
 			RelativePath=".\oocsimp.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ply_stream.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ply_stream.h"
 			>
 		</File>
 		<File
