@@ -29,78 +29,23 @@ typedef unsigned char RepCalcPolicy;
 #define QEM_INV		0
 #define MEAN_VERTEX 1
 
-/* integer index type */
-typedef int Integer;
-
 //#define PRINT_HASH
 const int INIT_BUCKET_SIZE = 1024 * 1024;
 
 /* class defined */
-class HTripleIndex;
 class HVertexCluster;
 class HVertexClusterContainer;
-class HFaceIndex;
-class HSoupTriangle;
-//class HFaceIndexHash;
 class HVertexClusterSimp;
-class HFaceIndexHash;
 
 class HFaceIndexHash;
 class HFaceIndexEqual;
 
 /* type of degenerated face container */
-//typedef stdext::hash_set<HFaceIndex, HFaceIndexHash> HDegFaceContainer;
 typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HDegFaceContainer;
 
 
 
 /* =================== class definition ==================== */
-
-class HTripleIndex
-{
-public:
-	HTripleIndex() {}
-
-	HTripleIndex(Integer _i, Integer _j, Integer _k) {
-		i = _i; j = _j; k = _k; }
-
-	void set(Integer _i, Integer _j, Integer _k) {
-		i = _i; j = _j; k = _k; }
-
-	bool operator!= (const HTripleIndex &trip_ind) const {
-		return i != trip_ind.i || j != trip_ind.j || k != trip_ind.k;
-	}
-
-	bool operator== (const HTripleIndex &trip_ind) const {
-		return i == trip_ind.i && j == trip_ind.j && k == trip_ind.k;
-	}
-
-	bool operator< (const HTripleIndex &trip_ind) const
-	{
-		if (this->i < trip_ind.i)
-			return true;
-		else if (this->j < trip_ind.j)
-			return true;
-		else if (this->k < trip_ind.k)
-			return true;
-
-		return false;
-	}
-
-public:
- 	Integer i, j, k;
-};
-
-/* triangle in a triangle soup */
-class HSoupTriangle
-{
-public:
-	void set(HVertex _v1, HVertex _v2, HVertex _v3) {
-		v1 = _v1; v2 = _v2; v3 = _v3; }
-
-public:
-	HVertex v1, v2, v3;
-};
 
 /* data structure depicting a vertex cluster */
 class HVertexCluster
@@ -108,7 +53,7 @@ class HVertexCluster
 public:
 	HVertexCluster() {
 		nverts = 0;
-		representative_vertex.set(0.0f, 0.0f, 0.0f);
+		representative_vertex.Set(0.0f, 0.0f, 0.0f);
 		qem.setZero();
 	}
 
@@ -202,45 +147,6 @@ private:
 	Integer cluster_count;
 	// valid cluster count
 	Integer valid_clusters;
-};
-
-/* face index: three HTripleIndex as cluster index */
-class HFaceIndex
-{
-public:
-	HFaceIndex() {}
-
-	HFaceIndex(HTripleIndex& tr1, HTripleIndex& tr2, HTripleIndex& tr3) {
-		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
-	}
-
-	void set(HTripleIndex& tr1, HTripleIndex& tr2, HTripleIndex& tr3) {
-		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
-	}
-
-	bool operator== (const HFaceIndex &index) const {
-		return this->v1CIndex == index.v1CIndex && this->v2CIndex == index.v2CIndex 
-			&& this->v3CIndex == index.v3CIndex;
-	}
-
-	bool operator!= (const HFaceIndex &index) const {
-		return !operator==(index); }
-
-	// used for hash compare functor
-	bool operator< (const HFaceIndex &index) const
-	{
-		if (this->v1CIndex < index.v1CIndex)
-			return true;
-		else if (this->v2CIndex < index.v2CIndex)
-			return true;
-		else if (this->v3CIndex < index.v3CIndex)
-			return true;
-
-		return false;
-	}
-
-public:
-	HTripleIndex v1CIndex, v2CIndex, v3CIndex;
 };
 
 /* the hash functor */

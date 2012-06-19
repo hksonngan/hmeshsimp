@@ -19,9 +19,9 @@ bool HOOCVertexClustering::run(int x_partition, int y_partition, int z_partition
 	while (sstream.readNext())
 	{
 		// retrieve the triangle soup
-		soup_tri.v1.set(sstream.getFloat(0, 0), sstream.getFloat(0, 1), sstream.getFloat(0, 2));
-		soup_tri.v2.set(sstream.getFloat(1, 0), sstream.getFloat(1, 1), sstream.getFloat(1, 2));
-		soup_tri.v3.set(sstream.getFloat(2, 0), sstream.getFloat(2, 1), sstream.getFloat(2, 2));
+		soup_tri.v1.Set(sstream.getFloat(0, 0), sstream.getFloat(0, 1), sstream.getFloat(0, 2));
+		soup_tri.v2.Set(sstream.getFloat(1, 0), sstream.getFloat(1, 1), sstream.getFloat(1, 2));
+		soup_tri.v3.Set(sstream.getFloat(2, 0), sstream.getFloat(2, 1), sstream.getFloat(2, 2));
 
 		vcsimp.addSoupTriangle(soup_tri);
 	}

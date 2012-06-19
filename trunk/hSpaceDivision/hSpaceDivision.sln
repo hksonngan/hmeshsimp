@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hSpaceDivision", "hSpaceDivision.vcproj", "{FA551814-5B6D-4B4C-BB30-1459BB1778F3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A03330D3-129A-4EB5-828C-0112EFE97B77} = {A03330D3-129A-4EB5-828C-0112EFE97B77}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hSimpKit", "..\hSimpKit\hSimpKit.vcproj", "{A03330D3-129A-4EB5-828C-0112EFE97B77}"
 EndProject

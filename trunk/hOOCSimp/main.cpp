@@ -1,7 +1,7 @@
 /*
-	main function and cmdline process
-	for oocsimp, author: ht
-*/
+ *	main function and cmdline process
+ *	for oocsimp, author: ht
+ */
 
 #include "getopt.h"
 #include <string>
@@ -145,8 +145,6 @@ void process_cmdline(int argc, char **argv)
 	// set input file name
 	g_oocsimp.infilename = argv[optind];
 }
-
-#include "vertex_cluster.h"
 
 int main (int argc, char **argv)
 {

@@ -24,13 +24,13 @@ using std::endl;
 //#define _OUTPUT_TRI_SOUP
 //#define _OUTPUT_VERT_TXT
 
-void print_error(char* e_msg)
+static void print_error(char* e_msg)
 {
 	std::cerr << std::endl << std::endl << "#error: " << e_msg << std::endl;
 	exit(0);
 }
 
-void determinBoundBox(BoundBox& bound_box, Vertex vertex)
+static void determinBoundBox(BoundBox& bound_box, Vertex vertex)
 {
 	if (bound_box.max_x < vertex.x) {
 		bound_box.max_x = vertex.x;
@@ -52,7 +52,7 @@ void determinBoundBox(BoundBox& bound_box, Vertex vertex)
 	}
 }
 
-void freePointersInFace(Face *face) {
+static void freePointersInFace(Face *face) {
 	if (face->verts) {
 		free(face->verts);
 	}
@@ -130,7 +130,7 @@ int HOOCSimp::toTriangleSoup()
 			   but luckily that vert_other is a global variable
 			   and can be freed in clean_ply() - houtao */
 			vert_other = ply_get_other_properties (ply, elem_name,
-				offsetof(Vertex,other_props));
+				offsetof(Vertex, other_props));
 
 			/* get the first vertex and set the bounding box */
 			vertex.other_props = NULL;
