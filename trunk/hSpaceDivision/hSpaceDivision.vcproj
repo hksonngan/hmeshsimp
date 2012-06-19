@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\hSimpKit;&quot;$(EIGEN_DIR)&quot;"
+				AdditionalIncludeDirectories="..\hSimpKit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

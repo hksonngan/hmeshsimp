@@ -27,8 +27,7 @@ using namespace Eigen;
 class HSDVertex : public HVertex
 {
 public:
-	HSDVertex()
-	{
+	HSDVertex() {
 		awQ.setZero();
 		awN.Set(0.0, 0.0, 0.0);
 		area = 0.0;
@@ -50,6 +49,7 @@ public:
 	~HSDVertexCluster() { /*delete[] vIndices;*/ }
 	void addVertex(Integer i, HSDVertex v);
 	bool operator< (const HSDVertexCluster &vc) const;
+	bool operator> (const HSDVertexCluster &vc) const;
 	// clear the object without free the vIndices
 	void weakClear();
 	// clear the object and free the vIndices

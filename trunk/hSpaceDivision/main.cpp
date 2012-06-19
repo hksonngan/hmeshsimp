@@ -1,6 +1,7 @@
 /*
  *	main function and cmdline process
- *	for oocsimp, author: ht
+ *
+ *	author: ht
  */
 
 #include "getopt.h"
@@ -17,7 +18,7 @@ using std::endl;
 int target;
 char *infilename;
 
-static char *options = "t";
+static char *options = "t:h";
 
 static char *usage_string = 
 "-t <n>\tX target vertices of the simplified mesh\n"
@@ -47,7 +48,7 @@ void process_cmdline(int argc, char **argv)
 	getopt_init();
 	while( (opt = getopt(argc, argv, options)) != EOF )
 	{
-		// set parameters for g_oocsimp
+		// set parameters for spatial partition
 		switch( opt )
 		{
 		case 't':
@@ -83,12 +84,10 @@ int main(int argc, char** argv)
 	process_cmdline(argc, argv);
 
 	HSpatialDivision sd;
-	//if (sd.readPly(infilename) == false) {
-	//	return 0;
-	//}
-	//sd.divide(target);
-
-	HVertexClusterSimp s;
+	if (sd.readPly(infilename) == false) {
+		return 0;
+	}
+	sd.divide(target);
 
 	return 0;
 }

@@ -46,12 +46,12 @@ float HFaceFormula::calcTriangleFaceArea(HVertex _v1, HVertex _v2, HVertex _v3)
 	return normal.Length();
 }
 
-inline float HFaceFormula::calcD(HNormal nm, HVertex v)
+float HFaceFormula::calcD(HNormal nm, HVertex v)
 {
 	return - nm * v;
 }
 
-inline WhichSide HFaceFormula::sideOfPlane(HNormal nm, float d, HVertex v)
+WhichSide HFaceFormula::sideOfPlane(HNormal nm, float d, HVertex v)
 {
 	if (nm.x < 0) {
 		nm = - nm;

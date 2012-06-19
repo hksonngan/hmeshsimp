@@ -90,7 +90,7 @@ bool PlyStream::close()
 	return true;
 }
 
-inline bool PlyStream::nextVertex(HVertex &v)
+bool PlyStream::nextVertex(HVertex &v)
 {
 	if (readVCount >= vCount) {
 		return false;
@@ -118,7 +118,7 @@ static void freePointersInFace(Face *face) {
 	}
 }
 
-inline bool PlyStream::nextFace(HTripleIndex &f)
+bool PlyStream::nextFace(HTripleIndex &f)
 {
 	if (readFCount >= fCount) {
 		return false;
