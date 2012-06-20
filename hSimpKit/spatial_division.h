@@ -12,8 +12,16 @@
 #define __SPATIAL_DIVISION__
 
 #include "util_common.h"
+#include "vertex_cluster.h"
+#include "hash_face.h"
 #include <vector>
+#include <boost/unordered_set.hpp>
+
+//#define PRINT_HEAP
 #include "double_heap.h"
+#include <ostream>
+
+using std::ostream;
 
 #include <Eigen/Eigenvalues>
 
@@ -22,7 +30,7 @@
 using std::vector;
 using namespace Eigen;
 
-/* spatial division vertex */
+/* -- spatial division vertex -- */
 
 class HSDVertex : public HVertex
 {
@@ -40,6 +48,8 @@ public:
 	HNormal awN;
 	// area, in fact the area computed is 3 times the de facto area
 	float area;
+	// cluster index
+	Integer clusterIndex;
 };
 
 class HSDVertexCluster
@@ -50,10 +60,13 @@ public:
 	void addVertex(Integer i, HSDVertex v);
 	bool operator< (const HSDVertexCluster &vc) const;
 	bool operator> (const HSDVertexCluster &vc) const;
+	//HSDVertexCluster& operator =(const HSDVertexCluster &vc);
 	// clear the object without free the vIndices
 	void weakClear();
 	// clear the object and free the vIndices
 	void strongClear();
+	inline float areaWeightedNormal() const;
+	HVertex getRepresentativeVertex();	
 
 public:
 	// mean vertex
@@ -72,12 +85,25 @@ public:
 	// the occupied memory space when
 	// discarding it
 	vector<Integer> *vIndices;
+	// bounding box
+	float max_x, min_x, max_y, min_y, max_z, min_z;
 
 private:
 	//static const int INIT_VERT_VOL = 100;
 };
 
-/* spatial division class */
+inline float HSDVertexCluster::areaWeightedNormal() const
+{
+	HNormal n1(awN.x, awN.y, awN.z);
+	n1 /= area;
+	float l1 = 1 - n1.Length();
+
+	return l1;
+}
+
+ostream& operator <<(ostream &out, const HSDVertexCluster& c);
+
+/* -- spatial division class -- */
 class HSpatialDivision
 {
 public:
@@ -89,9 +115,10 @@ public:
 	void addFace(HTripleIndex i3);
 	bool readPly(char *filename);
 	bool divide(int target_count);
-	bool toPly();
+	bool toPly(char *filename);
 	// clear the vertex indices allocated in the heap of HSDVertexCluster
 	void clear();
+	void generateIndexedMesh();
 
 private:
 	// partition the vertex cluster to 8 4 2 sub clusters 
@@ -117,6 +144,8 @@ public:
 	vector<HTripleIndex> faces;
 	// all the clusters in a heap
 	doubleHeap<HSDVertexCluster> clusters;
+	// degenerated face hash set
+	HTripleIndexSet degFaces;
 
 private:
 	static const int INIT_HEAP_VOL = 10000; // initial heap capacity

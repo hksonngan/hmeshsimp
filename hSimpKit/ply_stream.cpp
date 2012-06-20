@@ -1,6 +1,8 @@
 #include "ply_stream.h"
-#include "ply/ply.h"
+#include "ply.h"
 #include <iostream>
+
+extern "C" { PlyElement *find_element(PlyFile *plyfile, char *element); }
 
 using std::cerr;
 using std::endl;
@@ -22,6 +24,8 @@ PlyStream::PlyStream()
 	ply = NULL;
 	vCount = 0;
 	fCount = 0;
+	vertexElem = NULL;
+	faceElem = NULL;
 }
 
 bool PlyStream::openForRead(char *filename)
@@ -34,6 +38,7 @@ bool PlyStream::openForRead(char *filename)
 	int num_elems;
 	PlyProperty **plist = NULL;
 	char *elem_name;
+	PlyOtherProp *vert_other, *face_other;
 
 	int i;
 
@@ -53,14 +58,26 @@ bool PlyStream::openForRead(char *filename)
 		plist = ply_get_element_description (ply, elem_name, &num_elems, &nprops);
 
 		if (equal_strings ("vertex", elem_name)) {
+
 			ply_get_property (ply, elem_name, &vert_props[0]);
 			ply_get_property (ply, elem_name, &vert_props[1]);
 			ply_get_property (ply, elem_name, &vert_props[2]);
+			/* the function malloc an OtherProperty and return it
+			   but luckily that vert_other is a global variable
+		       and can be freed in clean_ply() - houtao */
+			vert_other = ply_get_other_properties (ply, elem_name, offsetof(Vertex, other_props));
+
+			vertexElem = find_element(ply, "vertex");
 			vCount = num_elems;
 		}
 		else if (equal_strings ("face", elem_name)) {
-			fCount = num_elems;
+
 			ply_get_property (ply, elem_name, &face_props[0]);
+			face_other = ply_get_other_properties (ply, elem_name,
+				offsetof(Face,other_props));
+
+			faceElem = find_element(ply, "face");
+			fCount = num_elems;
 		}
 
 		/* free plist and its memory space in case of memory leaking */
@@ -95,6 +112,8 @@ bool PlyStream::nextVertex(HVertex &v)
 	if (readVCount >= vCount) {
 		return false;
 	}
+
+	ply->which_elem = vertexElem;
 	
 	vertex.other_props = NULL;
 	ply_get_element (ply, (void *) &vertex);
@@ -123,6 +142,8 @@ bool PlyStream::nextFace(HTripleIndex &f)
 	if (readFCount >= fCount) {
 		return false;
 	}
+
+	ply->which_elem = faceElem;
 
 	face.nverts = NULL;
 	face.other_props = NULL;

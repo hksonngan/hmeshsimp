@@ -1,7 +1,7 @@
 /*
-	read in ply files
-	modified by ht
-*/
+ *	read in ply files
+ *	modified by ht
+ */
 
 /*
 
@@ -16,7 +16,7 @@
 */
 
 //#include <stdmix.h>
-#include "ply.h"
+#include "ply/ply.h"
 #include <iostream>
 #include <fstream>
 #include "ply_inc.h"

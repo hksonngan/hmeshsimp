@@ -42,6 +42,8 @@ private:
 	Integer readFCount;
 	Vertex vertex;
 	Face face;
+	PlyElement *vertexElem;
+	PlyElement *faceElem;
 };
 
 #endif //__PLY_STREAM__

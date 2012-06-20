@@ -17,8 +17,8 @@
 #include "math/vec3.h"
 #include "math/vec4.h"
 #include "math/mat44.h"
-#include <boost/unordered_set.hpp>
 #include "util_common.h"
+#include "hash_face.h"
 
 
 
@@ -36,14 +36,6 @@ const int INIT_BUCKET_SIZE = 1024 * 1024;
 class HVertexCluster;
 class HVertexClusterContainer;
 class HVertexClusterSimp;
-
-class HFaceIndexHash;
-class HFaceIndexEqual;
-
-/* type of degenerated face container */
-typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HDegFaceContainer;
-
-
 
 /* =================== class definition ==================== */
 
@@ -149,36 +141,6 @@ private:
 	Integer valid_clusters;
 };
 
-/* the hash functor */
-class HFaceIndexHash
-{
-public:
-	size_t operator()(const HFaceIndex& index) const {
-		unsigned long h = 0;
-
-		h += index.v1CIndex.i & 0x0000000f; h <<= 4;
-		h += index.v1CIndex.j & 0x0000000f; h <<= 4;
-		h += index.v1CIndex.k & 0x0000000f; h <<= 4;
-		h += index.v2CIndex.i & 0x0000000f; h <<= 4;
-		h += index.v2CIndex.j & 0x0000000f; h <<= 4;
-		h += index.v2CIndex.k & 0x0000000f; h <<= 4;
-		h += index.v3CIndex.i & 0x0000000f; h <<= 4;
-		h += index.v3CIndex.j & 0x0000000f;
-		h += index.v3CIndex.k;
-
-		return size_t(h);
-	}
-};
-
-/* the equal functor */
-class HFaceIndexEqual
-{
-public:
-	bool operator()(const HFaceIndex& h1, const HFaceIndex& h2) const {
-		return h1 == h2;
-	}
-};
-
 /* out-of-core vertex clustering algorithm */
 class HVertexClusterSimp
 {
@@ -196,7 +158,7 @@ public:
 
 private:
 	/* use hash map to store the degenerated face index */
-	HDegFaceContainer face_set;
+	HFaceIndexSet face_set;
 	/* vertex clusters */
 	HVertexClusterContainer vertex_clusters;
 	/* partitions in x y z dimension */

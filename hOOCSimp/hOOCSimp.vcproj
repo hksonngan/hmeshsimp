@@ -61,6 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\hSimpKit.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -172,102 +173,6 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="hSimpKit"
-			>
-			<File
-				RelativePath="..\hSimpKit\htime.h"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\ooc_vertex_clustering.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\ooc_vertex_clustering.h"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\oocsimp.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\oocsimp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\tri_soup_stream.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\tri_soup_stream.h"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\vert_bin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\vert_bin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\vertex_cluster.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\hSimpKit\vertex_cluster.h"
-				>
-			</File>
-			<Filter
-				Name="ply"
-				>
-				<File
-					RelativePath="..\hSimpKit\ply\ply.h"
-					>
-				</File>
-				<File
-					RelativePath="..\hSimpKit\ply\ply_additional.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\hSimpKit\ply\ply_inc.h"
-					>
-				</File>
-				<File
-					RelativePath="..\hSimpKit\ply\ply_read.cxx"
-					>
-				</File>
-				<File
-					RelativePath="..\hSimpKit\ply\plyfile.c"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="math"
-				>
-				<File
-					RelativePath="..\hSimpKit\math\mat44.h"
-					>
-				</File>
-				<File
-					RelativePath="..\hSimpKit\math\vec3.h"
-					>
-				</File>
-				<File
-					RelativePath="..\hSimpKit\math\vec4.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<File
-			RelativePath=".\getopt.c"
-			>
-		</File>
-		<File
-			RelativePath=".\getopt.h"
-			>
-		</File>
 		<File
 			RelativePath=".\global_var.cpp"
 			>

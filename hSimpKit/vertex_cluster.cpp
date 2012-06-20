@@ -345,7 +345,7 @@ bool HVertexClusterSimp::writeToPly(char* filename)
 			}
 
 	/* write faces */
-	HDegFaceContainer::iterator iter;
+	HFaceIndexSet::iterator iter;
 
 	for (iter = face_set.begin(); iter != face_set.end(); iter ++)
 	{
@@ -361,8 +361,9 @@ bool HVertexClusterSimp::writeToPly(char* filename)
 	}
 
 	// statistics
-	std::cout << "\t#info:" << std::endl << "\twrite simplified mesh to " << filename << " successfully" 
-		<< std::endl << "\tvertex count: " << c << std::endl
+	std::cout << "\t#info:" << std::endl << "\twrite simplified mesh successfully"
+		<< "\tfile name: " << filename << std::endl
+		<< "\tvertex count: " << c << std::endl
 		<< "\tface count: " <<  face_set.size() << std::endl
 		<< "\trep vertex policy: " << getPolicyStr(rep_calc_policy) << std::endl;
 

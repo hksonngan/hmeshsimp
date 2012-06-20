@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;"
+				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -164,6 +164,38 @@
 			<File
 				RelativePath=".\ply\ply.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\ply\ply_.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories="./"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\ply\ply_.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\ply\ply_additional.cpp"
@@ -176,10 +208,24 @@
 			<File
 				RelativePath=".\ply\ply_read.cxx"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\ply\plyfile.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<File
@@ -192,6 +238,10 @@
 		</File>
 		<File
 			RelativePath=".\getopt.h"
+			>
+		</File>
+		<File
+			RelativePath=".\hash_face.h"
 			>
 		</File>
 		<File
@@ -236,6 +286,10 @@
 		</File>
 		<File
 			RelativePath=".\tri_soup_stream.h"
+			>
+		</File>
+		<File
+			RelativePath=".\trivial.h"
 			>
 		</File>
 		<File

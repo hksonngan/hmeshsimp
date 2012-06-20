@@ -9,6 +9,8 @@
 #include <iostream>
 #include "spatial_division.h"
 #include "vertex_cluster.h"
+#include "trivial.h"
+#include "htime.h"
 
 using std::string;
 using std::cerr;
@@ -17,11 +19,12 @@ using std::endl;
 
 int target;
 char *infilename;
+char outfilename[200];
 
 static char *options = "t:h";
 
 static char *usage_string = 
-"-t <n>\tX target vertices of the simplified mesh\n"
+"-t <n>\ttarget vertices of the simplified mesh\n"
 "-h\tprint help\n"
 "\n";
 
@@ -77,17 +80,28 @@ void process_cmdline(int argc, char **argv)
 	}
 	// set input file name
 	infilename = argv[optind];
+	trimExtAndAppend(infilename, outfilename, "_sdsimp.ply");
 }
 
 int main(int argc, char** argv)
 {
 	process_cmdline(argc, argv);
 
+	HTime htime;
+
 	HSpatialDivision sd;
-	if (sd.readPly(infilename) == false) {
-		return 0;
-	}
-	sd.divide(target);
+	if (sd.readPly(infilename) == false) 
+		return 1;
+	cout << "\tread file time: " << htime.printElapseSec() << endl;
+
+	if (sd.divide(target) == false) 
+		return 1;
+	cout << "\tsimplification time: " << htime.printElapseSec() << endl;
+
+	if (sd.toPly(outfilename) == false) 
+		return 1;
+
+	sd.clear();
 
 	return 0;
 }
