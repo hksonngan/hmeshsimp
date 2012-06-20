@@ -62,12 +62,12 @@ void HSDVertexCluster::addVertex(Integer i, HSDVertex v)
 
 bool HSDVertexCluster::operator< (const HSDVertexCluster &vc) const
 {
-	return areaWeightedNormal() < vc.areaWeightedNormal();
+	return getImportance() < vc.getImportance();
 }
 
 bool HSDVertexCluster::operator> (const HSDVertexCluster &vc) const
 {
-	return areaWeightedNormal() > vc.areaWeightedNormal();
+	return getImportance() > vc.getImportance();
 }
 
 HVertex HSDVertexCluster::getRepresentativeVertex()
@@ -78,13 +78,13 @@ HVertex HSDVertexCluster::getRepresentativeVertex()
 	awQ.calcRepresentativeVertex(new_vertex);
 
 	// the vertex falls in the cluster
-	//if (meanVertex != new_vertex &&
-	//	new_vertex.x >= min_x && new_vertex.x <= max_x &&
-	//	new_vertex.y >= min_y && new_vertex.y <= max_y &&
-	//	new_vertex.z >= min_z && new_vertex.z <= max_z) {
+	if (meanVertex != new_vertex &&
+		new_vertex.x >= min_x && new_vertex.x <= max_x &&
+		new_vertex.y >= min_y && new_vertex.y <= max_y &&
+		new_vertex.z >= min_z && new_vertex.z <= max_z) {
 
-	//	return new_vertex;
-	//}
+		return new_vertex;
+	}
 
 	return meanVertex;
 }
@@ -120,7 +120,7 @@ void HSDVertexCluster::strongClear()
 
 ostream& operator <<(ostream& out, const HSDVertexCluster& c)
 {
-	out << c.areaWeightedNormal();
+	out << c.getImportance();
 
 	return out;
 }

@@ -65,7 +65,7 @@ public:
 	void weakClear();
 	// clear the object and free the vIndices
 	void strongClear();
-	inline float areaWeightedNormal() const;
+	inline float getImportance() const;
 	HVertex getRepresentativeVertex();	
 
 public:
@@ -92,11 +92,10 @@ private:
 	//static const int INIT_VERT_VOL = 100;
 };
 
-inline float HSDVertexCluster::areaWeightedNormal() const
+inline float HSDVertexCluster::getImportance() const
 {
 	HNormal n1(awN.x, awN.y, awN.z);
-	n1 /= area;
-	float l1 = 1 - n1.Length();
+	float l1 = area - n1.Length();
 
 	return l1;
 }
