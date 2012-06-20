@@ -1,5 +1,5 @@
 /*
- *  uitility & common classes
+ *  uitility & common classes for algorithms
  *
  *  author: ht
  *  email : waytofall916@gmail.com

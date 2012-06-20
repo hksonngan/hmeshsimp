@@ -1,13 +1,15 @@
 /*
  *  a maximum/minimum heap with an array as a container
+ *
  *  constructor:
  *    doubleHeap(
  *      int _size, // initial volume of the heap
  *      int _type // 1 : max heap 2 : min heap
  *    );
+ *
  *  the element type T should overload
  *  operator '<' for max heap,
- *  '>' for min heap
+ *           '>' for min heap
  *
  *  author : ht
  *  email  : waytofall916@gmail.com
@@ -16,13 +18,22 @@
 #ifndef __DOUBLE_HEAP__
 #define __DOUBLE_HEAP__
 
+#include <ostream>
+
+using std::ostream;
+using std::endl;
+
+enum HeapType {
+	MaxHeap, MinHeap
+};
+
 template<class T>
 class doubleHeap
 {
 public:
 	doubleHeap(
 		int _size,
-		int _type // 1 : max heap 2 : min heap
+		HeapType _type
 		);
 	~doubleHeap() { delete[] data; }
 	void getTop(T &top);
@@ -34,7 +45,10 @@ public:
 	bool addElement(T _new_element);
 	bool empty();
 	bool full();
-	void printHeap(int root, int level); // for debug
+	/* int root  : index of the root
+	 * int level : count of the level 
+	 */
+	void printHeap(ostream& out, int root, int level); // for debug
 	int count() { return size; }
 	T get(int i) { return data[i]; }
 	// clear the content while half the capacity if it's too big
@@ -52,7 +66,7 @@ private:
 	int max_size;
 	int user_set_size;
 	int size;
-	int type;
+	HeapType type;
 	static const int DEFAULT_CAPACITY = 100;
 };
 
@@ -63,7 +77,7 @@ using std::cout;
 using std::endl;
 
 template<class T>
-doubleHeap<T>::doubleHeap(int _size, int _type)
+doubleHeap<T>::doubleHeap(int _size, HeapType _type = MaxHeap) // default max heap
 {
 	max_size = DEFAULT_CAPACITY;
 	user_set_size = DEFAULT_CAPACITY;
@@ -73,9 +87,7 @@ doubleHeap<T>::doubleHeap(int _size, int _type)
 	}
 	data = new T[max_size];
 	size = 0;
-	type = 1; // default max heap
-	if(_type == 1 || type == 2)
-		type = _type;
+	type = _type;
 }
 
 template<class T>
@@ -238,7 +250,7 @@ int doubleHeap<T>::parent(int i)
 template<class T>
 bool doubleHeap<T>::comp(int i, int j)
 {
-	if(type == 1) // max heap
+	if(type == MaxHeap) // max heap
 	{
 		return data[i] < data[j];
 	}
@@ -249,18 +261,32 @@ bool doubleHeap<T>::comp(int i, int j)
 }
 
 template<class T>
-void doubleHeap<T>::printHeap(int root, int level)
+void doubleHeap<T>::printHeap(ostream& out, int root, int level)
 {
 	int i;
 
 	if(root >= size)
 		return;
 
-	printHeap(leftChild(root), level + 1);
+	printHeap(out, leftChild(root), level + 1);
 	for(i = 0; i < level; i ++)
-		cout << "\t";
-	cout << data[root] << endl;
-	printHeap(rightChild(root), level + 1);
+		out << "\t";
+	out << data[root] << endl;
+	printHeap(out, rightChild(root), level + 1);
+}
+
+/* helper functions */
+
+template<class T>
+inline void PrintHeap(doubleHeap<T> &h)
+{
+#ifdef PRINT_HEAP
+	if (h.empty())
+		return;
+
+	h.printHeap(cout, 0, 0);
+	cout << endl << endl;
+#endif
 }
 
 //int main()
