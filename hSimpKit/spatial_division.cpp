@@ -21,17 +21,18 @@ HSDVertexCluster::HSDVertexCluster() {
 
 void HSDVertexCluster::addVertex(Integer i, HSDVertex v)
 {
-	if (vIndices == NULL) {
-		vIndices = new vector<Integer>();
-	}
+	//if (vIndices == NULL) {
+	//	vIndices = new vector<Integer>();
+	//}
 
-	if (vIndices->size() == 0) {
+	if (vRangeStart == NO_VERTEX) {
 		max_x = v.x;
 		min_x = v.x;
 		max_y = v.y;
 		min_y = v.y;
 		max_z = v.z;
 		min_z = v.z;
+		vRangeStart = VERTEX_ADDED;
 	}
 	else {
 		if (v.x > max_x)
@@ -50,10 +51,10 @@ void HSDVertexCluster::addVertex(Integer i, HSDVertex v)
 			min_z = v.z;
 	}
 
-	vIndices->push_back(i);
+	//vIndices->push_back(i);
 
-	meanVertex = meanVertex * (float)(vIndices->size() - 1) / (float)vIndices->size()
-		+ v / (float)vIndices->size();
+	//meanVertex = meanVertex * (float)(vIndices->size() - 1) / (float)vIndices->size()
+	//	+ v / (float)vIndices->size();
 
 	this->awN += v.awN;
 	this->awQ += v.awQ;
@@ -105,15 +106,16 @@ void HSDVertexCluster::weakClear()
 	awQ.setZero();
 	awN.Set(0.0, 0.0, 0.0);
 	meanVertex.Set(0.0, 0.0, 0.0);
-	vIndices = NULL;
+	//vIndices = NULL;
+	vRangeStart = vRangeEnd = fRangeStart = fRangeEnd = NO_VERTEX;
 	area = 0;
 }
 
 void HSDVertexCluster::strongClear()
 {
-	if (vIndices) {
-		delete vIndices;
-	}
+	//if (vIndices) {
+	//	delete vIndices;
+	//}
 
 	weakClear();
 }
@@ -132,8 +134,10 @@ const float HSpatialDivision::SPHERE_MEAN_NORMAL_THRESH = 0.2;
 // threshold of the ratio of maximum / minimum curvature treated as a hemisphere
 const float HSpatialDivision::MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE = 2.0;
 
-HSpatialDivision::HSpatialDivision()
-:clusters(INIT_HEAP_VOL, MaxHeap)
+HSpatialDivision::HSpatialDivision():
+clusters(INIT_HEAP_VOL, MaxHeap),
+vertices(INIT_F_CAPACITY),
+faces(INIT_V_CAPACITY)
 {
 
 }
@@ -303,38 +307,38 @@ bool HSpatialDivision::divide(int target_count)
 				maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex),
 				minDir, HFaceFormula::calcD(minDir, vc.meanVertex));
 
-			if (vc1.vIndices && vc1.vIndices->size() > 0) {
-				clusters.addElement(vc1);
-				PrintHeap(clusters);
-			}
-			if (vc2.vIndices && vc2.vIndices->size() > 0) {
-				clusters.addElement(vc2);
-				PrintHeap(clusters);
-			}
-			if (vc3.vIndices && vc3.vIndices->size() > 0) {
-				clusters.addElement(vc3);
-				PrintHeap(clusters);
-			}
-			if (vc4.vIndices && vc4.vIndices->size() > 0) {
-				clusters.addElement(vc4);
-				PrintHeap(clusters);
-			}
-			if (vc5.vIndices && vc5.vIndices->size() > 0) {
-				clusters.addElement(vc5);
-				PrintHeap(clusters);
-			}
-			if (vc6.vIndices && vc6.vIndices->size() > 0) {
-				clusters.addElement(vc6);
-				PrintHeap(clusters);
-			}
-			if (vc7.vIndices && vc7.vIndices->size() > 0) {
-				clusters.addElement(vc7);
-				PrintHeap(clusters);
-			}
-			if (vc8.vIndices && vc8.vIndices->size() > 0) {
-				clusters.addElement(vc8);
-				PrintHeap(clusters);
-			}
+			//if (vc1.vIndices && vc1.vIndices->size() > 0) {
+			//	clusters.addElement(vc1);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc2.vIndices && vc2.vIndices->size() > 0) {
+			//	clusters.addElement(vc2);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc3.vIndices && vc3.vIndices->size() > 0) {
+			//	clusters.addElement(vc3);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc4.vIndices && vc4.vIndices->size() > 0) {
+			//	clusters.addElement(vc4);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc5.vIndices && vc5.vIndices->size() > 0) {
+			//	clusters.addElement(vc5);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc6.vIndices && vc6.vIndices->size() > 0) {
+			//	clusters.addElement(vc6);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc7.vIndices && vc7.vIndices->size() > 0) {
+			//	clusters.addElement(vc7);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc8.vIndices && vc8.vIndices->size() > 0) {
+			//	clusters.addElement(vc8);
+			//	PrintHeap(clusters);
+			//}
 
 			// free space of vc
 			vc.strongClear();
@@ -354,22 +358,22 @@ bool HSpatialDivision::divide(int target_count)
 				maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex),
 				minDir, HFaceFormula::calcD(minDir, vc.meanVertex));
 
-			if (vc1.vIndices && vc1.vIndices->size() > 0) {
-				clusters.addElement(vc1);
-				PrintHeap(clusters);
-			}
-			if (vc2.vIndices && vc2.vIndices->size() > 0) {
-				clusters.addElement(vc2);
-				PrintHeap(clusters);
-			}
-			if (vc3.vIndices && vc3.vIndices->size() > 0) {
-				clusters.addElement(vc3);
-				PrintHeap(clusters);
-			}
-			if (vc4.vIndices && vc4.vIndices->size() > 0) {
-				clusters.addElement(vc4);
-				PrintHeap(clusters);
-			}
+			//if (vc1.vIndices && vc1.vIndices->size() > 0) {
+			//	clusters.addElement(vc1);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc2.vIndices && vc2.vIndices->size() > 0) {
+			//	clusters.addElement(vc2);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc3.vIndices && vc3.vIndices->size() > 0) {
+			//	clusters.addElement(vc3);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc4.vIndices && vc4.vIndices->size() > 0) {
+			//	clusters.addElement(vc4);
+			//	PrintHeap(clusters);
+			//}
 
 			// free space of vc
 			vc.strongClear();
@@ -383,14 +387,14 @@ bool HSpatialDivision::divide(int target_count)
 		{
 			partition2(vc, vc1, vc2, maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex));
 
-			if (vc1.vIndices && vc1.vIndices->size() > 0) {
-				clusters.addElement(vc1);
-				PrintHeap(clusters);
-			}
-			if (vc2.vIndices && vc2.vIndices->size() > 0) {
-				clusters.addElement(vc2);
-				PrintHeap(clusters);
-			}
+			//if (vc1.vIndices && vc1.vIndices->size() > 0) {
+			//	clusters.addElement(vc1);
+			//	PrintHeap(clusters);
+			//}
+			//if (vc2.vIndices && vc2.vIndices->size() > 0) {
+			//	clusters.addElement(vc2);
+			//	PrintHeap(clusters);
+			//}
 
 			// free space of vc
 			vc.strongClear();
@@ -410,45 +414,45 @@ inline void HSpatialDivision::partition8(HSDVertexCluster vc, HSDVertexCluster &
 				HNormal n1, float d1, HNormal n2, float d2,
 				HNormal n3, float d3) {
 
-	if (vc.vIndices == NULL) {
-		return;
-	}
+	//if (vc.vIndices == NULL) {
+	//	return;
+	//}
 
-	int i, j;
+	//int i, j;
 
-	for (i = 0; i < vc.vIndices->size(); i ++)
-	{
-		j = vc.vIndices->at(i);
+	//for (i = 0; i < vc.vIndices->size(); i ++)
+	//{
+	//	j = vc.vIndices->at(i);
 
-		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, this->vertices[j]);
-		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, this->vertices[j]);
-		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(n3, d3, this->vertices[j]);
+	//	WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, this->vertices[j]);
+	//	WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, this->vertices[j]);
+	//	WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(n3, d3, this->vertices[j]);
 
-		if      (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
-			vc1.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
-			vc2.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
-			vc3.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side2) {
-			vc4.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
-			vc5.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
-			vc6.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
-			vc7.addVertex(j, this->vertices[j]);
-		}
-		else {
-			vc8.addVertex(j, this->vertices[j]);
-		}
-	}
+	//	if      (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
+	//		vc1.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
+	//		vc2.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
+	//		vc3.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side2) {
+	//		vc4.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
+	//		vc5.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
+	//		vc6.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
+	//		vc7.addVertex(j, this->vertices[j]);
+	//	}
+	//	else {
+	//		vc8.addVertex(j, this->vertices[j]);
+	//	}
+	//}
 }
 
 inline void HSpatialDivision::partition4(HSDVertexCluster vc, HSDVertexCluster &vc1,
@@ -456,54 +460,54 @@ inline void HSpatialDivision::partition4(HSDVertexCluster vc, HSDVertexCluster &
 				HSDVertexCluster &vc4, 
 				HNormal n1, float d1, HNormal n2, float d2) {
 
-	if (vc.vIndices == NULL) {
-		return;
-	}
+	//if (vc.vIndices == NULL) {
+	//	return;
+	//}
 
-	int i, j;
+	//int i, j;
 
-	for (i = 0; i < vc.vIndices->size(); i ++)
-	{
-		j = vc.vIndices->at(i);
-		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[j]);
-		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, vertices[j]);
+	//for (i = 0; i < vc.vIndices->size(); i ++)
+	//{
+	//	j = vc.vIndices->at(i);
+	//	WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[j]);
+	//	WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, vertices[j]);
 
-		if      (sideOfPlane1 == Side1 && sideOfPlane2 == Side1) {
-			vc1.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2) {
-			vc2.addVertex(j, this->vertices[j]);
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1) {
-			vc3.addVertex(j, this->vertices[j]);
-		}
-		else {
-			vc4.addVertex(j, this->vertices[j]);
-		}
-	}
+	//	if      (sideOfPlane1 == Side1 && sideOfPlane2 == Side1) {
+	//		vc1.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2) {
+	//		vc2.addVertex(j, this->vertices[j]);
+	//	}
+	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1) {
+	//		vc3.addVertex(j, this->vertices[j]);
+	//	}
+	//	else {
+	//		vc4.addVertex(j, this->vertices[j]);
+	//	}
+	//}
 }
 
 inline void HSpatialDivision::partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
 				HSDVertexCluster &vc2, HNormal n1, float d1) {
 
-	if (vc.vIndices == NULL) {
-		return;
-	}
+	//if (vc.vIndices == NULL) {
+	//	return;
+	//}
 
 	int i, j;
 
-	for (i = 0; i < vc.vIndices->size(); i ++)
-	{
-		j = vc.vIndices->at(i);
-		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[j]);	
+	//for (i = 0; i < vc.vIndices->size(); i ++)
+	//{
+	//	j = vc.vIndices->at(i);
+	//	WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[j]);	
 
-		if (sideOfPlane1 == Side1) {
-			vc1.addVertex(j, this->vertices[j]);
-		}
-		else {
-			vc2.addVertex(j, this->vertices[j]);
-		}
-	}
+	//	if (sideOfPlane1 == Side1) {
+	//		vc1.addVertex(j, this->vertices[j]);
+	//	}
+	//	else {
+	//		vc2.addVertex(j, this->vertices[j]);
+	//	}
+	//}
 }
 
 void HSpatialDivision::clear()
@@ -512,7 +516,7 @@ void HSpatialDivision::clear()
 	faces.clear();
 	for (int i = 0; i < clusters.count(); i ++)
 	{
-		delete clusters.get(i).vIndices;
+		//delete clusters.get(i).vIndices;
 	}
 	clusters.clear();
 }
@@ -571,10 +575,10 @@ void HSpatialDivision::generateIndexedMesh()
 	for (i = 0; i < clusters.count(); i ++) {
 		sdc = clusters.get(i);
 
-		for (j = 0; j < sdc.vIndices->size(); j ++) {
-			vindex = sdc.vIndices->at(j);
-			vertices[vindex].clusterIndex = i;
-		}
+		//for (j = 0; j < sdc.vIndices->size(); j ++) {
+		//	vindex = sdc.vIndices->at(j);
+		//	vertices[vindex].clusterIndex = i;
+		//}
 	}
 
 	degFaces.clear();
@@ -588,4 +592,233 @@ void HSpatialDivision::generateIndexedMesh()
 			degFaces.insert(tripleIndex);
 		}
 	}
+}
+
+void HSpatialDivision::addUncheckedCluster(HSDVertexCluster &vc)
+{
+	
+}
+
+/* -- ElemPartOf drivatives -- */
+
+virtual bool VertPart1::operator() (HSDVertex v) {
+
+	if (planeCount == 1) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+
+		if (sideOfPlane1 == Side1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (planeCount == 2) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+
+		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+virtual bool VertPart2::operator() (HSDVertex v) {
+
+	if (planeCount == 1) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+
+		if (sideOfPlane1 == Side2) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (planeCount == 2) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+
+		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+virtual bool VertPart3::operator() (HSDVertex v) {
+
+	if (planeCount == 2) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+
+		if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+virtual bool VertPart4::operator() (HSDVertex v) {
+
+	if (planeCount == 2) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+
+		if (sideOfPlane1 == Side2 && sideOfPlane2 == Side2) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side2) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+virtual bool VertPart5::operator() (HSDVertex v) {
+
+	if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+virtual bool VertPart6::operator() (HSDVertex v) {
+
+	if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+virtual bool VertPart7::operator() (HSDVertex v) {
+
+	if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side2 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+virtual bool VertPart8::operator() (HSDVertex v) {
+
+	if (planeCount == 3) {
+
+		WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(planes[0]._a, planes[0]._b, planes[0]._c, planes[0]._d, v);
+		WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(planes[1]._a, planes[1]._b, planes[1]._c, planes[1]._d, v);
+		WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(planes[2]._a, planes[2]._b, planes[2]._c, planes[2]._d, v);
+
+		if (sideOfPlane1 == Side2 && sideOfPlane2 == Side2 && sideOfPlane3 == Side2) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
 }

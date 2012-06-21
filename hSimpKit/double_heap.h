@@ -19,9 +19,11 @@
 #define __DOUBLE_HEAP__
 
 #include <ostream>
+#include <iostream>
 
-using std::ostream;
+using std::cout;
 using std::endl;
+using std::ostream;
 
 enum HeapType {
 	MaxHeap, MinHeap
@@ -69,12 +71,6 @@ private:
 	HeapType type;
 	static const int DEFAULT_CAPACITY = 100;
 };
-
-#include "double_heap.h"
-#include <iostream>
-
-using std::cout;
-using std::endl;
 
 template<class T>
 doubleHeap<T>::doubleHeap(int _size, HeapType _type = MaxHeap) // default max heap
