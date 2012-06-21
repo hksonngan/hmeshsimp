@@ -178,7 +178,7 @@ public:
 	// all the faces, gfl
 	HDynamArray<HTripleIndex> faces;
 	// vertex index map
-	HDynamArray<Integer> vIndexMap; 
+	HDynamArray<Integer> vIndexMap;
 	// all the clusters in a heap
 	doubleHeap<HSDVertexCluster> clusters;
 	// degenerated face hash set
@@ -271,6 +271,20 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
+};
+
+class NotifyVertexMove : public NotifyMove {
+public:
+	virtual void operator() (int src, int dst) {
+		
+	}
+
+	void setVMap(HDynamArray<Integer> *map) {
+		vMap = map;
+	}
+
+private:
+	HDynamArray<Integer> *vMap;
 };
 
 #endif //__SPATIAL_DIVISION__
