@@ -16,19 +16,26 @@
 #include "hash_face.h"
 #include <vector>
 #include <boost/unordered_set.hpp>
-
 //#define PRINT_HEAP
 #include "double_heap.h"
 #include <ostream>
-
-using std::ostream;
-
 #include <Eigen/Eigenvalues>
+#include "algorithm.h"
+
 
 //#define INIT_HEAP_VOL 10000 //initial heap volume
 
-using std::vector;
+// constants for the variable vRangeStart to mark 
+// if there has been vertex added for computing 
+// of bounding box
+#define NO_VERTEX -1
+#define VERTEX_ADDED -2
+
+#define HDynamArray std::vector
+
 using namespace Eigen;
+using std::ostream;
+
 
 /* -- spatial division vertex -- */
 
@@ -48,27 +55,38 @@ public:
 	HNormal awN;
 	// area, in fact the area computed is 3 times the de facto area
 	float area;
-	// cluster index
-	Integer clusterIndex;
+	// cluster or old index before partition
+	Integer index;
 };
 
+/* the cluster class, mostly a data maintaining class */
 class HSDVertexCluster
 {
+	friend class HSpatialDivision;
+
 public:
 	HSDVertexCluster();
 	~HSDVertexCluster() { /*delete[] vIndices;*/ }
 	void addVertex(Integer i, HSDVertex v);
 	bool operator< (const HSDVertexCluster &vc) const;
 	bool operator> (const HSDVertexCluster &vc) const;
+
+	/// deprecated
 	//HSDVertexCluster& operator =(const HSDVertexCluster &vc);
-	// clear the object without free the vIndices
+	///
+	
+	// clear the object
 	void weakClear();
+	
+	/// deprecated
 	// clear the object and free the vIndices
 	void strongClear();
+	///
+
 	inline float getImportance() const;
 	HVertex getRepresentativeVertex();	
 
-public:
+private:
 	// mean vertex
 	HVertex meanVertex;
 	// accumulated area weighted quadric matrix
@@ -77,6 +95,8 @@ public:
 	HNormal awN;
 	// accumulated area
 	float area;
+
+	/// deprecated
 	// vertices indices in the cluster.
 	// this pointer will be null unless
 	// the function addVertex() is called
@@ -84,11 +104,16 @@ public:
 	// value copied, remember to delete
 	// the occupied memory space when
 	// discarding it
-	vector<Integer> *vIndices;
+	// vector<Integer> *vIndices;
+	///
+
+	// vertex and face range in the gvl, gfl
+	Integer vRangeStart, vRangeEnd;
+	Integer fRangeStart, fRangeEnd;
+
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
 
-private:
 	//static const int INIT_VERT_VOL = 100;
 };
 
@@ -102,9 +127,17 @@ inline float HSDVertexCluster::getImportance() const
 
 ostream& operator <<(ostream &out, const HSDVertexCluster& c);
 
-/* -- spatial division class -- */
+/* -- spatial division class, mostly a algorithm class -- */
 class HSpatialDivision
 {
+	// constants
+private:
+	static const int INIT_HEAP_VOL = 10000; // initial heap capacity
+	static const float SPHERE_MEAN_NORMAL_THRESH; // threshold of the mean normal treated as a sphere
+	static const float MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE; // threshold of the ratio of maximum / minimum curvature treated as a hemisphere
+	static const int INIT_V_CAPACITY = 20000; // initial capacity for the vertex container
+	static const int INIT_F_CAPACITY = 35000; // initial capacity for the face container
+
 public:
 	HSpatialDivision();
 	~HSpatialDivision();
@@ -135,21 +168,109 @@ private:
 		HNormal n1, float d1, HNormal n2, float d2);
 	void partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
 		HSDVertexCluster &vc2, HNormal n1, float d1);
+	// check the connectivity of the cluster and add
+	// all the connected clusters to heap
+	void addUncheckedCluster(HSDVertexCluster &vc);
 
 public:
-	// all the vertices
-	vector<HSDVertex> vertices;
-	// all the faces
-	vector<HTripleIndex> faces;
+	// all the vertices, gvl
+	HDynamArray<HSDVertex> vertices;
+	// all the faces, gfl
+	HDynamArray<HTripleIndex> faces;
+	// vertex index map
+	HDynamArray<Integer> vIndexMap; 
 	// all the clusters in a heap
 	doubleHeap<HSDVertexCluster> clusters;
 	// degenerated face hash set
 	HTripleIndexSet degFaces;
+	// partition functors
+	ArraySelfPartition<HSDVertex, HDynamArray<HSDVertex>> vertPartition;
+	ArraySelfPartition<HTripleIndex, HDynamArray<HTripleIndex>> facePartition;
+	ElemPartOf<HSDVertex>* vertPartOf[8];
+	ElemPartOf<HTripleIndex>* facePartOf[10];
+	HFaceFormula faceFormulas[8];
+};
+
+/* -- ElemPartOf derivatives -- */
+
+class VertPart1 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
 
 private:
-	static const int INIT_HEAP_VOL = 10000; // initial heap capacity
-	static const float SPHERE_MEAN_NORMAL_THRESH; // threshold of the mean normal treated as a sphere
-	static const float MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE; // threshold of the ratio of maximum / minimum curvature treated as a hemisphere
+	HFaceFormula* planes;
+	int planeCount;
+};
+
+class VertPart2 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+};
+
+class VertPart3 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+};
+
+class VertPart4 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+};
+
+class VertPart5 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+};
+
+class VertPart6 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+};
+
+class VertPart7 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+};
+
+class VertPart8 : public ElemPartOf<HSDVertex>
+{
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
 };
 
 #endif //__SPATIAL_DIVISION__

@@ -232,6 +232,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\algorithm.h"
+			>
+		</File>
+		<File
 			RelativePath=".\double_heap.h"
 			>
 		</File>
@@ -268,6 +272,18 @@
 			>
 		</File>
 		<File
+			RelativePath=".\partition_test.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath=".\ply_stream.cpp"
 			>
 		</File>
@@ -278,6 +294,13 @@
 		<File
 			RelativePath=".\spatial_division.cpp"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\spatial_division.h"

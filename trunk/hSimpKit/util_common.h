@@ -81,10 +81,18 @@ public:
 	static float calcTriangleFaceArea(HVertex _v1, HVertex _v2, HVertex _v3);
 	static float calcD(HNormal nm, HVertex v);
 	static WhichSide sideOfPlane(HNormal, float d, HVertex v);
+	static WhichSide sideOfPlane(float a, float b, float c, float d, HVertex v) {
+		return sideOfPlane(HNormal(a, b, c), d, v); }
+
+	void setStatic() {
+		_a = a; _b = b; _c = c; _d = d; }
 
 public:
 	// parameters of a plane
 	static float a, b, c, d;
+
+private:
+	float _a, _b, _c, _d;
 };
 
 /* triangle in a triangle soup */
