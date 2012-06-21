@@ -8,6 +8,7 @@
 #ifndef __H_ALGORITHM__
 #define __H_ALGORITHM__
 
+/* ------ classes concerning the arbitrary partition ------ */
 
 /* if the element is part of a concerning patch */
 template<class ElemType>
@@ -16,7 +17,11 @@ public:
 	virtual bool operator() (ElemType e) = 0;
 };
 
-/* ----------------------------------------- */
+/* call back for every move of element */
+class NotifyMove {
+public:
+	virtual void operator() (int src, int dst) = 0;
+};
 
 /* array self partition like what's in quicksort 
  * able to partition into arbitrary patches */
@@ -25,7 +30,9 @@ class ArraySelfPartition {
 public:
 	ArraySelfPartition(int _cap = 2);
 	~ArraySelfPartition();
-	int* operator() (ContainerType &arr, int arr_start, int arr_end, ElemPartOf<ElemType> **part_of, int partion_count);
+	int* operator() (ContainerType &arr, int arr_start, int arr_end, 
+		ElemPartOf<ElemType> **part_of, int partion_count, 
+		NotifyMove *notify_move = NULL);
 
 private:
 	int *index;
@@ -65,7 +72,9 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 	int arr_start,
 	int arr_end,
 	ElemPartOf<ElemType> **part_of, 
-	int partition_count) {
+	int partition_count,
+	NotifyMove *notify_move = NULL // call back when moving any element
+	) {
 
 	if (partition_count > indexCapacity) {
 		delete[] index;
@@ -92,13 +101,20 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 
 		// assign the fist elem before the shifting to the last elem after the shifting
 		for (j = partition_count - 1; j > which_partition; j --) {
+			// move the (index[j - 1] + 1)th element 
+			// to location (index[j] + 1)
 			arr[index[j] + 1] = arr[index[j - 1] + 1];
+			if (notify_move)
+				notify_move(index[j - 1] + 1, index[j] + 1);
 			index[j] ++;
 		}
 
 		// assign the new elem to the last of the enlarged (by 1) partition
+		// that is move the ith element to the location index[which_partition]
 		index[which_partition] ++;
 		arr[index[which_partition]] = elem;
+		if (notify_move)
+			notify_move(i, index[which_partition]);
 	}
 
 	return index;

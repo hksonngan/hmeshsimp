@@ -294,13 +294,6 @@
 		<File
 			RelativePath=".\spatial_division.cpp"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-				/>
-			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\spatial_division.h"

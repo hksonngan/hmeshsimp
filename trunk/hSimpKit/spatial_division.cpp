@@ -201,6 +201,11 @@ bool HSpatialDivision::readPly(char *filename)
 	if (plyStream.openForRead(filename) == false) {
 		return false;
 	}
+
+	// set the capacity for the gvl and gfl
+	vertices.resize(plyStream.getVertexCount());
+	faces.resize(plyStream.getFaceCount());
+	vIndexMap.resize(plyStream.getVertexCount());
 	
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 		if (plyStream.nextVertex(v) == false) {
