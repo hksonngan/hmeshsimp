@@ -13,6 +13,19 @@ using std::cout;
 using std::endl;
 using std::vector;
 
+/* -- vertex -- */
+
+void HSDVertex::addConnectivity(Integer i) {
+	list<int>::iterator iter;
+
+	// check if i has already existed
+	for (iter = connectedVerts.begin(); iter != connectedVerts.end(); iter ++) 
+		if ((*iter) == i)
+			return;
+	
+	connectedVerts.push_back(i);
+}
+
 /* -- spatial division vertex cluster -- */
 
 HSDVertexCluster::HSDVertexCluster() {
@@ -52,9 +65,8 @@ void HSDVertexCluster::addVertex(Integer i, HSDVertex v)
 	}
 
 	//vIndices->push_back(i);
-
-	//meanVertex = meanVertex * (float)(vIndices->size() - 1) / (float)vIndices->size()
-	//	+ v / (float)vIndices->size();
+	vCount ++;
+	meanVertex = meanVertex * (float)(vCount - 1) / (float)vCount + v / (float)vCount;
 
 	this->awN += v.awN;
 	this->awQ += v.awQ;
@@ -107,7 +119,8 @@ void HSDVertexCluster::weakClear()
 	awN.Set(0.0, 0.0, 0.0);
 	meanVertex.Set(0.0, 0.0, 0.0);
 	//vIndices = NULL;
-	vRangeStart = vRangeEnd = fRangeStart = fRangeEnd = NO_VERTEX;
+	vRangeStart = vRangeEnd = NO_VERTEX;
+	vCount = 0;
 	area = 0;
 }
 
@@ -139,7 +152,16 @@ clusters(INIT_HEAP_VOL, MaxHeap),
 vertices(INIT_F_CAPACITY),
 faces(INIT_V_CAPACITY)
 {
+	vertPartOf[0] = &vertPart1;
+	vertPartOf[1] = &vertPart2;
+	vertPartOf[2] = &vertPart3;
+	vertPartOf[3] = &vertPart4;
+	vertPartOf[4] = &vertPart5;
+	vertPartOf[5] = &vertPart6;
+	vertPartOf[6] = &vertPart7;
+	vertPartOf[7] = &vertPart8;
 
+	notifyVertSwap.vertices = &vertices;
 }
 
 HSpatialDivision::~HSpatialDivision()
@@ -159,7 +181,7 @@ void HSpatialDivision::addFace(HTripleIndex i3)
 {
 	faces.push_back(i3);
 
-	//float area = HFaceFormula::calcTriangleFaceArea(vertices[i3.i], vertices[i3.j], vertices[i3.k]);
+	/* alter the vertices */
 
 	Vec3<float> &v1 = vertices[i3.i], &v2 = vertices[i3.j], &v3 = vertices[i3.k];
 	Vec3<float> e1 = v1 - v2;
@@ -189,6 +211,14 @@ void HSpatialDivision::addFace(HTripleIndex i3)
 	vertices[i3.i].awQ += qem;
 	vertices[i3.j].awQ += qem;
 	vertices[i3.k].awQ += qem;
+
+	// add the connectivity info
+	vertices[i3.i].addConnectivity(i3.j);
+	vertices[i3.i].addConnectivity(i3.k);
+	vertices[i3.j].addConnectivity(i3.i);
+	vertices[i3.j].addConnectivity(i3.k);
+	vertices[i3.k].addConnectivity(i3.i);
+	vertices[i3.k].addConnectivity(i3.j);
 }
 
 bool HSpatialDivision::readPly(char *filename)
@@ -254,8 +284,9 @@ bool HSpatialDivision::divide(int target_count)
 	/* - routines - */
 
 	// init the first cluster
-	for (i = 0; i < this->vertices.size(); i ++)
-	{
+	vc.vRangeStart = 0;
+	vc.vRangeEnd = vertices.size();
+	for (i = 0; i < this->vertices.size(); i ++) {
 		vc.addVertex(i, vertices[i]);
 	}
 	clusters.addElement(vc);
@@ -312,41 +343,9 @@ bool HSpatialDivision::divide(int target_count)
 				maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex),
 				minDir, HFaceFormula::calcD(minDir, vc.meanVertex));
 
-			//if (vc1.vIndices && vc1.vIndices->size() > 0) {
-			//	clusters.addElement(vc1);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc2.vIndices && vc2.vIndices->size() > 0) {
-			//	clusters.addElement(vc2);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc3.vIndices && vc3.vIndices->size() > 0) {
-			//	clusters.addElement(vc3);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc4.vIndices && vc4.vIndices->size() > 0) {
-			//	clusters.addElement(vc4);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc5.vIndices && vc5.vIndices->size() > 0) {
-			//	clusters.addElement(vc5);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc6.vIndices && vc6.vIndices->size() > 0) {
-			//	clusters.addElement(vc6);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc7.vIndices && vc7.vIndices->size() > 0) {
-			//	clusters.addElement(vc7);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc8.vIndices && vc8.vIndices->size() > 0) {
-			//	clusters.addElement(vc8);
-			//	PrintHeap(clusters);
-			//}
+			
 
-			// free space of vc
-			vc.strongClear();
+			vc.weakClear();
 			vc1.weakClear();
 			vc2.weakClear();
 			vc3.weakClear();
@@ -363,25 +362,9 @@ bool HSpatialDivision::divide(int target_count)
 				maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex),
 				minDir, HFaceFormula::calcD(minDir, vc.meanVertex));
 
-			//if (vc1.vIndices && vc1.vIndices->size() > 0) {
-			//	clusters.addElement(vc1);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc2.vIndices && vc2.vIndices->size() > 0) {
-			//	clusters.addElement(vc2);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc3.vIndices && vc3.vIndices->size() > 0) {
-			//	clusters.addElement(vc3);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc4.vIndices && vc4.vIndices->size() > 0) {
-			//	clusters.addElement(vc4);
-			//	PrintHeap(clusters);
-			//}
+			
 
-			// free space of vc
-			vc.strongClear();
+			vc.weakClear();
 			vc1.weakClear();
 			vc2.weakClear();
 			vc3.weakClear();
@@ -392,17 +375,9 @@ bool HSpatialDivision::divide(int target_count)
 		{
 			partition2(vc, vc1, vc2, maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex));
 
-			//if (vc1.vIndices && vc1.vIndices->size() > 0) {
-			//	clusters.addElement(vc1);
-			//	PrintHeap(clusters);
-			//}
-			//if (vc2.vIndices && vc2.vIndices->size() > 0) {
-			//	clusters.addElement(vc2);
-			//	PrintHeap(clusters);
-			//}
+			
 
-			// free space of vc
-			vc.strongClear();
+			vc.weakClear();
 			vc1.weakClear();
 			vc2.weakClear();
 		}
@@ -411,7 +386,7 @@ bool HSpatialDivision::divide(int target_count)
 	return true;
 }
 
-inline void HSpatialDivision::partition8(HSDVertexCluster vc, HSDVertexCluster &vc1,
+void HSpatialDivision::partition8(HSDVertexCluster vc, HSDVertexCluster &vc1,
 				HSDVertexCluster &vc2, HSDVertexCluster &vc3,
 				HSDVertexCluster &vc4, HSDVertexCluster &vc5,
 				HSDVertexCluster &vc6, HSDVertexCluster &vc7,
@@ -419,110 +394,108 @@ inline void HSpatialDivision::partition8(HSDVertexCluster vc, HSDVertexCluster &
 				HNormal n1, float d1, HNormal n2, float d2,
 				HNormal n3, float d3) {
 
-	//if (vc.vIndices == NULL) {
-	//	return;
-	//}
+	if (vc.vCount == 0) {
+		return;
+	}
 
-	//int i, j;
+	planes[0].set(n1, d1);
+	planes[1].set(n2, d2);
+	planes[2].set(n3, d3);
 
-	//for (i = 0; i < vc.vIndices->size(); i ++)
-	//{
-	//	j = vc.vIndices->at(i);
+	vertPart1.planeCount = 3;
+	vertPart1.planes = planes;
+	vertPart1.vc = &vc1;
 
-	//	WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, this->vertices[j]);
-	//	WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, this->vertices[j]);
-	//	WhichSide sideOfPlane3 = HFaceFormula::sideOfPlane(n3, d3, this->vertices[j]);
+	vertPart2.planeCount = 3;
+	vertPart2.planes = planes;
+	vertPart2.vc = &vc2;
 
-	//	if      (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
-	//		vc1.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
-	//		vc2.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
-	//		vc3.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side2) {
-	//		vc4.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
-	//		vc5.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
-	//		vc6.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
-	//		vc7.addVertex(j, this->vertices[j]);
-	//	}
-	//	else {
-	//		vc8.addVertex(j, this->vertices[j]);
-	//	}
-	//}
+	vertPart3.planeCount = 3;
+	vertPart3.planes = planes;
+	vertPart3.vc = &vc3;
+
+	vertPart4.planeCount = 3;
+	vertPart4.planes = planes;
+	vertPart4.vc = &vc4;
+
+	vertPart5.planeCount = 3;
+	vertPart5.planes = planes;
+	vertPart5.vc = &vc5;
+
+	vertPart6.planeCount = 3;
+	vertPart6.planes = planes;
+	vertPart6.vc = &vc6;
+
+	vertPart7.planeCount = 3;
+	vertPart7.planes = planes;
+	vertPart7.vc = &vc7;
+
+	vertPart8.planeCount = 3;
+	vertPart8.planes = planes;
+	vertPart8.vc = &vc8;
+
+	vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 8, &notifyVertSwap);
 }
 
-inline void HSpatialDivision::partition4(HSDVertexCluster vc, HSDVertexCluster &vc1,
+void HSpatialDivision::partition4(HSDVertexCluster vc, HSDVertexCluster &vc1,
 				HSDVertexCluster &vc2, HSDVertexCluster &vc3,
 				HSDVertexCluster &vc4, 
 				HNormal n1, float d1, HNormal n2, float d2) {
 
-	//if (vc.vIndices == NULL) {
-	//	return;
-	//}
+	if (vc.vCount == 0) {
+		return;
+	}
 
-	//int i, j;
+	planes[0].set(n1, d1);
+	planes[1].set(n2, d2);
 
-	//for (i = 0; i < vc.vIndices->size(); i ++)
-	//{
-	//	j = vc.vIndices->at(i);
-	//	WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[j]);
-	//	WhichSide sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, vertices[j]);
+	vertPart1.planeCount = 2;
+	vertPart1.planes = planes;
+	vertPart1.vc = &vc1;
 
-	//	if      (sideOfPlane1 == Side1 && sideOfPlane2 == Side1) {
-	//		vc1.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2) {
-	//		vc2.addVertex(j, this->vertices[j]);
-	//	}
-	//	else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1) {
-	//		vc3.addVertex(j, this->vertices[j]);
-	//	}
-	//	else {
-	//		vc4.addVertex(j, this->vertices[j]);
-	//	}
-	//}
+	vertPart2.planeCount = 2;
+	vertPart2.planes = planes;
+	vertPart2.vc = &vc2;
+
+	vertPart3.planeCount = 2;
+	vertPart3.planes = planes;
+	vertPart3.vc = &vc3;
+
+	vertPart4.planeCount = 2;
+	vertPart4.planes = planes;
+	vertPart4.vc = &vc4;
+
+	vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 4, &notifyVertSwap);
 }
 
-inline void HSpatialDivision::partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
+void HSpatialDivision::partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
 				HSDVertexCluster &vc2, HNormal n1, float d1) {
 
-	//if (vc.vIndices == NULL) {
-	//	return;
-	//}
+	if (vc.vCount == 0) {
+		return;
+	}
 
-	int i, j;
+	planes[0].set(n1, d1);
 
-	//for (i = 0; i < vc.vIndices->size(); i ++)
-	//{
-	//	j = vc.vIndices->at(i);
-	//	WhichSide sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[j]);	
+	vertPart1.planeCount = 1;
+	vertPart1.planes = planes;
+	vertPart1.vc = &vc1;
 
-	//	if (sideOfPlane1 == Side1) {
-	//		vc1.addVertex(j, this->vertices[j]);
-	//	}
-	//	else {
-	//		vc2.addVertex(j, this->vertices[j]);
-	//	}
-	//}
+	vertPart2.planeCount = 1;
+	vertPart2.planes = planes;
+	vertPart2.vc = &vc2;
+
+	vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 2, &notifyVertSwap);
 }
 
 void HSpatialDivision::clear()
 {
 	vertices.clear();
 	faces.clear();
-	for (int i = 0; i < clusters.count(); i ++)
-	{
-		//delete clusters.get(i).vIndices;
-	}
+	//for (int i = 0; i < clusters.count(); i ++)
+	//{
+	//	//delete clusters.get(i).vIndices;
+	//}
 	clusters.clear();
 }
 
@@ -599,14 +572,59 @@ void HSpatialDivision::generateIndexedMesh()
 	}
 }
 
-void HSpatialDivision::addUncheckedCluster(HSDVertexCluster &vc)
+void HSpatialDivision::splitConnectedRange(Integer start, Integer end)
 {
-	
+	if (start < end)
+		return;
+
+	int i;
+	list<Integer>::iterator iter;
+	// local cluster index start from 1, 0 denotes that it hasn't been given a cluster id
+	unsigned short curCluster = 1;
+
+	// erase the adjacent index out of the range
+	for (i = start; i <= end; i ++) {
+		vertices[i].clusterIndex = 0;
+		for (iter = vertices[i].connectedVerts.begin(); iter != vertices[i].connectedVerts.end(); iter ++)
+			if (*iter < start || *iter > end) 
+				vertices[i].connectedVerts.erase(iter);
+	}
+
+	// search and assign the connected clusters the local cluster index
+	for (i = start; i <= end; i ++)	{
+		// if the vertex hasn't been visited
+		if (vertices[i].clusterIndex == 0) {
+			searchConnectivity(i, start, curCluster);
+			curCluster ++;
+		}
+	}
+
+	if (curCluster <= 1)
+		return;
+
+	VertPartofCluster** partOf = new VertPartofCluster*[curCluster - 1];
+	for (i = 1; i < curCluster; i ++) {
+		partOf[i - 1] = new VertPartofCluster();
+		partOf[i - 1]->cIndex = i;
+	}
+
+	vertPartition(vertices, start, end, partOf, notifyVertSwap);
+}
+
+void HSpatialDivision::searchConnectivity(Integer vIndex, Integer rangeStart, Integer clusterIndex) {
+
+	list<Integer>::iterator iter;
+	vertices[vIndex].clusterIndex = clusterIndex;
+
+	for (iter = vertices[vIndex].connectedVerts.begin(); iter != vertices[vIndex].connectedVerts.end(); iter ++)
+		// haven't been visited
+		if (*iter != vIndex && vertices[*iter].clusterIndex == 0) 
+			searchConnectivity(*iter, rangeStart, clusterIndex);
 }
 
 /* -- ElemPartOf drivatives -- */
 
-virtual bool VertPart1::operator() (HSDVertex v) {
+bool VertPart1::operator() (HSDVertex v) {
 
 	if (planeCount == 1) {
 
@@ -648,7 +666,7 @@ virtual bool VertPart1::operator() (HSDVertex v) {
 	return false;
 }
 
-virtual bool VertPart2::operator() (HSDVertex v) {
+bool VertPart2::operator() (HSDVertex v) {
 
 	if (planeCount == 1) {
 
@@ -690,7 +708,7 @@ virtual bool VertPart2::operator() (HSDVertex v) {
 	return false;
 }
 
-virtual bool VertPart3::operator() (HSDVertex v) {
+bool VertPart3::operator() (HSDVertex v) {
 
 	if (planeCount == 2) {
 
@@ -721,7 +739,7 @@ virtual bool VertPart3::operator() (HSDVertex v) {
 	return false;
 }
 
-virtual bool VertPart4::operator() (HSDVertex v) {
+bool VertPart4::operator() (HSDVertex v) {
 
 	if (planeCount == 2) {
 
@@ -752,7 +770,7 @@ virtual bool VertPart4::operator() (HSDVertex v) {
 	return false;
 }
 
-virtual bool VertPart5::operator() (HSDVertex v) {
+bool VertPart5::operator() (HSDVertex v) {
 
 	if (planeCount == 3) {
 
@@ -771,7 +789,7 @@ virtual bool VertPart5::operator() (HSDVertex v) {
 	return false;
 }
 
-virtual bool VertPart6::operator() (HSDVertex v) {
+bool VertPart6::operator() (HSDVertex v) {
 
 	if (planeCount == 3) {
 
@@ -790,7 +808,7 @@ virtual bool VertPart6::operator() (HSDVertex v) {
 	return false;
 }
 
-virtual bool VertPart7::operator() (HSDVertex v) {
+bool VertPart7::operator() (HSDVertex v) {
 
 	if (planeCount == 3) {
 
@@ -809,7 +827,7 @@ virtual bool VertPart7::operator() (HSDVertex v) {
 	return false;
 }
 
-virtual bool VertPart8::operator() (HSDVertex v) {
+bool VertPart8::operator() (HSDVertex v) {
 
 	if (planeCount == 3) {
 
@@ -826,4 +844,18 @@ virtual bool VertPart8::operator() (HSDVertex v) {
 	}
 
 	return false;
+}
+ 
+void NotifyVertSwap::operator() (int i, int j) {
+
+	if (i == j)
+		return;
+
+	ChangeConnecIndicesAfterSwap(i, j);
+	ChangeConnecIndicesAfterSwap(j, i);
+}
+
+
+bool VertPartofCluster::operator() (HSDVertex v) {
+	return v.clusterIndex == cIndex;
 }

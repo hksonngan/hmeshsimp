@@ -15,6 +15,7 @@
 #include "vertex_cluster.h"
 #include "hash_face.h"
 #include <vector>
+#include <list>
 #include <boost/unordered_set.hpp>
 //#define PRINT_HEAP
 #include "double_heap.h"
@@ -35,7 +36,21 @@
 
 using namespace Eigen;
 using std::ostream;
+using std::list;
 
+/* class defined */
+class HSDVertex;
+class HSDVertexCluster;
+class HSpatialDivision;
+class VertPart1;
+class VertPart2;
+class VertPart3;
+class VertPart4;
+class VertPart5;
+class VertPart6;
+class VertPart7;
+class VertPart8;
+class NotifyVertSwap;
 
 /* -- spatial division vertex -- */
 
@@ -48,6 +63,9 @@ public:
 		area = 0.0;
 	}
 
+	void addConnectivity(Integer i);
+	void changeConnecIndices(Integer orig_i, Integer changed_i);
+
 public:
 	// area weighted quadric matrix
 	HQEMatrix awQ;
@@ -55,9 +73,22 @@ public:
 	HNormal awN;
 	// area, in fact the area computed is 3 times the de facto area
 	float area;
-	// cluster or old index before partition
-	Integer index;
+	// cluster index, could be used as local cluster index when checking connectivity
+	Integer clusterIndex;
+	// connected vertices
+	list<Integer> connectedVerts;
 };
+
+void HSDVertex::changeConnecIndices(Integer orig_i, Integer changed_i) {
+
+	list<Integer>::iterator iter;
+
+	for (iter = connectedVerts.begin(); iter != connectedVerts.end(); iter ++)
+		if (*iter == orig_i) {
+			*iter = changed_i;
+			return;
+		}
+}
 
 /* the cluster class, mostly a data maintaining class */
 class HSDVertexCluster
@@ -109,7 +140,8 @@ private:
 
 	// vertex and face range in the gvl, gfl
 	Integer vRangeStart, vRangeEnd;
-	Integer fRangeStart, fRangeEnd;
+	// vertex count
+	Integer vCount;
 
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
@@ -126,6 +158,183 @@ inline float HSDVertexCluster::getImportance() const
 }
 
 ostream& operator <<(ostream &out, const HSDVertexCluster& c);
+
+/* -- ElemPartOf derivatives, used for partition -- */
+
+class VertPart1 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPart2 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPart3 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPart4 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPart5 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPart6 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPart7 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPart8 : public ElemPartOf<HSDVertex>
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	HFaceFormula* planes;
+	int planeCount;
+	HSDVertexCluster *vc;
+};
+
+class VertPartofCluster : public ElemPartOf<HSDVertex> 
+{
+	friend class HSpatialDivision;
+
+public:
+	virtual bool operator() (HSDVertex v);
+
+private:
+	Integer cIndex;
+};
+
+/*  take such a connectivity as an example:
+ *   v | 2 .. 4 .. 7 ..
+ *  ---+---------------- 
+ *   c | 1    2    8
+ *     | 7    6    2
+ *     | 4    5
+ *
+ *  if we swap 2 and 4, the memory looks like:
+ *   v | 2 .. 4 .. 7 ..
+ *  ---+---------------- 
+ *   c | 2    1    8
+ *     | 6    7    2
+ *     | 5    4
+ *
+ *  the ChangeConnecIndicesAfterSwap(2, 4) updates
+ *  the original 2th element's connectivity information
+ *  by notifying all its adjacent vertices that its
+ *  index has changed from 2 to 4, so you have to change
+ *  the '2' in 7's adjacent vertices to '4'. However, if
+ *  the swapped vertices are adjacent themselves, we don't
+ *  go their connectivity vertices array but modify the 
+ *  index instantly, so after ChangeConnecIndicesAfterSwap(2, 4)
+ *  has been invoked, the memory looks like this, * denote
+ *  changed indices:
+ *   v | 2 .. 4 .. 7 ..
+ *  ---+---------------- 
+ *   c | 2    1    8
+ *     | 6    7    4*
+ *     | 5    2*
+ */
+class NotifyVertSwap : public NotifySwap {
+	friend class HSpatialDivision;
+
+public:
+	virtual void operator() (Integer i, Integer j);
+
+private:
+	/* change the connected indices after the swap
+	 * orig_i:		original index
+	 * changed_i:	changed index */
+	void ChangeConnecIndicesAfterSwap(int orig_i, int changed_i) {
+		
+		list<Integer>::iterator iter;
+		HSDVertex vert = vertices->at(changed_i);
+		
+		for (iter = vert.connectedVerts.begin(); iter != vert.connectedVerts.end(); iter ++) {
+
+			if (*iter == changed_i) {
+				*iter = orig_i;
+				continue;
+			}
+
+			vertices->at(*iter).changeConnecIndices(orig_i, changed_i);
+		}
+	}
+
+public:
+	HDynamArray<HSDVertex>* vertices;
+};
 
 /* -- spatial division class, mostly a algorithm class -- */
 class HSpatialDivision
@@ -168,123 +377,35 @@ private:
 		HNormal n1, float d1, HNormal n2, float d2);
 	void partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
 		HSDVertexCluster &vc2, HNormal n1, float d1);
-	// check the connectivity of the cluster and add
-	// all the connected clusters to heap
-	void addUncheckedCluster(HSDVertexCluster &vc);
+	// split the range of vertices to connected vertex clusters
+	void splitConnectedRange(Integer start, Integer end);
+	// recursively search the connectivity region
+	void searchConnectivity(Integer vIndex, Integer rangeStart, Integer clusterIndex);
 
-public:
+private:
 	// all the vertices, gvl
 	HDynamArray<HSDVertex> vertices;
 	// all the faces, gfl
 	HDynamArray<HTripleIndex> faces;
 	// vertex index map
-	HDynamArray<Integer> vIndexMap;
+	HDynamArray<Integer> vIndexMap; 
 	// all the clusters in a heap
 	doubleHeap<HSDVertexCluster> clusters;
 	// degenerated face hash set
 	HTripleIndexSet degFaces;
 	// partition functors
 	ArraySelfPartition<HSDVertex, HDynamArray<HSDVertex>> vertPartition;
-	ArraySelfPartition<HTripleIndex, HDynamArray<HTripleIndex>> facePartition;
 	ElemPartOf<HSDVertex>* vertPartOf[8];
-	ElemPartOf<HTripleIndex>* facePartOf[10];
-	HFaceFormula faceFormulas[8];
-};
-
-/* -- ElemPartOf derivatives -- */
-
-class VertPart1 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class VertPart2 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class VertPart3 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class VertPart4 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class VertPart5 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class VertPart6 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class VertPart7 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class VertPart8 : public ElemPartOf<HSDVertex>
-{
-public:
-	virtual bool operator() (HSDVertex v);
-
-private:
-	HFaceFormula* planes;
-	int planeCount;
-};
-
-class NotifyVertexMove : public NotifyMove {
-public:
-	virtual void operator() (int src, int dst) {
-		
-	}
-
-	void setVMap(HDynamArray<Integer> *map) {
-		vMap = map;
-	}
-
-private:
-	HDynamArray<Integer> *vMap;
+	VertPart1 vertPart1;
+	VertPart2 vertPart2;
+	VertPart3 vertPart3;
+	VertPart4 vertPart4;
+	VertPart5 vertPart5;
+	VertPart6 vertPart6;
+	VertPart7 vertPart7;
+	VertPart8 vertPart8;
+	HFaceFormula planes[3];
+	NotifyVertSwap notifyVertSwap;
 };
 
 #endif //__SPATIAL_DIVISION__

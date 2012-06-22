@@ -8,7 +8,8 @@
 #ifndef __H_ALGORITHM__
 #define __H_ALGORITHM__
 
-/* ------ classes concerning the arbitrary partition ------ */
+
+/* ---------- array partitioning ---------- */
 
 /* if the element is part of a concerning patch */
 template<class ElemType>
@@ -17,10 +18,10 @@ public:
 	virtual bool operator() (ElemType e) = 0;
 };
 
-/* call back for every move of element */
-class NotifyMove {
+/* evoked when swapping two elements */
+class NotifySwap {
 public:
-	virtual void operator() (int src, int dst) = 0;
+	virtual void operator() (int i, int j) = 0;
 };
 
 /* array self partition like what's in quicksort 
@@ -31,8 +32,7 @@ public:
 	ArraySelfPartition(int _cap = 2);
 	~ArraySelfPartition();
 	int* operator() (ContainerType &arr, int arr_start, int arr_end, 
-		ElemPartOf<ElemType> **part_of, int partion_count, 
-		NotifyMove *notify_move = NULL);
+		ElemPartOf<ElemType> **part_of, int partion_count, NotifySwap* notify_swap = NULL);
 
 private:
 	int *index;
@@ -73,7 +73,7 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 	int arr_end,
 	ElemPartOf<ElemType> **part_of, 
 	int partition_count,
-	NotifyMove *notify_move = NULL // call back when moving any element
+	NotifySwap* notify_swap
 	) {
 
 	if (partition_count > indexCapacity) {
@@ -97,24 +97,27 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 				break;
 
 		// the new elem
-		elem = arr[i];
+		//elem = arr[i];
 
-		// assign the fist elem before the shifting to the last elem after the shifting
+		// swap the elements
 		for (j = partition_count - 1; j > which_partition; j --) {
-			// move the (index[j - 1] + 1)th element 
-			// to location (index[j] + 1)
-			arr[index[j] + 1] = arr[index[j - 1] + 1];
-			if (notify_move)
-				notify_move(index[j - 1] + 1, index[j] + 1);
+
+			if (index[j] + 1 != index[j - 1] + 1) {
+
+				elem = arr[index[j] + 1];
+				arr[index[j] + 1] = arr[index[j - 1] + 1];
+				arr[index[j - 1] + 1] = elem;
+
+				if (notify_swap)
+					(*notify_swap)(index[j] + 1, index[j - 1] + 1);
+			}
+			
 			index[j] ++;
 		}
 
 		// assign the new elem to the last of the enlarged (by 1) partition
-		// that is move the ith element to the location index[which_partition]
 		index[which_partition] ++;
-		arr[index[which_partition]] = elem;
-		if (notify_move)
-			notify_move(i, index[which_partition]);
+		//arr[index[which_partition]] = elem;
 	}
 
 	return index;

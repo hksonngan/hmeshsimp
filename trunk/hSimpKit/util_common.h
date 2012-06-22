@@ -86,12 +86,15 @@ public:
 
 	void setStatic() {
 		_a = a; _b = b; _c = c; _d = d; }
+	
+	void set(HNormal n, float __d) {
+		_a = n.x; _b = n.y; _c = n.z; _d = __d;
+	}
 
 public:
 	// parameters of a plane
 	static float a, b, c, d;
 
-private:
 	float _a, _b, _c, _d;
 };
 
