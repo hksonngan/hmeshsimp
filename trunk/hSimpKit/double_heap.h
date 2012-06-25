@@ -274,14 +274,14 @@ void doubleHeap<T>::printHeap(ostream& out, int root, int level)
 /* helper functions */
 
 template<class T>
-inline void PrintHeap(doubleHeap<T> &h)
+inline void PrintHeap(ostream& out, doubleHeap<T> &h)
 {
 #ifdef PRINT_HEAP
 	if (h.empty())
 		return;
 
-	h.printHeap(cout, 0, 0);
-	cout << endl << endl;
+	h.printHeap(out, 0, 0);
+	out << endl << endl;
 #endif
 }
 

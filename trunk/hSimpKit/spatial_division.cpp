@@ -32,12 +32,8 @@ HSDVertexCluster::HSDVertexCluster() {
 	weakClear();
 }
 
-void HSDVertexCluster::addVertex(Integer i, HSDVertex v)
+void HSDVertexCluster::addVertex(HSDVertex v)
 {
-	//if (vIndices == NULL) {
-	//	vIndices = new vector<Integer>();
-	//}
-
 	if (vRangeStart == NO_VERTEX) {
 		max_x = v.x;
 		min_x = v.x;
@@ -64,7 +60,6 @@ void HSDVertexCluster::addVertex(Integer i, HSDVertex v)
 			min_z = v.z;
 	}
 
-	//vIndices->push_back(i);
 	vCount ++;
 	meanVertex = meanVertex * (float)(vCount - 1) / (float)vCount + v / (float)vCount;
 
@@ -146,11 +141,10 @@ ostream& operator <<(ostream& out, const HSDVertexCluster& c)
 const float HSpatialDivision::SPHERE_MEAN_NORMAL_THRESH = 0.2; 
 // threshold of the ratio of maximum / minimum curvature treated as a hemisphere
 const float HSpatialDivision::MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE = 2.0;
+const float HSpatialDivision::RANGE_MAX = 1000.0f;
 
 HSpatialDivision::HSpatialDivision():
-clusters(INIT_HEAP_VOL, MaxHeap),
-vertices(INIT_F_CAPACITY),
-faces(INIT_V_CAPACITY)
+clusters(INIT_HEAP_VOL, MaxHeap)
 {
 	vertPartOf[0] = &vertPart1;
 	vertPartOf[1] = &vertPart2;
@@ -161,7 +155,14 @@ faces(INIT_V_CAPACITY)
 	vertPartOf[6] = &vertPart7;
 	vertPartOf[7] = &vertPart8;
 
-	notifyVertSwap.vertices = &vertices;
+	vertices = NULL;
+	vertexCount = 0;
+	faces = NULL;
+	faceCount = 0;
+
+	//notifyVertSwap.vertices = &vertices;
+
+	fout.open("sddebug.txt");
 }
 
 HSpatialDivision::~HSpatialDivision()
@@ -171,19 +172,47 @@ HSpatialDivision::~HSpatialDivision()
 
 void HSpatialDivision::addVertex(HVertex v)
 {
-	HSDVertex sdv;
-	sdv.Set(v.x, v.y, v.z);
+	if (vertexCount == 0) {
+		max_x = v.x;
+		min_x = v.x;
+		max_y = v.y;
+		min_y = v.y;
+		max_z = v.z;
+		min_z = v.z;
+	}
+	else {
+		if (v.x > max_x)
+			max_x = v.x;
+		else if (v.x < min_x)
+			min_x = v.x;
 
-	vertices.push_back(sdv);
+		if (v.y > max_y)
+			max_y = v.y;
+		else if (v.y < min_y)
+			min_y = v.y;
+
+		if (v.z > max_z)
+			max_z = v.z;
+		else if (v.z < min_z)
+			min_z = v.z;
+	}
+
+	vertices[vertexCount].Set(v.x, v.y, v.z);
+	vertices[vertexCount].oldIndex = vertexCount;
+	vertexCount ++;
 }
 
 void HSpatialDivision::addFace(HTripleIndex i3)
 {
-	faces.push_back(i3);
+	faces[faceCount] = i3;
+	faceCount ++;
 
 	/* alter the vertices */
 
-	Vec3<float> &v1 = vertices[i3.i], &v2 = vertices[i3.j], &v3 = vertices[i3.k];
+	Vec3<float> v1, v2, v3;
+	v1.Set(vertices[i3.i].x, vertices[i3.i].y, vertices[i3.i].z);
+	v2.Set(vertices[i3.j].x, vertices[i3.j].y, vertices[i3.j].z);
+	v3.Set(vertices[i3.k].x, vertices[i3.k].y, vertices[i3.k].z);
 	Vec3<float> e1 = v1 - v2;
 	Vec3<float> e2 = v2 - v3;
 	Vec3<float> nm = e1 ^ e2;
@@ -233,9 +262,10 @@ bool HSpatialDivision::readPly(char *filename)
 	}
 
 	// set the capacity for the gvl and gfl
-	vertices.resize(plyStream.getVertexCount());
-	faces.resize(plyStream.getFaceCount());
-	vIndexMap.resize(plyStream.getVertexCount());
+	vertices = new HSDVertex[plyStream.getVertexCount()];
+	faces = new HTripleIndex[plyStream.getFaceCount()];
+	//vIndexMap.resize(plyStream.getVertexCount());
+	notifyVertSwap.vertices = vertices;
 	
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 		if (plyStream.nextVertex(v) == false) {
@@ -243,6 +273,21 @@ bool HSpatialDivision::readPly(char *filename)
 		}
 		
 		addVertex(v);
+	}
+
+	max_range = max_x - min_x;
+	if (max_range < max_y - min_y) {
+		max_range = max_y - min_y;
+	}
+	if (max_range < max_z - min_z) {
+		max_range = max_z - min_z;
+	}
+
+	// resize all coprdinates of vertices to [0, 1000]
+	for (i = 0; i < vertexCount; i ++)	{
+		vertices[i].x = RANGE_MAX / max_range * (vertices[i].x - min_x);
+		vertices[i].y = RANGE_MAX / max_range * (vertices[i].y - min_y);
+		vertices[i].z = RANGE_MAX / max_range * (vertices[i].z - min_z);
 	}
 
 	for (i = 0; i < plyStream.getFaceCount(); i ++) {
@@ -268,8 +313,9 @@ bool HSpatialDivision::divide(int target_count)
 {
 	/* - variables - */
 
-	HSDVertexCluster vc, vc1, vc2, vc3, vc4, vc5, vc6, vc7, vc8;
-	int i;
+	HSDVertexCluster vc;
+	int i, lastClusterCount = 1, continuousUnchangeCount = 0;
+	float diff;
 
 	// maximum/minimum curvature and the direction
 	float maxCurvature; // maximum curvature
@@ -285,9 +331,9 @@ bool HSpatialDivision::divide(int target_count)
 
 	// init the first cluster
 	vc.vRangeStart = 0;
-	vc.vRangeEnd = vertices.size();
-	for (i = 0; i < this->vertices.size(); i ++) {
-		vc.addVertex(i, vertices[i]);
+	vc.vRangeEnd = vertexCount - 1;
+	for (i = 0; i < vertexCount; i ++) {
+		vc.addVertex(vertices[i]);
 	}
 	clusters.addElement(vc);
 
@@ -299,16 +345,34 @@ bool HSpatialDivision::divide(int target_count)
 	// subdivide until the divided clusters reach the target count
 	while(clusters.count() < target_count)
 	{
+		diff = ((float)target_count - (float)clusters.count()) / target_count;
+		if (diff < 0.01) {
+			break;
+		}
+
+		if (clusters.count() == lastClusterCount) {
+			continuousUnchangeCount ++;
+		}
+		else {
+			continuousUnchangeCount = 0;
+		}
+
+		if (continuousUnchangeCount >= 50) {
+			cout << "\tstop without reaching the target count because of unchanged cluster count" << endl;
+			break;
+		}
+		
 		if (clusters.empty()) {
 			cerr << "#error: don't know why but the clusters heap have came to empty" << endl;
 			return false;
 		}
 
 		// get the value of the top in the heap of clusters and delete it
+		lastClusterCount = clusters.count();
 		vc = clusters.getTop();
-		clusters.deleteTop();
+ 		clusters.deleteTop();
 
-		PrintHeap(clusters);
+		//PrintHeap(clusters);
 
 		// get the eigenvalue
 		M << vc.awQ.a11, vc.awQ.a12, vc.awQ.a13,
@@ -338,59 +402,33 @@ bool HSpatialDivision::divide(int target_count)
 		{
 			HNormal p_nm = maxDir ^ minDir;
 
-			partition8(vc, vc1, vc2, vc3, vc4, vc5, vc6, vc7, vc8,
+			partition8(vc,
 				p_nm, HFaceFormula::calcD(p_nm, vc.meanVertex),
 				maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex),
 				minDir, HFaceFormula::calcD(minDir, vc.meanVertex));
-
-			
-
-			vc.weakClear();
-			vc1.weakClear();
-			vc2.weakClear();
-			vc3.weakClear();
-			vc4.weakClear();
-			vc5.weakClear();
-			vc6.weakClear();
-			vc7.weakClear();
-			vc8.weakClear();
 		}
 		// partition to 4
 		else if (maxCurvature / minCurvature < MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE)
 		{
-			partition4(vc, vc1, vc2, vc3, vc4,
+			partition4(vc, 
 				maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex),
 				minDir, HFaceFormula::calcD(minDir, vc.meanVertex));
-
-			
-
-			vc.weakClear();
-			vc1.weakClear();
-			vc2.weakClear();
-			vc3.weakClear();
-			vc4.weakClear();
 		}
 		// partition to 2
-		else
-		{
-			partition2(vc, vc1, vc2, maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex));
-
-			
-
-			vc.weakClear();
-			vc1.weakClear();
-			vc2.weakClear();
+		else {
+			partition2(vc, maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex));
 		}
+
+		PrintHeap(fout, clusters);
 	}
+
+	PrintHeap(fout, clusters);
 
 	return true;
 }
 
-void HSpatialDivision::partition8(HSDVertexCluster vc, HSDVertexCluster &vc1,
-				HSDVertexCluster &vc2, HSDVertexCluster &vc3,
-				HSDVertexCluster &vc4, HSDVertexCluster &vc5,
-				HSDVertexCluster &vc6, HSDVertexCluster &vc7,
-				HSDVertexCluster &vc8, 
+void HSpatialDivision::partition8(
+				HSDVertexCluster vc,
 				HNormal n1, float d1, HNormal n2, float d2,
 				HNormal n3, float d3) {
 
@@ -404,42 +442,40 @@ void HSpatialDivision::partition8(HSDVertexCluster vc, HSDVertexCluster &vc1,
 
 	vertPart1.planeCount = 3;
 	vertPart1.planes = planes;
-	vertPart1.vc = &vc1;
 
 	vertPart2.planeCount = 3;
 	vertPart2.planes = planes;
-	vertPart2.vc = &vc2;
 
 	vertPart3.planeCount = 3;
 	vertPart3.planes = planes;
-	vertPart3.vc = &vc3;
 
 	vertPart4.planeCount = 3;
 	vertPart4.planes = planes;
-	vertPart4.vc = &vc4;
 
 	vertPart5.planeCount = 3;
 	vertPart5.planes = planes;
-	vertPart5.vc = &vc5;
 
 	vertPart6.planeCount = 3;
 	vertPart6.planes = planes;
-	vertPart6.vc = &vc6;
 
 	vertPart7.planeCount = 3;
 	vertPart7.planes = planes;
-	vertPart7.vc = &vc7;
 
 	vertPart8.planeCount = 3;
 	vertPart8.planes = planes;
-	vertPart8.vc = &vc8;
 
-	vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 8, &notifyVertSwap);
+	int* partitionIndices = vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 8, &notifyVertSwap);
+	int i, vcStart, vcEnd;
+
+	for (i = 0, vcStart = vc.vRangeStart; i < 8; i ++) {
+		vcEnd = partitionIndices[i];
+		splitConnectedRange(vcStart, vcEnd);
+		vcStart = vcEnd + 1;
+	}
 }
 
-void HSpatialDivision::partition4(HSDVertexCluster vc, HSDVertexCluster &vc1,
-				HSDVertexCluster &vc2, HSDVertexCluster &vc3,
-				HSDVertexCluster &vc4, 
+void HSpatialDivision::partition4(
+				HSDVertexCluster vc, 
 				HNormal n1, float d1, HNormal n2, float d2) {
 
 	if (vc.vCount == 0) {
@@ -451,25 +487,29 @@ void HSpatialDivision::partition4(HSDVertexCluster vc, HSDVertexCluster &vc1,
 
 	vertPart1.planeCount = 2;
 	vertPart1.planes = planes;
-	vertPart1.vc = &vc1;
 
 	vertPart2.planeCount = 2;
 	vertPart2.planes = planes;
-	vertPart2.vc = &vc2;
 
 	vertPart3.planeCount = 2;
 	vertPart3.planes = planes;
-	vertPart3.vc = &vc3;
 
 	vertPart4.planeCount = 2;
 	vertPart4.planes = planes;
-	vertPart4.vc = &vc4;
 
-	vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 4, &notifyVertSwap);
+	int* partitionIndices = vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 4, &notifyVertSwap);
+	int i, vcStart, vcEnd;
+
+	for (i = 0, vcStart = vc.vRangeStart; i < 4; i ++) {
+		vcEnd = partitionIndices[i];
+		splitConnectedRange(vcStart, vcEnd);
+		vcStart = vcEnd + 1;
+	}
 }
 
-void HSpatialDivision::partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
-				HSDVertexCluster &vc2, HNormal n1, float d1) {
+void HSpatialDivision::partition2(
+				HSDVertexCluster vc, 
+				HNormal n1, float d1) {
 
 	if (vc.vCount == 0) {
 		return;
@@ -479,23 +519,28 @@ void HSpatialDivision::partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
 
 	vertPart1.planeCount = 1;
 	vertPart1.planes = planes;
-	vertPart1.vc = &vc1;
 
 	vertPart2.planeCount = 1;
 	vertPart2.planes = planes;
-	vertPart2.vc = &vc2;
 
-	vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 2, &notifyVertSwap);
+	int* partitionIndices = vertPartition(vertices, vc.vRangeStart, vc.vRangeEnd, vertPartOf, 2, &notifyVertSwap);
+	int i, vcStart, vcEnd;
+
+	for (i = 0, vcStart = vc.vRangeStart; i < 2; i ++) {
+		vcEnd = partitionIndices[i];
+		splitConnectedRange(vcStart, vcEnd);
+		vcStart = vcEnd + 1;
+	}
 }
 
 void HSpatialDivision::clear()
 {
-	vertices.clear();
-	faces.clear();
-	//for (int i = 0; i < clusters.count(); i ++)
-	//{
-	//	//delete clusters.get(i).vIndices;
-	//}
+	if (vertices) {
+		delete[] vertices;
+	}
+	if (faces) {
+		delete[] faces;
+	}
 	clusters.clear();
 }
 
@@ -526,6 +571,9 @@ bool HSpatialDivision::toPly(char *filename)
 
 	for (i = 0; i < clusters.count(); i ++) {
 		v = clusters.get(i).getRepresentativeVertex();
+		v.x = v.x * max_range / RANGE_MAX + min_x;
+		v.y = v.y * max_range / RANGE_MAX + min_y;
+		v.z = v.z * max_range / RANGE_MAX + min_z;
 		fout << v.x << " " << v.y << " " << v.z << endl;
 	}
 
@@ -549,32 +597,35 @@ void HSpatialDivision::generateIndexedMesh()
 	int i, vindex, j, i1, i2, i3;
 	HSDVertexCluster sdc;
 	HTripleIndex tripleIndex;
+	int *indexMap = new int[vertexCount];
 
 	for (i = 0; i < clusters.count(); i ++) {
 		sdc = clusters.get(i);
 
-		//for (j = 0; j < sdc.vIndices->size(); j ++) {
-		//	vindex = sdc.vIndices->at(j);
-		//	vertices[vindex].clusterIndex = i;
-		//}
+		for (j = sdc.vRangeStart; j <= sdc.vRangeEnd; j ++) {
+			vertices[j].clusterIndex = i;
+			indexMap[vertices[j].oldIndex] = j;
+		}
 	}
 
 	degFaces.clear();
-	for (i = 0; i < faces.size(); i ++) {
-		i1 = vertices[faces[i].i].clusterIndex;
-		i2 = vertices[faces[i].j].clusterIndex;
-		i3 = vertices[faces[i].k].clusterIndex;
+	for (i = 0; i < faceCount; i ++) {
+		i1 = vertices[indexMap[faces[i].i]].clusterIndex;
+		i2 = vertices[indexMap[faces[i].j]].clusterIndex;
+		i3 = vertices[indexMap[faces[i].k]].clusterIndex;
 
 		if (i1 != i2 && i1 != i3 && i2 != i3) {
 			tripleIndex.set(i1, i2, i3);
 			degFaces.insert(tripleIndex);
 		}
 	}
+
+	delete[] indexMap;
 }
 
 void HSpatialDivision::splitConnectedRange(Integer start, Integer end)
 {
-	if (start < end)
+	if (start > end)
 		return;
 
 	int i;
@@ -585,9 +636,11 @@ void HSpatialDivision::splitConnectedRange(Integer start, Integer end)
 	// erase the adjacent index out of the range
 	for (i = start; i <= end; i ++) {
 		vertices[i].clusterIndex = 0;
-		for (iter = vertices[i].connectedVerts.begin(); iter != vertices[i].connectedVerts.end(); iter ++)
+		for (iter = vertices[i].connectedVerts.begin(); iter != vertices[i].connectedVerts.end();)
 			if (*iter < start || *iter > end) 
-				vertices[i].connectedVerts.erase(iter);
+				iter = vertices[i].connectedVerts.erase(iter);
+			else
+				iter ++;
 	}
 
 	// search and assign the connected clusters the local cluster index
@@ -599,16 +652,36 @@ void HSpatialDivision::splitConnectedRange(Integer start, Integer end)
 		}
 	}
 
-	if (curCluster <= 1)
-		return;
-
-	VertPartofCluster** partOf = new VertPartofCluster*[curCluster - 1];
+	// curCluster - 1 is the count of connected clusters
+	ElemPartOf<HSDVertex>** partOf = new ElemPartOf<HSDVertex>*[curCluster - 1];
+	// retrieve the condition functor for every cluster
 	for (i = 1; i < curCluster; i ++) {
 		partOf[i - 1] = new VertPartofCluster();
-		partOf[i - 1]->cIndex = i;
+		((VertPartofCluster*)partOf[i - 1])->cIndex = i;
 	}
 
-	vertPartition(vertices, start, end, partOf, notifyVertSwap);
+	int *partitionIndices = vertPartition2(vertices, start, end, partOf, curCluster - 1, &notifyVertSwap);
+
+	// create vc and add to the heap for every cluster
+	HSDVertexCluster vc;
+	int vcStart, vcEnd, j;
+	for (i = 0, vcStart = start; i < curCluster - 1; i ++) {
+		vcEnd = partitionIndices[i];
+		if (vcStart <= vcEnd) {
+			vc.weakClear();
+			for (j = vcStart; j <= vcEnd; j ++) {
+				vc.addVertex(vertices[j]);
+			}
+			vc.vRangeStart = vcStart;
+			vc.vRangeEnd = vcEnd;
+			clusters.addElement(vc);
+		}
+		vcStart = vcEnd + 1;
+	}
+
+	for (i = i; i < curCluster; i ++)
+		delete partOf[i - 1];
+	delete[] partOf;
 }
 
 void HSpatialDivision::searchConnectivity(Integer vIndex, Integer rangeStart, Integer clusterIndex) {

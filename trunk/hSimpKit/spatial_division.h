@@ -17,11 +17,12 @@
 #include <vector>
 #include <list>
 #include <boost/unordered_set.hpp>
-//#define PRINT_HEAP
+#define PRINT_HEAP
 #include "double_heap.h"
 #include <ostream>
 #include <Eigen/Eigenvalues>
 #include "algorithm.h"
+#include <fstream>
 
 
 //#define INIT_HEAP_VOL 10000 //initial heap volume
@@ -29,14 +30,15 @@
 // constants for the variable vRangeStart to mark 
 // if there has been vertex added for computing 
 // of bounding box
-#define NO_VERTEX -1
-#define VERTEX_ADDED -2
+#define NO_VERTEX -2
+#define VERTEX_ADDED -3
 
 #define HDynamArray std::vector
 
 using namespace Eigen;
 using std::ostream;
 using std::list;
+using std::ofstream;
 
 /* class defined */
 class HSDVertex;
@@ -51,6 +53,7 @@ class VertPart6;
 class VertPart7;
 class VertPart8;
 class NotifyVertSwap;
+class VertPartofCluster;
 
 /* -- spatial division vertex -- */
 
@@ -64,7 +67,7 @@ public:
 	}
 
 	void addConnectivity(Integer i);
-	void changeConnecIndices(Integer orig_i, Integer changed_i);
+	inline void changeConnecIndices(Integer orig_i, Integer changed_i);
 
 public:
 	// area weighted quadric matrix
@@ -77,6 +80,8 @@ public:
 	Integer clusterIndex;
 	// connected vertices
 	list<Integer> connectedVerts;
+	// index before moved
+	Integer oldIndex;
 };
 
 void HSDVertex::changeConnecIndices(Integer orig_i, Integer changed_i) {
@@ -98,7 +103,10 @@ class HSDVertexCluster
 public:
 	HSDVertexCluster();
 	~HSDVertexCluster() { /*delete[] vIndices;*/ }
-	void addVertex(Integer i, HSDVertex v);
+	/// deprecated
+	//void addVertex(Integer i, HSDVertex v);
+	///
+	void addVertex(HSDVertex v);
 	bool operator< (const HSDVertexCluster &vc) const;
 	bool operator> (const HSDVertexCluster &vc) const;
 
@@ -151,6 +159,10 @@ private:
 
 inline float HSDVertexCluster::getImportance() const
 {
+	if (vCount <= 1) {
+		return 0.0;
+	}
+
 	HNormal n1(awN.x, awN.y, awN.z);
 	float l1 = area - n1.Length();
 
@@ -171,7 +183,6 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
-	HSDVertexCluster *vc;
 };
 
 class VertPart2 : public ElemPartOf<HSDVertex>
@@ -184,7 +195,6 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
-	HSDVertexCluster *vc;
 };
 
 class VertPart3 : public ElemPartOf<HSDVertex>
@@ -210,7 +220,6 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
-	HSDVertexCluster *vc;
 };
 
 class VertPart5 : public ElemPartOf<HSDVertex>
@@ -223,7 +232,6 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
-	HSDVertexCluster *vc;
 };
 
 class VertPart6 : public ElemPartOf<HSDVertex>
@@ -236,7 +244,6 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
-	HSDVertexCluster *vc;
 };
 
 class VertPart7 : public ElemPartOf<HSDVertex>
@@ -249,7 +256,6 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
-	HSDVertexCluster *vc;
 };
 
 class VertPart8 : public ElemPartOf<HSDVertex>
@@ -262,10 +268,9 @@ public:
 private:
 	HFaceFormula* planes;
 	int planeCount;
-	HSDVertexCluster *vc;
 };
 
-class VertPartofCluster : public ElemPartOf<HSDVertex> 
+class VertPartofCluster : public ElemPartOf<HSDVertex>
 {
 	friend class HSpatialDivision;
 
@@ -319,7 +324,7 @@ private:
 	void ChangeConnecIndicesAfterSwap(int orig_i, int changed_i) {
 		
 		list<Integer>::iterator iter;
-		HSDVertex vert = vertices->at(changed_i);
+		HSDVertex vert = vertices[changed_i];
 		
 		for (iter = vert.connectedVerts.begin(); iter != vert.connectedVerts.end(); iter ++) {
 
@@ -328,12 +333,12 @@ private:
 				continue;
 			}
 
-			vertices->at(*iter).changeConnecIndices(orig_i, changed_i);
+			vertices[*iter].changeConnecIndices(orig_i, changed_i);
 		}
 	}
 
 public:
-	HDynamArray<HSDVertex>* vertices;
+	HSDVertex* vertices;
 };
 
 /* -- spatial division class, mostly a algorithm class -- */
@@ -346,6 +351,7 @@ private:
 	static const float MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE; // threshold of the ratio of maximum / minimum curvature treated as a hemisphere
 	static const int INIT_V_CAPACITY = 20000; // initial capacity for the vertex container
 	static const int INIT_F_CAPACITY = 35000; // initial capacity for the face container
+	static const float RANGE_MAX;
 
 public:
 	HSpatialDivision();
@@ -364,19 +370,32 @@ public:
 private:
 	// partition the vertex cluster to 8 4 2 sub clusters 
 	// based on the 3 2 1 partition plane
-	void partition8(HSDVertexCluster vc, HSDVertexCluster &vc1,
-		HSDVertexCluster &vc2, HSDVertexCluster &vc3,
-		HSDVertexCluster &vc4, HSDVertexCluster &vc5,
-		HSDVertexCluster &vc6, HSDVertexCluster &vc7,
-		HSDVertexCluster &vc8, 
+	void partition8(
+		HSDVertexCluster vc,
 		HNormal n1, float d1, HNormal n2, float d2,
 		HNormal n3, float d3);
-	void partition4(HSDVertexCluster vc, HSDVertexCluster &vc1,
-		HSDVertexCluster &vc2, HSDVertexCluster &vc3,
-		HSDVertexCluster &vc4, 
+	void partition4(
+		HSDVertexCluster vc,
 		HNormal n1, float d1, HNormal n2, float d2);
-	void partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
-		HSDVertexCluster &vc2, HNormal n1, float d1);
+	void partition2(
+		HSDVertexCluster vc, 
+		HNormal n1, float d1);
+	/// deprecated
+	//void partition8(HSDVertexCluster vc, HSDVertexCluster &vc1,
+	//	HSDVertexCluster &vc2, HSDVertexCluster &vc3,
+	//	HSDVertexCluster &vc4, HSDVertexCluster &vc5,
+	//	HSDVertexCluster &vc6, HSDVertexCluster &vc7,
+	//	HSDVertexCluster &vc8, 
+	//	HNormal n1, float d1, HNormal n2, float d2,
+	//	HNormal n3, float d3);
+	//void partition4(HSDVertexCluster vc, HSDVertexCluster &vc1,
+	//	HSDVertexCluster &vc2, HSDVertexCluster &vc3,
+	//	HSDVertexCluster &vc4, 
+	//	HNormal n1, float d1, HNormal n2, float d2);
+	//void partition2(HSDVertexCluster vc, HSDVertexCluster &vc1,
+	//	HSDVertexCluster &vc2, HNormal n1, float d1);
+	///
+
 	// split the range of vertices to connected vertex clusters
 	void splitConnectedRange(Integer start, Integer end);
 	// recursively search the connectivity region
@@ -384,17 +403,23 @@ private:
 
 private:
 	// all the vertices, gvl
-	HDynamArray<HSDVertex> vertices;
+	HSDVertex *vertices;
+	int vertexCount;
 	// all the faces, gfl
-	HDynamArray<HTripleIndex> faces;
+	HTripleIndex *faces;
+	int faceCount;
+	/// deprecated
 	// vertex index map
-	HDynamArray<Integer> vIndexMap; 
+	//HDynamArray<Integer> vIndexMap; 
+	///
 	// all the clusters in a heap
 	doubleHeap<HSDVertexCluster> clusters;
 	// degenerated face hash set
 	HTripleIndexSet degFaces;
 	// partition functors
-	ArraySelfPartition<HSDVertex, HDynamArray<HSDVertex>> vertPartition;
+	// patition8 4 2 and splitConnectedRange should use different object of ArraySelfPartition
+	ArraySelfPartition<HSDVertex, HSDVertex*> vertPartition;
+	ArraySelfPartition<HSDVertex, HSDVertex*> vertPartition2;
 	ElemPartOf<HSDVertex>* vertPartOf[8];
 	VertPart1 vertPart1;
 	VertPart2 vertPart2;
@@ -406,6 +431,12 @@ private:
 	VertPart8 vertPart8;
 	HFaceFormula planes[3];
 	NotifyVertSwap notifyVertSwap;
+
+	ofstream fout;
+
+	// bounding box
+	float max_x, min_x, max_y, min_y, max_z, min_z;
+	float max_range;
 };
 
 #endif //__SPATIAL_DIVISION__
