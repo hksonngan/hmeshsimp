@@ -135,6 +135,8 @@ private:
 	// accumulated area
 	float area;
 
+	float importance;
+
 	/// deprecated
 	// vertices indices in the cluster.
 	// this pointer will be null unless

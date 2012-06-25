@@ -335,6 +335,7 @@ bool HSpatialDivision::divide(int target_count)
 	for (i = 0; i < vertexCount; i ++) {
 		vc.addVertex(vertices[i]);
 	}
+	vc.importance = vc.getImportance();
 	clusters.addElement(vc);
 
 	vector<int> index; // index of eigenvalues in eigensolver.eigenvalues()
@@ -372,7 +373,7 @@ bool HSpatialDivision::divide(int target_count)
 		vc = clusters.getTop();
  		clusters.deleteTop();
 
-		//PrintHeap(clusters);
+		//PrintHeap(fout, clusters);
 
 		// get the eigenvalue
 		M << vc.awQ.a11, vc.awQ.a12, vc.awQ.a13,
@@ -422,7 +423,7 @@ bool HSpatialDivision::divide(int target_count)
 		PrintHeap(fout, clusters);
 	}
 
-	PrintHeap(fout, clusters);
+	//PrintHeap(cout, clusters);
 
 	return true;
 }
@@ -675,6 +676,9 @@ void HSpatialDivision::splitConnectedRange(Integer start, Integer end)
 			vc.vRangeStart = vcStart;
 			vc.vRangeEnd = vcEnd;
 			clusters.addElement(vc);
+			vc.importance = vc.getImportance();
+
+			//PrintHeap(fout, clusters);
 		}
 		vcStart = vcEnd + 1;
 	}
