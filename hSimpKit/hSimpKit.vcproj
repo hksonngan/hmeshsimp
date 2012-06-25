@@ -252,6 +252,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\hdynamarray.h"
+			>
+		</File>
+		<File
 			RelativePath=".\htime.h"
 			>
 		</File>
@@ -297,6 +301,14 @@
 		</File>
 		<File
 			RelativePath=".\spatial_division.h"
+			>
+		</File>
+		<File
+			RelativePath=".\spatial_division2.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\spatial_division2.h"
 			>
 		</File>
 		<File
