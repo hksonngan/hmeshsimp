@@ -23,11 +23,11 @@ private:
 	// size
 	int size;
 
-	static int DEFAULT_INIT_CAP = 8;
+	static const int DEFAULT_INIT_CAP = 8;
 };
 
 template<class ElemType>
-HDynamArray::HDynamArray(int _init_cap)
+HDynamArray<ElemType>::HDynamArray(int _init_cap)
 {
 	if (_init_cap <= 0) {
 		_init_cap = DEFAULT_INIT_CAP;
@@ -40,13 +40,13 @@ HDynamArray::HDynamArray(int _init_cap)
 }
 
 template<class ElemType>
-HDynamArray::~HDynamArray()
+HDynamArray<ElemType>::~HDynamArray()
 {
 	delete[] data;
 }
 
 template<class ElemType>
-void HDynamArray::push_back(ElemType e)
+void HDynamArray<ElemType>::push_back(ElemType e)
 {
 	if (size >= capacity) {
 		ElemType *new_data = new ElemType[capacity * 2];
@@ -60,7 +60,7 @@ void HDynamArray::push_back(ElemType e)
 }
 
 template<class ElemType>
-ElemType& HDynamArray::operator[] (int i)
+ElemType& HDynamArray<ElemType>::operator[] (int i)
 {
 	if (i >= 0 && i < size)
 		return data[i];
@@ -69,7 +69,7 @@ ElemType& HDynamArray::operator[] (int i)
 }
 
 template<class ElemType>
-int HDynamArray::count()
+int HDynamArray<ElemType>::count()
 {
 	return size;
 }

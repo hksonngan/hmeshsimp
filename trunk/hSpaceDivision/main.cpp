@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
 	HTime htime;
 
-	HSpatialDivision sd;
+	HSpatialDivision2 sd;
 	if (sd.readPly(infilename) == false) 
 		return 1;
 	cout << "\tread file time: " << htime.printElapseSec() << endl;
