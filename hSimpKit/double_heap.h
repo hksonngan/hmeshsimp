@@ -240,7 +240,7 @@ int doubleHeap<T>::rightChild(int i)
 template<class T>
 int doubleHeap<T>::parent(int i)
 {
-	return (i + i) / 2 - 1;
+	return (i + 1) / 2 - 1;
 }
 
 template<class T>
@@ -281,7 +281,8 @@ inline void PrintHeap(ostream& out, doubleHeap<T> &h)
 		return;
 
 	h.printHeap(out, 0, 0);
-	out << endl << endl;
+	out << "______________________________________________________________" 
+		<< endl << "items count: " << h.count() << endl << endl;
 #endif
 }
 
