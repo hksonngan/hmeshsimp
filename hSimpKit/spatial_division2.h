@@ -84,11 +84,15 @@ public:
 	~HSDVertexCluster2() { /*delete[] vIndices;*/ }
 	inline void addVertex(Integer i, HSDVertex2 v);
 	inline void addFace(Integer i);
-	bool HSDVertexCluster2::operator< (const HSDVertexCluster2 &vc) const 
+	
+	bool operator <(const HSDVertexCluster2 &vc) const 
 		{ return getImportance() < vc.getImportance(); }
 
-	bool HSDVertexCluster2::operator> (const HSDVertexCluster2 &vc) const 
+	bool operator >(const HSDVertexCluster2 &vc) const 
 		{ return getImportance() > vc.getImportance(); }
+	
+	bool hasVertex()
+		{ return vIndices != NULL && vIndices->size() > 0; }
 
 	// clear the object
 	inline void weakClear();
@@ -119,7 +123,7 @@ private:
 	// the occupied memory space when
 	// discarding it
 	list<Integer> *vIndices;
-	list<HTripleIndex> *fIndices;
+	list<Integer> *fIndices;
 
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
@@ -171,7 +175,7 @@ inline void HSDVertexCluster2::addVertex(Integer i, HSDVertex2 v)
 inline void HSDVertexCluster2::addFace(Integer i)
 {
 	if (fIndices == NULL) {
-		fIndices = new list<HTripleIndex>;
+		fIndices = new list<Integer>;
 	}
 
 	fIndices->push_back(i);
@@ -255,7 +259,7 @@ private:
 		HNormal n1, float d1);
 
 	// split the range of vertices to connected vertex clusters
-	void splitConnectedRange(HSDVertexCluster2 vc);
+	void splitConnectedRange(HSDVertexCluster2 &vc);
 	// recursively search the connectivity region
 	void searchConnectivity(Integer vIndex, Integer clusterIndex);
 
@@ -274,9 +278,8 @@ private:
 	float max_range;
 
 	// some constantly used aiding variables
-	HSDVertexCluster2 vc[8];
 	WhichSide sideOfPlane1, sideOfPlane2, sideOfPlane3;
-	HSDVertexCluster2 *vc2, vc2Count;
+	HSDVertexCluster2 *vcArr; int vcArrCount;
 
 	// debug info
 	ofstream fout;
