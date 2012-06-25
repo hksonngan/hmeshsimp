@@ -1,4 +1,6 @@
 /*
+ *  the vertices and faces division algorithm algorithm is based on array self partition
+ *
  *  codes about the algorithm of  'reverse spatial subdivision mesh simplification', 
  *  more detail please refer to 
  *    [Brodsky&Watson] Model Simplification Through Refinement
@@ -64,6 +66,7 @@ public:
 		awQ.setZero();
 		awN.Set(0.0, 0.0, 0.0);
 		area = 0.0;
+		clusterIndex = -1;
 	}
 
 	void addConnectivity(Integer i);

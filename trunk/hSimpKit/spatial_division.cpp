@@ -83,15 +83,16 @@ HVertex HSDVertexCluster::getRepresentativeVertex()
 	/* if the qem is not invertible, 
 	   it won't modify the input vertex */
 	HVertex new_vertex;
-	awQ.calcRepresentativeVertex(new_vertex);
+	if (awQ.calcRepresentativeVertex(new_vertex))
+	{
+		// the vertex falls in the cluster
+		if (meanVertex != new_vertex &&
+			new_vertex.x >= min_x && new_vertex.x <= max_x &&
+			new_vertex.y >= min_y && new_vertex.y <= max_y &&
+			new_vertex.z >= min_z && new_vertex.z <= max_z) {
 
-	// the vertex falls in the cluster
-	if (meanVertex != new_vertex &&
-		new_vertex.x >= min_x && new_vertex.x <= max_x &&
-		new_vertex.y >= min_y && new_vertex.y <= max_y &&
-		new_vertex.z >= min_z && new_vertex.z <= max_z) {
-
-		return new_vertex;
+			return new_vertex;
+		}
 	}
 
 	return meanVertex;
