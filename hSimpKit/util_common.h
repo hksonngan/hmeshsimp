@@ -24,7 +24,7 @@ template<class T> class HVec3;
 class HFaceFormula;
 class HQEMatrix;
 class HSoupTriangle;
-class HTripleIndex;
+template<class ElemType> class HTripleIndex;
 class HFaceIndex;
 
 typedef Vec3<float> HVertex;
@@ -141,15 +141,16 @@ public:
 	float                a44;
 };
 
+template<class ElemType>
 class HTripleIndex
 {
 public:
 	HTripleIndex() {}
 
-	HTripleIndex(Integer _i, Integer _j, Integer _k) {
+	HTripleIndex(ElemType _i, ElemType _j, ElemType _k) {
 		i = _i; j = _j; k = _k; }
 
-	void set(Integer _i, Integer _j, Integer _k) {
+	void set(ElemType _i, ElemType _j, ElemType _k) {
 		i = _i; j = _j; k = _k; }
 
 	bool operator!= (const HTripleIndex &trip_ind) const {
@@ -158,6 +159,14 @@ public:
 
 	bool operator== (const HTripleIndex &trip_ind) const {
 		return i == trip_ind.i && j == trip_ind.j && k == trip_ind.k;
+	}
+
+	// equals without considering the sequence
+	bool unsequncedEqual(const HTripleIndex &trip) const {
+		this->sortIndex(arr1);
+		trip.sortIndex(arr2);
+
+		return arr1[0] == arr2[0] && arr1[1] == arr2[1] && arr1[2] == arr2[2];
 	}
 
 	bool operator< (const HTripleIndex &trip_ind) const
@@ -172,9 +181,47 @@ public:
 		return false;
 	}
 
+	// sort the index with ascending order so that 
+	// it can be identified with the same indices 
+	// occurring in different order
+	void sortIndex(ElemType *arr) const
+	{
+		arr[0] = i;
+		arr[1] = j;
+		arr[2] = k;
+
+		// insertion sort
+		for (index1 = 1; index1 < 3; index1 ++) {
+
+			for (index2 = 0; index2 < index1; index2 ++)
+				if (arr[index2] > arr[index1])
+					break;
+
+			if (index1 == index2)
+				continue;
+
+			temp = arr[index1];
+			for (index3 = index1; index3 > index2; index3 --) {
+				arr[index3] = arr[index3 - 1];
+			}
+			arr[index2] = temp;
+		}
+	}
+
 public:
-	Integer i, j, k;
+	ElemType i, j, k;
+
+private:
+	static ElemType arr1[3], arr2[3], temp;
+	static int index1, index2, index3;
 };
+
+template<class ElemType> ElemType HTripleIndex<ElemType>::arr1[3];
+template<class ElemType> ElemType HTripleIndex<ElemType>::arr2[3];
+template<class ElemType> ElemType HTripleIndex<ElemType>::temp;
+template<class ElemType> int HTripleIndex<ElemType>::index1;
+template<class ElemType> int HTripleIndex<ElemType>::index2;
+template<class ElemType> int HTripleIndex<ElemType>::index3;
 
 /* face index: three HTripleIndex as cluster index */
 class HFaceIndex
@@ -182,11 +229,11 @@ class HFaceIndex
 public:
 	HFaceIndex() {}
 
-	HFaceIndex(HTripleIndex& tr1, HTripleIndex& tr2, HTripleIndex& tr3) {
+	HFaceIndex(HTripleIndex<Integer>& tr1, HTripleIndex<Integer>& tr2, HTripleIndex<Integer>& tr3) {
 		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
 	}
 
-	void set(HTripleIndex& tr1, HTripleIndex& tr2, HTripleIndex& tr3) {
+	void set(HTripleIndex<Integer>& tr1, HTripleIndex<Integer>& tr2, HTripleIndex<Integer>& tr3) {
 		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
 	}
 
@@ -212,7 +259,7 @@ public:
 	}
 
 public:
-	HTripleIndex v1CIndex, v2CIndex, v3CIndex;
+	HTripleIndex<Integer> v1CIndex, v2CIndex, v3CIndex;
 };
 
 #endif //__UTIL_COMMON__

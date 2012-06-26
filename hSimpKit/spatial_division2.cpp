@@ -16,6 +16,8 @@ using std::vector;
 
 /* -- spatial division vertex cluster -- */
 
+float HSDVertexCluster2::MINIMUM_NORMAL_VARI = 0.5; 
+
 HVertex HSDVertexCluster2::getRepresentativeVertex()
 {
 	/* if the qem is not invertible, 
@@ -38,7 +40,17 @@ HVertex HSDVertexCluster2::getRepresentativeVertex()
 
 ostream& operator <<(ostream& out, const HSDVertexCluster2& c)
 {
-	out << c.getImportance();
+	HNormal n1(c.awN.x, c.awN.y, c.awN.z);
+	float l1 = n1.Length() / c.area;
+	// scale and move the [0, 1] l1 to interval [M, 1]
+	l1 = (1.0 - HSDVertexCluster2::MINIMUM_NORMAL_VARI) * l1 + HSDVertexCluster2::MINIMUM_NORMAL_VARI;
+
+	if (c.vIndices->size() <= 1) {
+		out << "0.0" << "=" << l1 << "*" << c.area << " (" << c.vIndices->size() << ")";
+		return out;
+	}
+
+	out << l1 * c.area << "=" << l1 << "*" << c.area << " (" << c.vIndices->size() << ")";
 
 	return out;
 }
@@ -61,86 +73,13 @@ clusters(INIT_HEAP_VOL, MaxHeap)
 
 	fout.open("sddebug.txt");
 
-	vcArrCount = 8;
-	vcArr = new HSDVertexCluster2[vcArrCount];
+	vcArr2Count = 0;
+	vcArr2 = NULL;
 }
 
 HSpatialDivision2::~HSpatialDivision2()
 {
-	if (vcArr) {
-		delete[] vcArr;
-	}
-}
-
-void HSpatialDivision2::addVertex(HVertex v)
-{
-	if (vertexCount == 0) {
-		max_x = v.x;
-		min_x = v.x;
-		max_y = v.y;
-		min_y = v.y;
-		max_z = v.z;
-		min_z = v.z;
-	}
-	else {
-		if (v.x > max_x)
-			max_x = v.x;
-		else if (v.x < min_x)
-			min_x = v.x;
-
-		if (v.y > max_y)
-			max_y = v.y;
-		else if (v.y < min_y)
-			min_y = v.y;
-
-		if (v.z > max_z)
-			max_z = v.z;
-		else if (v.z < min_z)
-			min_z = v.z;
-	}
-
-	vertices[vertexCount].Set(v.x, v.y, v.z);
-	vertexCount ++;
-}
-
-void HSpatialDivision2::addFace(HTripleIndex i3)
-{
-	faces[faceCount] = i3;
-	faceCount ++;
-
-	/* alter the vertices */
-
-	Vec3<float> v1, v2, v3;
-	v1.Set(vertices[i3.i].x, vertices[i3.i].y, vertices[i3.i].z);
-	v2.Set(vertices[i3.j].x, vertices[i3.j].y, vertices[i3.j].z);
-	v3.Set(vertices[i3.k].x, vertices[i3.k].y, vertices[i3.k].z);
-	Vec3<float> e1 = v1 - v2;
-	Vec3<float> e2 = v2 - v3;
-	Vec3<float> nm = e1 ^ e2;
-	float area = nm.Length(); // triangle's area is length of cross product of the two edge vectors
-
-	// add area to the corresponding vertices
-	vertices[i3.i].area += area;
-	vertices[i3.j].area += area;
-	vertices[i3.k].area += area;
-
-	nm.Normalize();
-	nm *= area;
-
-	// add area weighted normal to the corresponding vertices
-	vertices[i3.i].awN += HNormal(nm.x, nm.y, nm.z);
-	vertices[i3.j].awN += HNormal(nm.x, nm.y, nm.z);
-	vertices[i3.k].awN += HNormal(nm.x, nm.y, nm.z);
-
-	HFaceFormula::calcTriangleFaceFormula(vertices[i3.i], vertices[i3.j], vertices[i3.k]);
-	HQEMatrix qem;
-	qem.calcQem(HFaceFormula::a, HFaceFormula::b, HFaceFormula::c, HFaceFormula::d);
-	qem *= area;
-
-	// add area weighted quadric matrix to the corresponding vertices
-	vertices[i3.i].awQ += qem;
-	vertices[i3.j].awQ += qem;
-	vertices[i3.k].awQ += qem;
+	clear();
 }
 
 bool HSpatialDivision2::readPly(char *filename)
@@ -148,7 +87,7 @@ bool HSpatialDivision2::readPly(char *filename)
 	PlyStream plyStream;
 	Integer i;
 	HVertex v;
-	HTripleIndex f;
+	HTripleIndex<Integer> f;
 
 	if (plyStream.openForRead(filename) == false) {
 		return false;
@@ -156,7 +95,7 @@ bool HSpatialDivision2::readPly(char *filename)
 
 	// set the capacity for the gvl and gfl
 	vertices = new HSDVertex2[plyStream.getVertexCount()];
-	faces = new HTripleIndex[plyStream.getFaceCount()];
+	faces = new HTripleIndex<Integer>[plyStream.getFaceCount()];
 	
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 		if (plyStream.nextVertex(v) == false) {
@@ -195,7 +134,7 @@ bool HSpatialDivision2::readPly(char *filename)
 
 static SelfAdjointEigenSolver<Matrix3f> *solver;
 
-static bool cmp(const int &a, const int &b)
+static inline bool cmp(const int &a, const int &b)
 {
 	return solver->eigenvalues()(a) > solver->eigenvalues()(b);
 }
@@ -221,9 +160,13 @@ bool HSpatialDivision2::divide(int target_count)
 	/* - routines - */
 
 	// init the first cluster
-	for (i = 0; i < vertexCount; i ++) {
-		vc.addVertex(i, vertices[i]);
-	}
+	for (i = 0; i < vertexCount; i ++) 
+		if (vertices[i].clusterIndex != -1) 
+			vc.addVertex(i, vertices[i]);
+
+	cout << "\tnon-referenced vertices count:\t" << vertexCount - vc.vIndices->size() << endl
+		 << "\tvalid vertices count:\t" << vc.vIndices->size() << endl;
+
 	for (i = 0; i < faceCount; i ++) {
 		vc.addFace(i);
 	}
@@ -320,195 +263,22 @@ bool HSpatialDivision2::divide(int target_count)
 	return true;
 }
 
-void HSpatialDivision2::partition8(
-	HSDVertexCluster2 vc,
-	HNormal n1, float d1, HNormal n2, float d2,
-	HNormal n3, float d3) {
-
-	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex f;
-
-	for (i = 0; i < 8; i ++) {
-		vcArr[i].weakClear();
-	}
-
-	// partition the vertices based which side is resides according to the 3 splitting planes
-	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++) {
-
-		sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[*iter]);
-		sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, vertices[*iter]);
-		sideOfPlane3 = HFaceFormula::sideOfPlane(n3, d3, vertices[*iter]);
-
-		// the vertex is on which side of the plane
-		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
-			vcArr[0].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 0;
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
-			vcArr[1].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 1;
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
-			vcArr[2].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 2;
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2 && sideOfPlane3 == Side2) {
-			vcArr[3].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 3;
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side1) {
-			vcArr[4].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 4;
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1 && sideOfPlane3 == Side2) {
-			vcArr[5].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 5;
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side2 && sideOfPlane3 == Side1) {
-			vcArr[6].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 6;
-		}
-		else {
-			vcArr[7].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 7;
-		}
-	}
-
-	// partition the faces based on that its three vertices belongs to the same subcluster
-	for (iter = vc.fIndices->begin(); iter != vc.fIndices->end(); iter ++) {
-
-		f = faces[*iter];
-
-		// if all vertices in a triangle falls in a partitioned cluster
-		if (vertices[f.i].clusterIndex == vertices[f.j].clusterIndex &&
-			vertices[f.j].clusterIndex == vertices[f.k].clusterIndex) {
-
-			vcArr[vertices[f.i].clusterIndex].addFace(*iter);
-		}
-	}
-
-	vc.strongClear();
-
-	for (i = 0; i < 8; i ++) {
-		splitConnectedRange(vcArr[i]);
-	}
-}
-
-void HSpatialDivision2::partition4(
-	HSDVertexCluster2 vc, 
-	HNormal n1, float d1, HNormal n2, float d2) {
-
-	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex f;
-
-	for (i = 0; i < 4; i ++) {
-		vcArr[i].weakClear();
-	}
-
-	// partition the vertices based which side is resides according to the 2 splitting planes
-	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++) {
-
-		sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[*iter]);
-		sideOfPlane2 = HFaceFormula::sideOfPlane(n2, d2, vertices[*iter]);
-
-		// the vertex is on which side of the plane
-		if (sideOfPlane1 == Side1 && sideOfPlane2 == Side1) {
-			vcArr[0].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 0;
-		}
-		else if (sideOfPlane1 == Side1 && sideOfPlane2 == Side2) {
-			vcArr[1].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 1;
-		}
-		else if (sideOfPlane1 == Side2 && sideOfPlane2 == Side1) {
-			vcArr[2].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 2;
-		}
-		else {
-			vcArr[3].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 3;
-		}
-	}
-
-	// partition the faces based on that its three vertices belongs to the same subcluster
-	for (iter = vc.fIndices->begin(); iter != vc.fIndices->end(); iter ++) {
-
-		f = faces[*iter];
-
-		// if all vertices in a triangle falls in a partitioned cluster
-		if (vertices[f.i].clusterIndex == vertices[f.j].clusterIndex &&
-			vertices[f.j].clusterIndex == vertices[f.k].clusterIndex) {
-
-			vcArr[vertices[f.i].clusterIndex].addFace(*iter);
-		}
-	}
-
-	vc.strongClear();
-
-	for (i = 0; i < 4; i ++) {
-		splitConnectedRange(vcArr[i]);
-	}
-}
-
-void HSpatialDivision2::partition2(
-	HSDVertexCluster2 vc, 
-	HNormal n1, float d1) {
-
-	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex f;
-
-	for (i = 0; i < 2; i ++) {
-		vcArr[i].weakClear();
-	}
-
-	// partition the vertices based which side is resides according to the 2 splitting planes
-	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++) {
-
-		sideOfPlane1 = HFaceFormula::sideOfPlane(n1, d1, vertices[*iter]);
-
-		// the vertex is on which side of the plane
-		if (sideOfPlane1 == Side1) {
-			vcArr[0].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 0;
-		}
-		else {
-			vcArr[1].addVertex(*iter, vertices[*iter]);
-			vertices[*iter].clusterIndex = 1;
-		}
-	}
-
-	// partition the faces based on that its three vertices belongs to the same subcluster
-	for (iter = vc.fIndices->begin(); iter != vc.fIndices->end(); iter ++) {
-
-		f = faces[*iter];
-
-		// if all vertices in a triangle falls in a partitioned cluster
-		if (vertices[f.i].clusterIndex == vertices[f.j].clusterIndex &&
-			vertices[f.j].clusterIndex == vertices[f.k].clusterIndex) {
-
-			vcArr[vertices[f.i].clusterIndex].addFace(*iter);
-		}
-	}
-
-	vc.strongClear();
-
-	for (i = 0; i < 2; i ++) {
-		splitConnectedRange(vcArr[i]);
-	}
-}
-
 void HSpatialDivision2::clear()
 {
 	if (vertices) {
 		delete[] vertices;
+		vertices = NULL;
 	}
 	if (faces) {
 		delete[] faces;
+		faces = NULL;
+	}
+	if (vcArr2) {
+		delete[] vcArr2;
+		vcArr2 = NULL;
 	}
 	clusters.clear();
+	degFaces.clear();
 }
 
 bool HSpatialDivision2::toPly(char *filename)
@@ -552,122 +322,44 @@ bool HSpatialDivision2::toPly(char *filename)
 
 	// statistics
 	cout << "\twrite simplified mesh successfully" << endl
-		<< "\tfile name: " << filename << endl
-		<< "\tvertex count: " << clusters.count() << endl
-		<< "\tface count: " <<  degFaces.size() << endl;
+		<< "\tfile name:\t" << filename << endl
+		<< "\tvertex count:\t" << clusters.count() << "\tface count:\t" <<  degFaces.size() << endl;
 
 	return true;
 }
 
 void HSpatialDivision2::generateIndexedMesh()
 {
-	int i, vindex, j, i1, i2, i3;
+	int i, vindex, i1, i2, i3;
 	HSDVertexCluster2 sdc;
-	HTripleIndex tripleIndex;
-	int *indexMap = new int[vertexCount];
+	HTripleIndex<Integer> tripleIndex;
+	list<Integer>::iterator iter;
 
 	for (i = 0; i < clusters.count(); i ++) {
 		sdc = clusters.get(i);
 
-		//for (j = sdc.vRangeStart; j <= sdc.vRangeEnd; j ++) {
-		//	vertices[j].clusterIndex = i;
-		//	indexMap[vertices[j].oldIndex] = j;
-		//}
+		for (iter = sdc.vIndices->begin(); iter != sdc.vIndices->end(); iter ++) {
+			vertices[*iter].clusterIndex = i;
+		}
 	}
 
 	degFaces.clear();
 	for (i = 0; i < faceCount; i ++) {
-		i1 = vertices[indexMap[faces[i].i]].clusterIndex;
-		i2 = vertices[indexMap[faces[i].j]].clusterIndex;
-		i3 = vertices[indexMap[faces[i].k]].clusterIndex;
+		i1 = vertices[faces[i].i].clusterIndex;
+		i2 = vertices[faces[i].j].clusterIndex;
+		i3 = vertices[faces[i].k].clusterIndex;
 
 		if (i1 != i2 && i1 != i3 && i2 != i3) {
 			tripleIndex.set(i1, i2, i3);
 			degFaces.insert(tripleIndex);
 		}
 	}
-
-	delete[] indexMap;
-}
-
-void HSpatialDivision2::splitConnectedRange(HSDVertexCluster2 &vc)
-{
-	if (vc.vIndices->size() <= 0)
-		return;
-
-	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex f;
-	// local cluster index start from 0, -1 denotes that it hasn't been given a cluster id
-	int curCluster = 0;
-
-	// add temporary adjacent faces information to every vertices
-	for (iter = vc.fIndices->begin(); iter != vc.fIndices->end(); iter ++) {
-		f = faces[*iter];
-		vertices[f.i].adjacentFaces.push_back(*iter);
-		vertices[f.j].adjacentFaces.push_back(*iter);
-		vertices[f.k].adjacentFaces.push_back(*iter);
-	}
-
-	// initialize cluster index for all the vertices as -1 (not assigned)
-	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++) {
-		vertices[*iter].clusterIndex = -1;
-	}
-
-	// search and assign the connected clusters the local cluster index
-	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++)	{
-		// if the vertex hasn't been visited
-		if (vertices[*iter].clusterIndex == -1) {
-			searchConnectivity(i, curCluster);
-			curCluster ++;
-		}
-	}
-
-	/* -- create vc and add to the heap for every cluster -- */
-
-	if (vcArrCount < curCluster) {
-		if (vcArr) {
-			delete[] vcArr;
-		}
-
-		vcArr = new HSDVertexCluster2[curCluster];
-		vcArrCount = curCluster;
-	}
-	else {
-		for (i = 0; i < curCluster; i ++)
-			vcArr[i].weakClear();
-	}
-
-	// add the vertex indices for every new clusters
-	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++) {
-		vcArr[vertices[*iter].clusterIndex].addVertex(*iter, vertices[*iter]);
-	}
-
-	// add the face indices for every new clusters
-	for (iter = vc.fIndices->begin(); iter != vc.fIndices->end(); iter ++) {
-		f = faces[*iter];
-		if (vertices[f.i].clusterIndex == vertices[f.j].clusterIndex &&
-			vertices[f.i].clusterIndex == vertices[f.k].clusterIndex) {
-			vcArr[vertices[f.i].clusterIndex].addFace(*iter);
-		}
-	}
-
-	// clear the temporary adjacent faces information for vertices in the old partitioned cluster
-	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++) {
-		vertices[*iter].adjacentFaces.clear();
-	}
-
-	// add to heap
-	for (i = 0; i < curCluster; i ++) {
-		if (vcArr[i].hasVertex())
-			clusters.addElement(vcArr[i]);
-	}
 }
 
 void HSpatialDivision2::searchConnectivity(Integer vIndex, Integer clusterIndex) {
 
 	list<Integer>::iterator iter;
-	HTripleIndex f;
+	HTripleIndex<Integer> f;
 
 	vertices[vIndex].clusterIndex = clusterIndex;
 

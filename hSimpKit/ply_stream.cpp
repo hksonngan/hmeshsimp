@@ -137,7 +137,7 @@ static void freePointersInFace(Face *face) {
 	}
 }
 
-bool PlyStream::nextFace(HTripleIndex &f)
+bool PlyStream::nextFace(HTripleIndex<Integer> &f)
 {
 	if (readFCount >= fCount) {
 		return false;
