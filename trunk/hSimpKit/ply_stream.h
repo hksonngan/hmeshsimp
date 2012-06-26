@@ -29,7 +29,7 @@ public:
 	bool openForRead(char *filename);
 	bool close();
 	bool nextVertex(HVertex &v);
-	bool nextFace(HTripleIndex &f);
+	bool nextFace(HTripleIndex<Integer> &f);
 
 	Integer getVertexCount() { return vCount; };
 	Integer getFaceCount() { return fCount; };

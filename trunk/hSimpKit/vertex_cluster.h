@@ -98,19 +98,19 @@ public:
 	bool create(Integer _x_partition, Integer _y_partition, Integer _z_partition);
 	bool clear();
 
-	HVertexCluster* get(const HTripleIndex &index) {
+	HVertexCluster* get(const HTripleIndex<Integer> &index) {
 		return get(index.i, index.j, index.k); }
 
 	HVertexCluster* get(Integer i, Integer j, Integer k) {
 		return pp_cluster[i * y_partition * z_partition + j * z_partition + k]; }
 
-	bool exist(const HTripleIndex &index) {
+	bool exist(const HTripleIndex<Integer> &index) {
 		return get(index) != NULL; }
 
 	bool exist(Integer i, Integer j, Integer k) {
 		return get(i, j, k) != NULL; }
 
-	bool addFace(HTripleIndex index, HSoupTriangle tri) {
+	bool addFace(HTripleIndex<Integer> index, HSoupTriangle tri) {
 		addFace(index.i, index.j, index.k, tri);
 		return true;
 	}
@@ -119,7 +119,7 @@ public:
 	bool addFace(Integer i, Integer j, Integer k, HSoupTriangle tri);
 
 	// add a vertex to a corresponding cluster for calculating of mean vertex
-	void addVertex(HTripleIndex index, HVertex vertex){
+	void addVertex(HTripleIndex<Integer> index, HVertex vertex){
 		addVertex(index.i, index.j, index.k, vertex); }
 
 	void addVertex(Integer i, Integer j, Integer k, HVertex vertex);
@@ -153,8 +153,8 @@ public:
 	bool addSoupTriangle(HSoupTriangle triangle);
 	bool generateIndexedMesh();
 	bool writeToPly(char* filename);
-	HTripleIndex retrieveIndex(HVertex v);
-	void getClusterRange(HTripleIndex index, float &_max_x, float &_min_x, float &_max_y, float &_min_y, float &_max_z, float &_min_z);
+	HTripleIndex<Integer> retrieveIndex(HVertex v);
+	void getClusterRange(HTripleIndex<Integer> index, float &_max_x, float &_min_x, float &_max_y, float &_min_y, float &_max_z, float &_min_z);
 
 private:
 	/* use hash map to store the degenerated face index */

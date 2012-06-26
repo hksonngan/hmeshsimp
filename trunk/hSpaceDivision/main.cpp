@@ -7,7 +7,8 @@
 #include "getopt.h"
 #include <string>
 #include <iostream>
-#include "spatial_division.h"
+//#include "spatial_division.h"
+#include "spatial_division2.h"
 #include "vertex_cluster.h"
 #include "trivial.h"
 #include "htime.h"
@@ -21,12 +22,16 @@ int target;
 char *infilename;
 char outfilename[200];
 
-static char *options = "t:h";
+static char *options = "t:m:h";
 
 static char *usage_string = 
-"-t <n>\ttarget vertices of the simplified mesh\n"
-"-h\tprint help\n"
-"\n";
+"\n"
+"\t-t <n>\ttarget vertices of the simplified mesh\n\n"
+"\t-m <n>\tminimum factor for normal variation.\n"
+"\t\tthis value is bigger means that the area\n"
+"\t\tcounts more importantly than normal variation.\n"
+"\t\tdefault 0.5, must falls in [0, 1].\n\n"
+"\t-h\tprint help\n\n";
 
 static void print_usage()
 {
@@ -39,7 +44,7 @@ static void print_usage()
 
 static void usage_error(char *msg = NULL)
 {
-	if( msg )  cerr << "#error: " << msg << endl;
+	if( msg )  cerr << "#" << msg << endl;
 	print_usage();
 	exit(1);
 }
@@ -47,6 +52,7 @@ static void usage_error(char *msg = NULL)
 void process_cmdline(int argc, char **argv)
 {
 	int opt, ival;
+	float fval;
 
 	getopt_init();
 	while( (opt = getopt(argc, argv, options)) != EOF )
@@ -61,9 +67,16 @@ void process_cmdline(int argc, char **argv)
 			else target = ival;
 			break;
 
+		case 'm':
+			fval = atof(optarg);
+			if( fval < 0 || fval > 1)
+				usage_error("minimum normal variation factor should fall in [0, 1]\n");
+			else HSDVertexCluster2::MINIMUM_NORMAL_VARI = fval;
+			break;
+
 		case 'h':  print_usage(); exit(0); break;
 
-		default:   usage_error("malformed command line."); break;
+		default:   usage_error("command line arguments error"); break;
 		}
 	}
 
@@ -87,19 +100,34 @@ int main(int argc, char** argv)
 {
 	process_cmdline(argc, argv);
 
+	//HTripleIndexHash hash;
+	//cout << hash(HTripleIndex<Integer>(2342341, 2435345, 652652)) << endl;
+	//cout << hash(HTripleIndex<Integer>(652652, 2435345, 2342341)) << endl;
+	//cout << hash(HTripleIndex<Integer>(652652, 0, 2342341)) << endl;
+	//cout << hash(HTripleIndex<Integer>(4, 1, 234241)) << endl;
+	//return 0;
+
 	HTime htime;
 
 	HSpatialDivision2 sd;
 	if (sd.readPly(infilename) == false) 
 		return 1;
-	cout << "\tread file time: " << htime.printElapseSec() << endl;
+	cout << "\t-----------------------------------------------" << endl 
+		 << "\tread file successfully" << endl
+		 << "\tfile name:\t" << infilename << endl
+		 << "\tvertex count:\t" << sd.getVertexCount() << "\tface count:\t" << sd.getFaceCount() << endl
+	     << "\tread file time:\t" << htime.printElapseSec() << endl << endl;
 
+	cout << "\t-----------------------------------------------" << endl;
 	if (sd.divide(target) == false) 
 		return 1;
-	cout << "\tsimplification time: " << htime.printElapseSec() << endl;
+	cout << "\tsimplification time:\t" << htime.printElapseSec() << endl << endl;
 
+	cout << "\t-----------------------------------------------" << endl;
 	if (sd.toPly(outfilename) == false) 
 		return 1;
+	cout << "\twrite file time:\t" << htime.printElapseSec() << endl << endl;
+		 
 
 	sd.clear();
 

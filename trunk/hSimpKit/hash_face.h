@@ -57,12 +57,15 @@ typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEq
 class HTripleIndexHash
 {
 public:
-	size_t operator()(const HTripleIndex& index) const {
+	size_t operator()(const HTripleIndex<Integer>& index) const {
 		unsigned long h = 0;
+		Integer arr[3];
 
-		h += index.i & 0x000003ff; h <<= 10;
-		h += index.j & 0x000003ff; h <<= 10;
-		h += index.k & 0x000003ff;
+		index.sortIndex(arr);
+
+		h += arr[0] & 0x000003ff; h <<= 10;
+		h += arr[1] & 0x000003ff; h <<= 10;
+		h += arr[2] & 0x000003ff;
 
 		return size_t(h);
 	}
@@ -72,12 +75,12 @@ public:
 class HTripleIndexEqual
 {
 public:
-	bool operator()(const HTripleIndex& h1, const HTripleIndex& h2) const {
-		return h1 == h2;
+	bool operator()(const HTripleIndex<Integer>& h1, const HTripleIndex<Integer>& h2) const {
+		return h1.unsequncedEqual(h2);
 	}
 };
 
 /* type of degenerated face container */
-typedef boost::unordered::unordered_set<HTripleIndex, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
+typedef boost::unordered::unordered_set<HTripleIndex<Integer>, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
 
 #endif //__HASH_FACE__

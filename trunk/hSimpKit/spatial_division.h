@@ -364,7 +364,7 @@ public:
 	void addVertex(HVertex v);
 	// caution: better add the faces after 
 	// you've added all the vertices
-	void addFace(HTripleIndex i3);
+	void addFace(HTripleIndex<Integer> i3);
 	bool readPly(char *filename);
 	bool divide(int target_count);
 	bool toPly(char *filename);
@@ -411,7 +411,7 @@ private:
 	HSDVertex *vertices;
 	int vertexCount;
 	// all the faces, gfl
-	HTripleIndex *faces;
+	HTripleIndex<Integer> *faces;
 	int faceCount;
 	/// deprecated
 	// vertex index map

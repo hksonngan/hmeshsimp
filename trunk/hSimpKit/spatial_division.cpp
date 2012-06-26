@@ -203,7 +203,7 @@ void HSpatialDivision::addVertex(HVertex v)
 	vertexCount ++;
 }
 
-void HSpatialDivision::addFace(HTripleIndex i3)
+void HSpatialDivision::addFace(HTripleIndex<Integer> i3)
 {
 	faces[faceCount] = i3;
 	faceCount ++;
@@ -256,7 +256,7 @@ bool HSpatialDivision::readPly(char *filename)
 	PlyStream plyStream;
 	Integer i;
 	HVertex v;
-	HTripleIndex f;
+	HTripleIndex<Integer> f;
 
 	if (plyStream.openForRead(filename) == false) {
 		return false;
@@ -264,7 +264,7 @@ bool HSpatialDivision::readPly(char *filename)
 
 	// set the capacity for the gvl and gfl
 	vertices = new HSDVertex[plyStream.getVertexCount()];
-	faces = new HTripleIndex[plyStream.getFaceCount()];
+	faces = new HTripleIndex<Integer>[plyStream.getFaceCount()];
 	//vIndexMap.resize(plyStream.getVertexCount());
 	notifyVertSwap.vertices = vertices;
 	
@@ -598,7 +598,7 @@ void HSpatialDivision::generateIndexedMesh()
 {
 	int i, vindex, j, i1, i2, i3;
 	HSDVertexCluster sdc;
-	HTripleIndex tripleIndex;
+	HTripleIndex<Integer> tripleIndex;
 	int *indexMap = new int[vertexCount];
 
 	for (i = 0; i < clusters.count(); i ++) {
