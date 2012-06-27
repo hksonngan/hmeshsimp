@@ -55,6 +55,7 @@ class HSDVertex2 : public HVertex
 {
 public:
 	HSDVertex2() {
+		Set(0.0, 0.0, 0.0);
 		awQ.setZero();
 		awN.Set(0.0, 0.0, 0.0);
 		area = 0.0;

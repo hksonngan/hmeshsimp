@@ -116,6 +116,9 @@ bool PlyStream::nextVertex(HVertex &v)
 	ply->which_elem = vertexElem;
 	
 	vertex.other_props = NULL;
+	vertex.x = 0;
+	vertex.y = 0;
+	vertex.z = 0;
 	ply_get_element (ply, (void *) &vertex);
 
 	v.Set(vertex.x, vertex.y, vertex.z);
