@@ -276,14 +276,12 @@ void doubleHeap<T>::printHeap(ostream& out, int root, int level)
 template<class T>
 inline void PrintHeap(ostream& out, doubleHeap<T> &h)
 {
-#ifdef PRINT_HEAP
 	if (h.empty())
 		return;
 
 	h.printHeap(out, 0, 0);
 	out << "______________________________________________________________" 
 		<< endl << "items count: " << h.count() << endl << endl;
-#endif
 }
 
 //int main()

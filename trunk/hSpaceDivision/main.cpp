@@ -112,22 +112,12 @@ int main(int argc, char** argv)
 	HSpatialDivision2 sd;
 	if (sd.readPly(infilename) == false) 
 		return 1;
-	cout << "\t-----------------------------------------------" << endl 
-		 << "\tread file successfully" << endl
-		 << "\tfile name:\t" << infilename << endl
-		 << "\tvertex count:\t" << sd.getVertexCount() << "\tface count:\t" << sd.getFaceCount() << endl
-	     << "\tread file time:\t" << htime.printElapseSec() << endl << endl;
 
-	cout << "\t-----------------------------------------------" << endl;
 	if (sd.divide(target) == false) 
 		return 1;
-	cout << "\tsimplification time:\t" << htime.printElapseSec() << endl << endl;
 
-	cout << "\t-----------------------------------------------" << endl;
 	if (sd.toPly(outfilename) == false) 
-		return 1;
-	cout << "\twrite file time:\t" << htime.printElapseSec() << endl << endl;
-		 
+		return 1;		 
 
 	sd.clear();
 

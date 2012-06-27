@@ -1,10 +1,12 @@
 /*
  *  the vertices and faces division algorithm algorithm is based on array self partition
  *
- *  codes about the algorithm of  'reverse spatial subdivision mesh simplification', 
+ *  codes about the algorithm of 'reverse spatial subdivision mesh simplification', 
  *  more detail please refer to 
- *    [Brodsky&Watson] Model Simplification Through Refinement
- *    [Garland] Quadric-based Polygonal Surface Simplification, Chapter 4 Analysis of Quadric Metric
+ *    [Brodsky & Watson]	Model Simplification Through Refinement
+ *    [Garland]				Quadric-based Polygonal Surface Simplification, 
+ *								Chapter 4 Analysis of Quadric Metric
+ *    [Shaffer & Garland]	Efficient Adaptive Simplification of Massive Meshes
  *
  *	author: ht
  *  email : waytofall916@gmail.com
@@ -23,7 +25,7 @@
 #include "double_heap.h"
 #include <ostream>
 #include <Eigen/Eigenvalues>
-#include "algorithm.h"
+#include "halgorithm.h"
 #include <fstream>
 
 

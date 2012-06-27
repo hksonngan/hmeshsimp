@@ -1,12 +1,16 @@
 /*
- *  the vertices and faces division algorithm is based on indices array
+ *  the vertices and faces division algorithm is based on indices array.
+ *  for the reason of running time, most of the routines called in the 
+ *  main loop 'bool divide(int target)' is made inline.
  *
- *  INHERITED FROM 'spatial_divison.h':
- *
- *  codes about the algorithm of  'reverse spatial subdivision mesh simplification', 
+ *  TEXT BELOW INHERITED FROM 'spatial_divison.h'
+ *  _______________________________________________________________________________
+ *  codes about the algorithm of 'reverse spatial subdivision mesh simplification', 
  *  more detail please refer to 
- *    [Brodsky&Watson] Model Simplification Through Refinement
- *    [Garland] Quadric-based Polygonal Surface Simplification, Chapter 4 Analysis of Quadric Metric
+ *    [Brodsky & Watson]	Model Simplification Through Refinement
+ *    [Garland]				Quadric-based Polygonal Surface Simplification, 
+ *								Chapter 4 Analysis of Quadric Metric
+ *    [Shaffer & Garland]	Efficient Adaptive Simplification of Massive Meshes
  *
  *	author: ht
  *  email : waytofall916@gmail.com
@@ -20,14 +24,13 @@
 #include "hash_face.h"
 #include <list>
 #include <boost/unordered_set.hpp>
-#define PRINT_HEAP
 #include "double_heap.h"
-#include <ostream>
+#include <iostream>
 #include <Eigen/Eigenvalues>
-#include "algorithm.h"
+#include "halgorithm.h"
 #include <fstream>
 #include "hdynamarray.h"
-//#include "spatial_division.h"
+#include "htime.h"
 
 //#define INIT_HEAP_VOL 10000 //initial heap volume
 
@@ -37,12 +40,15 @@
 #define NO_VERTEX -2
 #define VERTEX_ADDED -3
 
+//#define PRINT_DEBUG_INFO
+
 //#define HDynamArray std::vector
 
 using namespace Eigen;
 using std::ostream;
 using std::list;
 using std::ofstream;
+using std::fstream;
 
 /* class defined */
 class HSDVertex2;
@@ -269,8 +275,12 @@ private:
 
 	// split the range of vertices to connected vertex clusters
 	inline void splitConnectedRange(HSDVertexCluster2 &vc);
+	/// deprecated: may cause stack overflow
 	// recursively depth-first search the connectivity region
+	///
 	void searchConnectivity(Integer vIndex, Integer clusterIndex);
+	// breadth-first search the connectivity
+	inline void searchConnectivityBF(Integer vSrcIndex, Integer clusterIndex);
 
 private:
 	// all the vertices, gvl
@@ -286,13 +296,20 @@ private:
 	float max_x, min_x, max_y, min_y, max_z, min_z;
 	float max_range;
 
-	// some constantly used aiding variables
-	WhichSide sideOfPlane1, sideOfPlane2, sideOfPlane3;
+	/* some constantly used aiding variables */
+ 	WhichSide sideOfPlane1, sideOfPlane2, sideOfPlane3;
 	HSDVertexCluster2 vcArr[8];
 	HSDVertexCluster2 *vcArr2; int vcArr2Count;
+	list<Integer> bfQueue; // queue used for breadth-first search
 
+#ifdef PRINT_DEBUG_INFO
 	// debug info
-	ofstream fout;
+	ofstream fdebug;
+#endif
+
+	// log file
+	ofstream flog;
+	HTime htime;
 };
 
 inline void HSpatialDivision2::addVertex(HVertex v)
@@ -586,7 +603,7 @@ inline void HSpatialDivision2::splitConnectedRange(HSDVertexCluster2 &vc)
 	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++)	{
 		// if the vertex hasn't been visited
 		if (vertices[*iter].clusterIndex == -1) {
-			searchConnectivity(*iter, curCluster);
+			searchConnectivityBF(*iter, curCluster);
 			curCluster ++;
 		}
 	}
@@ -634,6 +651,41 @@ inline void HSpatialDivision2::splitConnectedRange(HSDVertexCluster2 &vc)
 		if (vcArr2[i].hasVertex())
 			clusters.addElement(vcArr2[i]);
 	}
+}
+
+inline void HSpatialDivision2::searchConnectivityBF(Integer vSrcIndex, Integer clusterIndex) {
+	
+	Integer vIndex;
+	list<Integer>::iterator iter;
+	HTripleIndex<Integer> f;
+
+	// push from front, pop from back
+	vertices[vSrcIndex].clusterIndex = clusterIndex;
+	bfQueue.push_front(vSrcIndex);
+
+	while (bfQueue.empty() == false) {
+		vIndex = bfQueue.back();
+		bfQueue.pop_back();
+
+		for (iter = vertices[vIndex].adjacentFaces.begin(); iter != vertices[vIndex].adjacentFaces.end(); iter ++) {
+			f = faces[*iter];
+			// haven't been visited
+			if (vertices[f.i].clusterIndex == -1) {
+				vertices[f.i].clusterIndex = clusterIndex;
+				bfQueue.push_front(f.i);
+			}
+			if (vertices[f.j].clusterIndex == -1) {
+				vertices[f.j].clusterIndex = clusterIndex;
+				bfQueue.push_front(f.j);
+			}
+			if (vertices[f.k].clusterIndex == -1) {
+				vertices[f.k].clusterIndex = clusterIndex;
+				bfQueue.push_front(f.k);
+			}
+		}
+	}
+
+	bfQueue.clear();
 }
 
 #endif //__SPATIAL_DIVISION__

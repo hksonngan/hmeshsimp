@@ -1,12 +1,11 @@
 #include "spatial_division2.h"
 #include <Eigen/Eigenvalues>
-#include <iostream>
 #include <vector>
 #include <algorithm>
 #include "util_common.h"
 #include "math/vec3.h"
 #include "ply_stream.h"
-#include <fstream>
+#include <time.h>
 
 using std::cerr;
 using std::cout;
@@ -71,7 +70,18 @@ clusters(INIT_HEAP_VOL, MaxHeap)
 	faces = NULL;
 	faceCount = 0;
 
-	fout.open("sddebug.txt");
+	time_t rawtime;
+	struct tm * timeinfo;
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+
+#ifdef PRINT_DEBUG_INFO
+	fdebug.open("sddebug.txt", fstream::out | fstream::app);
+	fdebug << endl << endl << asctime(timeinfo) << endl; 
+#endif
+
+	flog.open("sd.log", fstream::out | fstream::app);
+	flog << endl << endl << asctime(timeinfo) << endl; 
 
 	vcArr2Count = 0;
 	vcArr2 = NULL;
@@ -88,6 +98,8 @@ bool HSpatialDivision2::readPly(char *filename)
 	Integer i;
 	HVertex v;
 	HTripleIndex<Integer> f;
+
+	htime.setCheckPoint();
 
 	if (plyStream.openForRead(filename) == false) {
 		return false;
@@ -129,6 +141,18 @@ bool HSpatialDivision2::readPly(char *filename)
 		addFace(f);
 	}
 
+	cout << "\t-----------------------------------------------" << endl 
+		 << "\tread file successfully" << endl
+		 << "\tfile name:\t" << filename << endl
+		 << "\tvertex count:\t" << getVertexCount() << "\tface count:\t" << getFaceCount() << endl
+		 << "\tread file time:\t" << htime.printElapseSec() << endl << endl;
+
+	flog << "\t-----------------------------------------------" << endl 
+	 	 << "\tread file successfully" << endl
+		 << "\tfile name:\t" << filename << endl
+		 << "\tvertex count:\t" << getVertexCount() << "\tface count:\t" << getFaceCount() << endl
+		 << "\tread file time:\t" << htime.printElapseSec() << endl << endl;
+
 	return true;
 }
 
@@ -157,6 +181,8 @@ bool HSpatialDivision2::divide(int target_count)
 	solver = &eigensolver;
 	Matrix3f M;
 
+	htime.setCheckPoint();
+
 	/* - routines - */
 
 	// init the first cluster
@@ -164,7 +190,14 @@ bool HSpatialDivision2::divide(int target_count)
 		if (vertices[i].clusterIndex != -1) 
 			vc.addVertex(i, vertices[i]);
 
-	cout << "\tnon-referenced vertices count:\t" << vertexCount - vc.vIndices->size() << endl
+	cout << "\t-----------------------------------------------" << endl 
+		 << "\tnon-referenced vertices count:\t" << vertexCount - vc.vIndices->size() << endl
+		 << "\tminimum normal-vari factor:\t" << HSDVertexCluster2::MINIMUM_NORMAL_VARI << endl
+		 << "\tvalid vertices count:\t" << vc.vIndices->size() << endl;
+
+	flog << "\t-----------------------------------------------" << endl
+		 << "\tnon-referenced vertices count:\t" << vertexCount - vc.vIndices->size() << endl
+		 << "\tminimum normal-vari factor:\t" << HSDVertexCluster2::MINIMUM_NORMAL_VARI << endl
 		 << "\tvalid vertices count:\t" << vc.vIndices->size() << endl;
 
 	for (i = 0; i < faceCount; i ++) {
@@ -195,11 +228,13 @@ bool HSpatialDivision2::divide(int target_count)
 
 		if (continuousUnchangeCount >= 50) {
 			cout << "\tstop without reaching the target count because of unchanged cluster count" << endl;
+			flog << "\tstop without reaching the target count because of unchanged cluster count" << endl;
 			break;
 		}
 		
 		if (clusters.empty()) {
 			cerr << "#error: don't know why but the clusters heap have came to empty" << endl;
+			flog << "#error: don't know why but the clusters heap have came to empty" << endl;
 			return false;
 		}
 
@@ -217,6 +252,7 @@ bool HSpatialDivision2::divide(int target_count)
 		eigensolver.compute(M);
 		if (eigensolver.info() != Success) {
 			cerr << "#error: eigenvalues computing error" << endl;
+			flog << "#error: eigenvalues computing error" << endl;
 			return false;
 		}
 
@@ -255,10 +291,16 @@ bool HSpatialDivision2::divide(int target_count)
 			partition2(vc, maxDir, HFaceFormula::calcD(maxDir, vc.meanVertex));
 		}
 
-		PrintHeap(fout, clusters);
+#ifdef PRINT_DEBUG_INFO
+		PrintHeap(fdebug, clusters);
+#endif
 	}
 
 	//PrintHeap(cout, clusters);
+
+	cout << "\tsimplification time:\t" << htime.printElapseSec() << endl << endl;
+
+	flog << "\tsimplification time:\t" << htime.printElapseSec() << endl << endl;
 
 	return true;
 }
@@ -321,9 +363,17 @@ bool HSpatialDivision2::toPly(char *filename)
 	}
 
 	// statistics
-	cout << "\twrite simplified mesh successfully" << endl
-		<< "\tfile name:\t" << filename << endl
-		<< "\tvertex count:\t" << clusters.count() << "\tface count:\t" <<  degFaces.size() << endl;
+	cout << "\t-----------------------------------------------" << endl
+		 << "\twrite simplified mesh successfully" << endl
+		 << "\tfile name:\t" << filename << endl
+		 << "\tvertex count:\t" << clusters.count() << "\tface count:\t" <<  degFaces.size() << endl
+		 << "\twrite file time:\t\t" << htime.printElapseSec() << endl << endl;
+
+	flog << "\t-----------------------------------------------" << endl
+		 << "\twrite simplified mesh successfully" << endl
+		 << "\tfile name:\t" << filename << endl
+		 << "\tvertex count:\t\t" << clusters.count() << "\tface count:\t" <<  degFaces.size() << endl
+		 << "\twrite file time:\t" << htime.printElapseSec() << endl << endl;
 
 	return true;
 }
