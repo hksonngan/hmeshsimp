@@ -3,7 +3,9 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ply"
-	ProjectGUID="{5CB663CB-A752-463C-BB7C-78BD4AFC8843}"
+	ProjectGUID="{FC919909-CEB7-4332-AB64-589E8979973F}"
+	RootNamespace="ply"
+	Keyword="Win32Proj"
 	>
 	<Platforms>
 		<Platform
@@ -17,7 +19,8 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -36,6 +39,16 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="./"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -48,6 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -76,8 +93,11 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -96,6 +116,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="./"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -108,6 +135,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -139,16 +172,24 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\_convertply.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\_ply_include.h"
-			>
-		</File>
-		<File
 			RelativePath=".\adjacency_module.c"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\boundply.c"
@@ -161,9 +202,61 @@
 					Name="VCCLCompilerTool"
 				/>
 			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\convertply.c"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\convertply.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					ObjectFile="$(IntDir)\$(InputName)1.obj"
+					XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					ObjectFile="$(IntDir)\$(InputName)1.obj"
+					XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\drand48.h"
 			>
 		</File>
 		<File
@@ -171,6 +264,14 @@
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
 				ExcludedFromBuild="true"
 				>
 				<Tool
@@ -189,12 +290,28 @@
 					Name="VCCLCompilerTool"
 				/>
 			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\normalsply.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
 				ExcludedFromBuild="true"
 				>
 				<Tool
@@ -213,12 +330,28 @@
 					Name="VCCLCompilerTool"
 				/>
 			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\platoply.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
 				ExcludedFromBuild="true"
 				>
 				<Tool
@@ -237,14 +370,10 @@
 		<File
 			RelativePath=".\ply2iv.c"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-				/>
-			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\ply_include.h"
+			>
 		</File>
 		<File
 			RelativePath=".\sphereply.c"
@@ -257,12 +386,28 @@
 					Name="VCCLCompilerTool"
 				/>
 			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\xformply.c"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
 				ExcludedFromBuild="true"
 				>
 				<Tool

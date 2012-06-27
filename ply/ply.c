@@ -35,7 +35,10 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <ply.h>
+#include "ply.h"
+
+// added by houao, code dragged from http://blog.sciencenet.cn/blog-653020-506871.html
+#include "drand48.h"
 
 char *type_names[] = {  /* names of scalar types */
 "invalid",
