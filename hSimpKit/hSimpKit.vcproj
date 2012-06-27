@@ -232,10 +232,6 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\algorithm.h"
-			>
-		</File>
-		<File
 			RelativePath=".\double_heap.h"
 			>
 		</File>
@@ -245,6 +241,10 @@
 		</File>
 		<File
 			RelativePath=".\getopt.h"
+			>
+		</File>
+		<File
+			RelativePath=".\halgorithm.h"
 			>
 		</File>
 		<File
