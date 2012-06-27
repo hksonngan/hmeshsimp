@@ -16,33 +16,27 @@
  *  email : waytofall916@gmail.com
  */
 
-#ifndef __SPATIAL_DIVISION__
-#define __SPATIAL_DIVISION__
+#ifndef __SPATIAL_DIVISION_2__
+#define __SPATIAL_DIVISION_2__
 
+/* c++ standard library */
+#include <list>
+#include <iostream>
+#include <fstream>
+
+/* external library */
+#include <boost/unordered_set.hpp>
+#include <Eigen/Eigenvalues>
+
+/* my own code */
 #include "util_common.h"
 #include "vertex_cluster.h"
 #include "hash_face.h"
-#include <list>
-#include <boost/unordered_set.hpp>
 #include "double_heap.h"
-#include <iostream>
-#include <Eigen/Eigenvalues>
 #include "halgorithm.h"
-#include <fstream>
-#include "hdynamarray.h"
 #include "htime.h"
 
-//#define INIT_HEAP_VOL 10000 //initial heap volume
-
-// constants for the variable vRangeStart to mark 
-// if there has been vertex added for computing 
-// of bounding box
-#define NO_VERTEX -2
-#define VERTEX_ADDED -3
-
 //#define PRINT_DEBUG_INFO
-
-//#define HDynamArray std::vector
 
 using namespace Eigen;
 using std::ostream;
@@ -688,4 +682,4 @@ inline void HSpatialDivision2::searchConnectivityBF(Integer vSrcIndex, Integer c
 	bfQueue.clear();
 }
 
-#endif //__SPATIAL_DIVISION__
+#endif //__SPATIAL_DIVISION_2__
