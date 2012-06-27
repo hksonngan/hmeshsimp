@@ -6,12 +6,14 @@
  copyleft : basically GPL
 *************************************/
 
+/* caution!! this file as well as 'ply_additional.h' may be deprecated due to the 'PlyStream' class defined */
+
 #ifndef __PLY_INC_H__
 #define __PLY_INC_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
 #include "ply.h"
 
@@ -54,8 +56,8 @@ extern void write_ply_model_to_file_as_smf(char *filename);
 extern void clean_ply();
 //extern int convert_ply(const char* infilename, const char* outfilename, int verbose_flag);
 
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//}
+//#endif
 
 #endif /* !__PLY_INC_H__ */

@@ -30,40 +30,6 @@ void clean_ply()
 		other_elements = NULL;
 	}
 
-	//if (flist)
-	//{
-	//	for (int i = 0; i < nfaces; i ++)
-	//	{
-	//		if (flist[i])
-	//		{
-	//			if (flist[i]->verts)
-	//			{
-	//				free(flist[i]->verts);
-	//			}
-	//			free(flist[i]);
-	//		}
-	//	}
-	//	free (flist);
-	//	flist = NULL;
-	//}
-
-	//if(vlist)
-	//{
-	//	for (int i = 0; i < nverts; i ++)
-	//	{
-	//		if (vlist[i])
-	//		{
-	//			if (vlist[i]->other_props)
-	//			{
-	//				free(vlist[i]->other_props);
-	//			}
-	//			free(vlist[i]);
-	//		}
-	//	}
-	//	free (vlist);
-	//	vlist = NULL;
-	//}
-
 	if (flist)
 	{
 		for (int i = 0; i < nfaces; i ++)

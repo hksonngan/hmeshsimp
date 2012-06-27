@@ -223,11 +223,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ply\ply_read.cxx"
+				RelativePath=".\ply\ply_read.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ply\plyfile.c"
+				RelativePath=".\ply\plyfile.cpp"
 				>
 			</File>
 		</Filter>
@@ -325,6 +325,10 @@
 		</File>
 		<File
 			RelativePath=".\tri_soup_stream.h"
+			>
+		</File>
+		<File
+			RelativePath=".\trivial.cpp"
 			>
 		</File>
 		<File
