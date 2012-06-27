@@ -109,6 +109,12 @@ bool HSpatialDivision2::readPly(char *filename)
 	faces = new HTripleIndex<Integer>[plyStream.getFaceCount()];
 	
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
+		if (i == 26) {
+			int k = 0;
+			k ++;
+		}
+
+		v.Set(0, 0, 0);
 		if (plyStream.nextVertex(v) == false) {
 			return false;
 		}
@@ -124,7 +130,7 @@ bool HSpatialDivision2::readPly(char *filename)
 		max_range = max_z - min_z;
 	}
 
-	// resize all coprdinates of vertices to [0, 1000]
+	// resize all coordinates of vertices to [0, 1000]
 	for (i = 0; i < vertexCount; i ++)	{
 		vertices[i].x = RANGE_MAX / max_range * (vertices[i].x - min_x);
 		vertices[i].y = RANGE_MAX / max_range * (vertices[i].y - min_y);
