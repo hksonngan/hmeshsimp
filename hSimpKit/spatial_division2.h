@@ -119,20 +119,16 @@ private:
 
 	float importance;
 
-	// vertices indices in the cluster.
-	// this pointer will be null unless
-	// the function addVertex() is called
-	// in case of a waste of memory when
-	// value copied, remember to delete
-	// the occupied memory space when
-	// discarding it
+	// vertices and faces indices in the cluster.
+	// these pointer will be null unless the function
+	// addVertex() and addFace() is called in case of 
+	// a waste of memory when value copied, remember 
+	// to delete the occupied memory space when discarding it
 	list<Integer> *vIndices;
 	list<Integer> *fIndices;
 
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
-
-	//static const int INIT_VERT_VOL = 100;
 };
 
 inline void HSDVertexCluster2::addVertex(Integer i, HSDVertex2 v)
@@ -271,8 +267,8 @@ private:
 	inline void splitConnectedRange(HSDVertexCluster2 &vc);
 	/// deprecated: may cause stack overflow
 	// recursively depth-first search the connectivity region
-	///
 	void searchConnectivity(Integer vIndex, Integer clusterIndex);
+	///
 	// breadth-first search the connectivity
 	inline void searchConnectivityBF(Integer vSrcIndex, Integer clusterIndex);
 
