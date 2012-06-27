@@ -823,7 +823,8 @@ PlyFile *ply_open_for_reading(
 
   /* open the file for reading */
 
-  fp = fopen (name, "r");
+  // modified by ht
+  fp = fopen (name, "rb");
   if (fp == NULL)
     return (NULL);
 
@@ -2149,24 +2150,25 @@ void get_binary_item(
 {
   char c[8];
   void *ptr;
+  int num; // added by ht
 
   ptr = (void *) c;
 
   switch (type) {
     case PLY_CHAR:
-      fread (ptr, 1, 1, fp);
+      num = fread (ptr, 1, 1, fp);
       *int_val = *((char *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
     case PLY_UCHAR:
-      fread (ptr, 1, 1, fp);
+      num = fread (ptr, 1, 1, fp);
       *uint_val = *((unsigned char *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
     case PLY_SHORT:
-      fread (ptr, 2, 1, fp);
+      num = fread (ptr, 2, 1, fp);
 	  // added by ht, check the endian issue
 	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
 		  switchBytes((char*)ptr, 2);
@@ -2177,7 +2179,7 @@ void get_binary_item(
       *double_val = *int_val;
       break;
     case PLY_USHORT:
-      fread (ptr, 2, 1, fp);
+      num = fread (ptr, 2, 1, fp);
 	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
 		  switchBytes((char*)ptr, 2);
 	  }
@@ -2187,7 +2189,7 @@ void get_binary_item(
       *double_val = *uint_val;
       break;
     case PLY_INT:
-      fread (ptr, 4, 1, fp);
+      num = fread (ptr, 4, 1, fp);
 	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
 		  switchBytes((char*)ptr, 4);
 	  }
@@ -2197,7 +2199,7 @@ void get_binary_item(
       *double_val = *int_val;
       break;
     case PLY_UINT:
-      fread (ptr, 4, 1, fp);
+      num = fread (ptr, 4, 1, fp);
 	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
 		  switchBytes((char*)ptr, 4);
 	  }
@@ -2207,7 +2209,7 @@ void get_binary_item(
       *double_val = *uint_val;
       break;
     case PLY_FLOAT:
-      fread (ptr, 4, 1, fp);
+      num = fread (ptr, 4, 1, fp);
 	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
 		  switchBytes((char*)ptr, 4);
 	  }
@@ -2217,7 +2219,7 @@ void get_binary_item(
       *uint_val = (unsigned int)*double_val;
       break;
     case PLY_DOUBLE:
-      fread (ptr, 8, 1, fp);
+      num = fread (ptr, 8, 1, fp);
 	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
 		  switchBytes((char*)ptr, 8);
 	  }
@@ -2230,6 +2232,19 @@ void get_binary_item(
       fprintf (stderr, "get_binary_item: bad type = %d\n", type);
       exit (-1);
   }
+
+  // added by ht
+  if (num < 1) {
+	  if ( feof(fp) != 0 ) {
+		  fprintf (stderr, "get_binary_item: file came to end when reading binary item\n");
+	  }
+	  else if ( ferror(fp) != 0 ) {
+		  fprintf (stderr, "get_binary_item: error occurred when reading binary item\n");
+	  }
+	  
+	  exit (EXIT_FAILURE);
+  }
+  
 }
 
 

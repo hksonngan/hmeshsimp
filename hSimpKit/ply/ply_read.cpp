@@ -1,6 +1,8 @@
 /*
  *	read in ply files
- *	modified by ht
+ *  this file is more like a sample code for using Greg Turk's ply routines,
+ *  however, there a lot more that behaves like this
+ *	 -- ht
  */
 
 /*

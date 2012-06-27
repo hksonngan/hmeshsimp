@@ -117,7 +117,6 @@ bool HSpatialDivision2::readPly(char *filename)
 			k ++;
 		}
 
-		v.Set(0, 0, 0);
 		if (plyStream.nextVertex(v) == false) {
 			return false;
 		}
