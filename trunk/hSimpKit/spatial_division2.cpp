@@ -1,11 +1,10 @@
 #include "spatial_division2.h"
-#include <Eigen/Eigenvalues>
 #include <vector>
 #include <algorithm>
+#include <time.h>
 #include "util_common.h"
 #include "math/vec3.h"
 #include "ply_stream.h"
-#include <time.h>
 
 using std::cerr;
 using std::cout;
