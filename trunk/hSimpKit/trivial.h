@@ -12,15 +12,26 @@
 
 using std::string;
 
-// trim the extention of the file name and append some str
-inline void trimExtAndAppend(char *src, char *dst, char *app)
-{
-	string s(src);
-	s = s.substr(0, s.find_last_of("."));
-	s += app;
+// specify the endian order
+enum EndianOrder { H_BIG_ENDIAN, H_LITTLE_ENDIAN };
 
-	memcpy(dst, s.c_str(), s.size());
-	dst[s.size()] = '\0';
+// trim the extention of the file name and append some str
+void trimExtAndAppend(char *src, char *dst, char *app);
+
+// get the system endian mode
+EndianOrder getSystemEndianMode();
+
+// switch bytes for a variable
+inline void switchBytes(char* ptr, int size)
+{
+	char temp;
+	int i;
+
+	for (i = 0; i < size / 2; i ++) {
+		temp = ptr[i];
+		ptr[i] = ptr[size - 1 - i];
+		ptr[size - 1 - i] = temp;
+	}
 }
 
 #endif //__TRIVIAL__

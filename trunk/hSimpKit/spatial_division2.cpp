@@ -5,6 +5,7 @@
 #include "util_common.h"
 #include "math/vec3.h"
 #include "ply_stream.h"
+#include "stdio.h"
 
 using std::cerr;
 using std::cout;
@@ -107,6 +108,8 @@ bool HSpatialDivision2::readPly(char *filename)
 	// set the capacity for the gvl and gfl
 	vertices = new HSDVertex2[plyStream.getVertexCount()];
 	faces = new HTripleIndex<Integer>[plyStream.getFaceCount()];
+
+	float float_val = 5.89458;
 	
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 		if (i == 26) {

@@ -1,8 +1,9 @@
 #include "ply_stream.h"
 #include "ply.h"
 #include <iostream>
+#include "trivial.h"
 
-extern "C" { PlyElement *find_element(PlyFile *plyfile, char *element); }
+extern /*"C" {*/ PlyElement *find_element(PlyFile *plyfile, char *element); /*}*/
 
 using std::cerr;
 using std::endl;
@@ -48,6 +49,15 @@ bool PlyStream::openForRead(char *filename)
 	if(ply == NULL) {
 		cerr << "#error: ply file open failed" << endl;
 		return false;
+	}
+
+	/* check the endian mode */
+	SYSTEM_ENDIAN_MODE = getSystemEndianMode();
+	if (ply->file_type == PLY_BINARY_BE/* binary PLY file, big endian */) {
+		FILE_ENDIAN_MODE = H_BIG_ENDIAN;
+	}
+	else if (ply->file_type == PLY_BINARY_LE/* binary PLY file, little endian */) {
+		FILE_ENDIAN_MODE = H_LITTLE_ENDIAN;
 	}
 
 	for (i = 0; i < nelems; i++) {

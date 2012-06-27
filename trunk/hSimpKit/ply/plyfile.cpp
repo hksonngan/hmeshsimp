@@ -111,6 +111,10 @@ static char *my_alloc(int, int, char *);
 #define myalloc(mem_size) my_alloc((mem_size), __LINE__, __FILE__)
 
 
+/* added by ht */
+EndianOrder SYSTEM_ENDIAN_MODE = H_LITTLE_ENDIAN;
+EndianOrder FILE_ENDIAN_MODE = H_BIG_ENDIAN;
+
 /*************/
 /*  Writing  */
 /*************/
@@ -529,7 +533,7 @@ void ply_put_element(PlyFile *plyfile, void *elem_ptr)
   char **other_ptr;
 
   elem = plyfile->which_elem;
-  elem_data = elem_ptr;
+  elem_data = (char*)elem_ptr;
   other_ptr = (char **) (((char *) elem_ptr) + elem->other_offset);
 
   /* write out either to an ascii or binary file */
@@ -544,7 +548,7 @@ void ply_put_element(PlyFile *plyfile, void *elem_ptr)
       if (elem->store_prop[j] == OTHER_PROP)
         elem_data = *other_ptr;
       else
-        elem_data = elem_ptr;
+        elem_data = (char*)elem_ptr;
       if (prop->is_list) {
         item = elem_data + prop->count_offset;
         get_stored_item ((void *) item, prop->count_internal,
@@ -584,7 +588,7 @@ void ply_put_element(PlyFile *plyfile, void *elem_ptr)
       if (elem->store_prop[j] == OTHER_PROP)
         elem_data = *other_ptr;
       else
-        elem_data = elem_ptr;
+        elem_data = (char*)elem_ptr;
       if (prop->is_list) {
         item = elem_data + prop->count_offset;
         item_size = ply_type_size[prop->count_internal];
@@ -2163,36 +2167,61 @@ void get_binary_item(
       break;
     case PLY_SHORT:
       fread (ptr, 2, 1, fp);
+	  // added by ht, check the endian issue
+	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
+		  switchBytes((char*)ptr, 2);
+	  }
+	  
       *int_val = *((short int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
     case PLY_USHORT:
       fread (ptr, 2, 1, fp);
+	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
+		  switchBytes((char*)ptr, 2);
+	  }
+
       *uint_val = *((unsigned short int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
     case PLY_INT:
       fread (ptr, 4, 1, fp);
+	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
+		  switchBytes((char*)ptr, 4);
+	  }
+
       *int_val = *((int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
     case PLY_UINT:
       fread (ptr, 4, 1, fp);
+	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
+		  switchBytes((char*)ptr, 4);
+	  }
+
       *uint_val = *((unsigned int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
     case PLY_FLOAT:
       fread (ptr, 4, 1, fp);
+	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
+		  switchBytes((char*)ptr, 4);
+	  }
+
       *double_val = *((float *) ptr);
       *int_val = (int)*double_val;
       *uint_val = (unsigned int)*double_val;
       break;
     case PLY_DOUBLE:
       fread (ptr, 8, 1, fp);
+	  if (SYSTEM_ENDIAN_MODE != FILE_ENDIAN_MODE){
+		  switchBytes((char*)ptr, 8);
+	  }
+
       *double_val = *((double *) ptr);
       *int_val = (int)*double_val;
       *uint_val = (unsigned int)*double_val;
