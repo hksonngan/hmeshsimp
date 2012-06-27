@@ -21,8 +21,8 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 
 #include <stdio.h>
 #include <math.h>
-#include <strings.h>
-#include <ply.h>
+#include <string.h>
+#include "ply.h"
 
 
 /* vertex and face definitions for a polygonal object */
@@ -78,34 +78,12 @@ static int has_normals = 0;
 Main program.
 ******************************************************************************/
 
-main(int argc, char *argv[])
-{
-  int i,j;
-  char *s;
-  char *progname;
-
-  progname = argv[0];
-
-  while (--argc > 0 && (*++argv)[0]=='-') {
-    for (s = argv[0]+1; *s; s++)
-      switch (*s) {
-        default:
-          usage (progname);
-          exit (-1);
-          break;
-      }
-  }
-
-  read_file();
-  write_inventor();
-}
-
 
 /******************************************************************************
 Print out usage information.
 ******************************************************************************/
 
-usage(char *progname)
+void usage(char *progname)
 {
   fprintf (stderr, "usage: %s [flags] <in.ply >out.iv\n", progname);
 }
@@ -115,7 +93,7 @@ usage(char *progname)
 Read in the PLY file from standard in.
 ******************************************************************************/
 
-read_file()
+void read_file(char* filename)
 {
   int i,j;
   int elem_count;
@@ -124,7 +102,9 @@ read_file()
 
   /*** Read in the original PLY object ***/
 
-  in_ply  = read_ply (stdin);
+  FILE *fin = fopen(filename, "r");
+
+  in_ply  = read_ply (fin);
 
   for (i = 0; i < in_ply->num_elem_types; i++) {
 
@@ -144,32 +124,32 @@ read_file()
       setup_property_ply (in_ply, &vert_props[2]);
 
       for (j = 0; j < in_ply->elems[i]->nprops; j++) {
-	PlyProperty *prop;
-	prop = in_ply->elems[i]->props[j];
-	if (equal_strings ("r", prop->name)) {
-	  setup_property_ply (in_ply, &vert_props[3]);
-	  per_vertex_color = 1;
-	}
-	if (equal_strings ("g", prop->name)) {
-	  setup_property_ply (in_ply, &vert_props[4]);
-	  per_vertex_color = 1;
-	}
-	if (equal_strings ("b", prop->name)) {
-	  setup_property_ply (in_ply, &vert_props[5]);
-	  per_vertex_color = 1;
-	}
-	if (equal_strings ("nx", prop->name)) {
-	  setup_property_ply (in_ply, &vert_props[6]);
-	  has_normals = 1;
-	}
-	if (equal_strings ("ny", prop->name)) {
-	  setup_property_ply (in_ply, &vert_props[7]);
-	  has_normals = 1;
-	}
-	if (equal_strings ("nz", prop->name)) {
-	  setup_property_ply (in_ply, &vert_props[8]);
-	  has_normals = 1;
-	}
+		PlyProperty *prop;
+		prop = in_ply->elems[i]->props[j];
+		if (equal_strings ("r", prop->name)) {
+		  setup_property_ply (in_ply, &vert_props[3]);
+		  per_vertex_color = 1;
+		}
+		if (equal_strings ("g", prop->name)) {
+		  setup_property_ply (in_ply, &vert_props[4]);
+		  per_vertex_color = 1;
+		}
+		if (equal_strings ("b", prop->name)) {
+		  setup_property_ply (in_ply, &vert_props[5]);
+		  per_vertex_color = 1;
+		}
+		if (equal_strings ("nx", prop->name)) {
+		  setup_property_ply (in_ply, &vert_props[6]);
+		  has_normals = 1;
+		}
+		if (equal_strings ("ny", prop->name)) {
+		  setup_property_ply (in_ply, &vert_props[7]);
+		  has_normals = 1;
+		}
+		if (equal_strings ("nz", prop->name)) {
+		  setup_property_ply (in_ply, &vert_props[8]);
+		  has_normals = 1;
+		}
       }
 
       vert_other = get_other_properties_ply (in_ply, 
@@ -178,9 +158,9 @@ read_file()
       /* grab all the vertex elements */
       for (j = 0; j < elem_count; j++) {
         vlist[j] = (Vertex *) malloc (sizeof (Vertex));
-	vlist[j]->r = 1;
-	vlist[j]->g = 1;
-	vlist[j]->b = 1;
+		vlist[j]->r = 1;
+		vlist[j]->g = 1;
+		vlist[j]->b = 1;
         get_element_ply (in_ply, (void *) vlist[j]);
       }
     }
@@ -215,94 +195,119 @@ read_file()
 Write out an Inventor file.
 ******************************************************************************/
 
-write_inventor()
+void write_inventor()
 {
   int i,j,k;
 
-  printf ("#Inventor V2.1 ascii\n");
-  printf ("\n");
+  FILE* fout = fopen("m.inv", "w");
 
-  printf ("Separator {\n");
-  printf ("\n");
+  fprintf (fout, "#Inventor V2.1 ascii\n");
+  fprintf (fout, "\n");
+
+  fprintf (fout, "Separator {\n");
+  fprintf (fout, "\n");
 
   /* write out the coordinates */
 
-  printf ("Coordinate3 {\n");
-  printf ("  point [\n");
+  fprintf (fout, "Coordinate3 {\n");
+  fprintf (fout, "  point [\n");
 
   for (i = 0; i < nverts; i++)
-    printf ("    %g %g %g,\n", vlist[i]->x, vlist[i]->y, vlist[i]->z);
+    fprintf (fout, "    %g %g %g,\n", vlist[i]->x, vlist[i]->y, vlist[i]->z);
 
-  printf ("  ]\n");
-  printf ("}\n");
-  printf ("\n");
+  fprintf (fout, "  ]\n");
+  fprintf (fout, "}\n");
+  fprintf (fout, "\n");
 
   /* if we have them, write surface normals */
 
   if (has_normals) {
-    printf ("Normal {\n");
-    printf ("  vector [\n");
+    fprintf (fout, "Normal {\n");
+    fprintf (fout, "  vector [\n");
 
     for (i = 0; i < nverts; i++)
-      printf ("    %g %g %g,\n", vlist[i]->nx, vlist[i]->ny, vlist[i]->nz);
+      fprintf (fout, "    %g %g %g,\n", vlist[i]->nx, vlist[i]->ny, vlist[i]->nz);
 
-    printf ("  ]\n");
-    printf ("}\n");
-    printf ("\n");
+    fprintf (fout, "  ]\n");
+    fprintf (fout, "}\n");
+    fprintf (fout, "\n");
   }
 
   /* write out the vertex colors */
 
-  printf ("Material {\n");
-  printf ("  diffuseColor [\n");
+  fprintf (fout, "Material {\n");
+  fprintf (fout, "  diffuseColor [\n");
   if (per_vertex_color) {
     for (i = 0; i < nverts; i++)
-      printf ("    %g %g %g,\n", vlist[i]->r, vlist[i]->g, vlist[i]->b);
+      fprintf (fout, "    %g %g %g,\n", vlist[i]->r, vlist[i]->g, vlist[i]->b);
   }
   else
-    printf ("    1 1 1\n");
-  printf ("  ]\n");
-  printf ("}\n");
-  printf ("\n");
+    fprintf (fout, "    1 1 1\n");
+  fprintf (fout, "  ]\n");
+  fprintf (fout, "}\n");
+  fprintf (fout, "\n");
 
-  printf ("\n");
-  printf ("MaterialBinding { value PER_VERTEX_INDEXED }\n");
-  printf ("\n");
+  fprintf (fout, "\n");
+  fprintf (fout, "MaterialBinding { value PER_VERTEX_INDEXED }\n");
+  fprintf (fout, "\n");
 
   /* write the faces */
 
-  printf ("IndexedFaceSet {\n");
-  printf ("  coordIndex [\n");
+  fprintf (fout, "IndexedFaceSet {\n");
+  fprintf (fout, "  coordIndex [\n");
 
   for (i = 0; i < nfaces; i++) {
-    printf ("   ");
+    fprintf (fout, "   ");
     for (j = flist[i]->nverts - 1; j >= 0; j--)
-      printf (" %d,", flist[i]->verts[j]);
-    printf (" -1,\n");
+      fprintf (fout, " %d,", flist[i]->verts[j]);
+    fprintf (fout, " -1,\n");
   }
 
-  printf ("  ]\n");
+  fprintf (fout, "  ]\n");
 
-  printf ("  materialIndex [\n");
+  fprintf (fout, "  materialIndex [\n");
 
   for (i = 0; i < nfaces; i++) {
-    printf ("   ");
+    fprintf (fout, "   ");
     for (j = flist[i]->nverts - 1; j >= 0; j--)
       if (per_vertex_color) {
-	printf (" %d,", flist[i]->verts[j]);
+	fprintf (fout, " %d,", flist[i]->verts[j]);
       }
       else
-	printf (" 0,");
-    printf (" -1,\n");
+	fprintf (fout, " 0,");
+    fprintf (fout, " -1,\n");
   }
 
-  printf ("  ]\n");
-  printf ("}\n");
-  printf ("\n");
+  fprintf (fout, "  ]\n");
+  fprintf (fout, "}\n");
+  fprintf (fout, "\n");
 
   /* end separator */
 
-  printf ("}\n");
-  printf ("\n");
+  fprintf (fout, "}\n");
+  fprintf (fout, "\n");
 }
 
+int main(int argc, char **argv)
+{
+	int i,j;
+	char *s;
+	char *progname;
+
+	progname = argv[0];
+
+	//while (--argc > 0 && (*++argv)[0]=='-') {
+	//	for (s = argv[0]+1; *s; s++)
+	//		switch (*s) {
+	//	default:
+	//		usage (progname);
+	//		exit (-1);
+	//		break;
+	//	}
+	//}
+
+	read_file(argv[1]);
+	write_inventor();
+
+	return 0;
+}

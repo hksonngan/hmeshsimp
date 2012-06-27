@@ -132,8 +132,7 @@ bool HSpatialDivision2::readPly(char *filename)
 	}
 
 	for (i = 0; i < plyStream.getFaceCount(); i ++) {
-		if (plyStream.nextFace(f) == false)
-		{
+		if (plyStream.nextFace(f) == false) {
 			return false;
 		}
 		
