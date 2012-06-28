@@ -244,19 +244,23 @@
 			>
 		</File>
 		<File
-			RelativePath=".\halgorithm.h"
+			RelativePath=".\h_algorithm.h"
+			>
+		</File>
+		<File
+			RelativePath=".\h_dynamarray.h"
+			>
+		</File>
+		<File
+			RelativePath=".\h_esort.h"
+			>
+		</File>
+		<File
+			RelativePath=".\h_time.h"
 			>
 		</File>
 		<File
 			RelativePath=".\hash_face.h"
-			>
-		</File>
-		<File
-			RelativePath=".\hdynamarray.h"
-			>
-		</File>
-		<File
-			RelativePath=".\htime.h"
 			>
 		</File>
 		<File

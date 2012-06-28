@@ -11,7 +11,7 @@
 #include "spatial_division2.h"
 #include "vertex_cluster.h"
 #include "trivial.h"
-#include "htime.h"
+#include "h_time.h"
 
 using std::string;
 using std::cerr;
