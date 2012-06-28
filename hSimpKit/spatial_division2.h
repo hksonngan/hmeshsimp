@@ -33,8 +33,8 @@
 #include "vertex_cluster.h"
 #include "hash_face.h"
 #include "double_heap.h"
-#include "halgorithm.h"
-#include "htime.h"
+#include "h_algorithm.h"
+#include "h_time.h"
 
 //#define PRINT_DEBUG_INFO
 

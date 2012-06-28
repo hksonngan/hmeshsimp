@@ -16,7 +16,7 @@
 #include "vert_bin.h"
 #include "tri_soup_stream.h"
 #include "ooc_vertex_clustering.h"
-#include "htime.h"
+#include "h_time.h"
 
 using std::cout;
 using std::endl;

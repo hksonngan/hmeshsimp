@@ -25,7 +25,7 @@
 #include "double_heap.h"
 #include <ostream>
 #include <Eigen/Eigenvalues>
-#include "halgorithm.h"
+#include "h_algorithm.h"
 #include <fstream>
 
 
