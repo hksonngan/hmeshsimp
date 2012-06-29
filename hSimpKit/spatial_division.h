@@ -420,7 +420,7 @@ private:
 	//HDynamArray<Integer> vIndexMap; 
 	///
 	// all the clusters in a heap
-	doubleHeap<HSDVertexCluster> clusters;
+	DoubleHeap<HSDVertexCluster> clusters;
 	// degenerated face hash set
 	HTripleIndexSet degFaces;
 	// partition functors

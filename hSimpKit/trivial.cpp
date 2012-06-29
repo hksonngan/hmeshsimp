@@ -1,4 +1,5 @@
 #include "trivial.h"
+#include <limits>
 
 void trimExtAndAppend(char *src, char *dst, char *app)
 {
@@ -25,7 +26,7 @@ string getFilename(char *filepath)
 		start = index1 + 1;
 	}
 	else if (index1 != string::npos && index2 != string::npos) {
-		start = max(index1, index2) + 1;
+		start = std::max(index1, index2) + 1;
 	}
 	else {
 		start = 0;

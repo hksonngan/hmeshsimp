@@ -2,7 +2,7 @@
  *  a maximum/minimum heap with an array as a container
  *
  *  constructor:
- *    doubleHeap(
+ *    DoubleHeap(
  *      int _size, // initial volume of the heap
  *      int _type // 1 : max heap 2 : min heap
  *    );
@@ -30,14 +30,14 @@ enum HeapType {
 };
 
 template<class T>
-class doubleHeap
+class DoubleHeap
 {
 public:
-	doubleHeap(
+	DoubleHeap(
 		int _size,
 		HeapType _type
 		);
-	~doubleHeap() { delete[] data; }
+	~DoubleHeap() { delete[] data; }
 	void getTop(T &top);
 	T* getTopPointer() { return data; };
 	T getTop() { return data[0]; };
@@ -73,7 +73,7 @@ private:
 };
 
 template<class T>
-doubleHeap<T>::doubleHeap(int _size, HeapType _type = MaxHeap) // default max heap
+DoubleHeap<T>::DoubleHeap(int _size, HeapType _type = MaxHeap) // default max heap
 {
 	max_size = DEFAULT_CAPACITY;
 	user_set_size = DEFAULT_CAPACITY;
@@ -87,7 +87,7 @@ doubleHeap<T>::doubleHeap(int _size, HeapType _type = MaxHeap) // default max he
 }
 
 template<class T>
-void doubleHeap<T>::getTop(T &top)
+void DoubleHeap<T>::getTop(T &top)
 {
 	if(size == 0)
 		return;
@@ -96,7 +96,7 @@ void doubleHeap<T>::getTop(T &top)
 }
 
 template<class T>
-T doubleHeap<T>::deleteTop()
+T DoubleHeap<T>::deleteTop()
 {
 	T deleted;
 
@@ -156,7 +156,7 @@ T doubleHeap<T>::deleteTop()
 }
 
 template<class T>
-bool doubleHeap<T>::addElement(T _new_element)
+bool DoubleHeap<T>::addElement(T _new_element)
 {
 	// realloc the data space
 	if (size + 1 >= max_size)
@@ -193,19 +193,19 @@ bool doubleHeap<T>::addElement(T _new_element)
 }
 
 template<class T>
-bool doubleHeap<T>::empty()
+bool DoubleHeap<T>::empty()
 {
 	return size == 0;
 }
 
 template<class T>
-bool doubleHeap<T>::full()
+bool DoubleHeap<T>::full()
 {
 	return max_size == size;
 }
 
 template<class T>
-void doubleHeap<T>::clear()
+void DoubleHeap<T>::clear()
 {
 	size = 0;
 
@@ -217,7 +217,7 @@ void doubleHeap<T>::clear()
 }
 
 template<class T>
-void doubleHeap<T>::swap(int i, int j)
+void DoubleHeap<T>::swap(int i, int j)
 {
 	T ex;
 	ex = data[i];
@@ -226,25 +226,25 @@ void doubleHeap<T>::swap(int i, int j)
 }
 
 template<class T>
-int doubleHeap<T>::leftChild(int i)
+int DoubleHeap<T>::leftChild(int i)
 {
 	return 2 * (i + 1) - 1;
 }
 
 template<class T>
-int doubleHeap<T>::rightChild(int i)
+int DoubleHeap<T>::rightChild(int i)
 {
 	return 2 * (i + 1);
 }
 
 template<class T>
-int doubleHeap<T>::parent(int i)
+int DoubleHeap<T>::parent(int i)
 {
 	return (i + 1) / 2 - 1;
 }
 
 template<class T>
-bool doubleHeap<T>::comp(int i, int j)
+bool DoubleHeap<T>::comp(int i, int j)
 {
 	if(type == MaxHeap) // max heap
 	{
@@ -257,7 +257,7 @@ bool doubleHeap<T>::comp(int i, int j)
 }
 
 template<class T>
-void doubleHeap<T>::printHeap(ostream& out, int root, int level)
+void DoubleHeap<T>::printHeap(ostream& out, int root, int level)
 {
 	int i;
 
@@ -274,7 +274,7 @@ void doubleHeap<T>::printHeap(ostream& out, int root, int level)
 /* helper functions */
 
 template<class T>
-inline void PrintHeap(ostream& out, doubleHeap<T> &h)
+inline void PrintHeap(ostream& out, DoubleHeap<T> &h)
 {
 	if (h.empty())
 		return;

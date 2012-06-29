@@ -279,7 +279,7 @@ private:
 	// all the faces, gfl
 	HTripleIndex<Integer> *faces; int faceCount;
 	// all the clusters in a heap
-	doubleHeap<HSDVertexCluster2> clusters;
+	DoubleHeap<HSDVertexCluster2> clusters;
 	// degenerated face hash set
 	HTripleIndexSet degFaces;
 
