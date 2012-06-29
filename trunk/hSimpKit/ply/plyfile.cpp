@@ -112,8 +112,8 @@ static char *my_alloc(int, int, char *);
 
 
 /* added by ht */
-EndianOrder SYSTEM_ENDIAN_MODE = H_LITTLE_ENDIAN;
-EndianOrder FILE_ENDIAN_MODE = H_BIG_ENDIAN;
+EndianOrder SYSTEM_ENDIAN_MODE	= H_LITTLE_ENDIAN;
+EndianOrder FILE_ENDIAN_MODE	= H_BIG_ENDIAN;
 
 /*************/
 /*  Writing  */
