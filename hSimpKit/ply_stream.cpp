@@ -8,13 +8,13 @@ extern /*"C" {*/ PlyElement *find_element(PlyFile *plyfile, char *element); /*}*
 using std::cerr;
 using std::endl;
 
-PlyProperty vert_props[] = { /* list of property information for a vertex */
+static PlyProperty vert_props[] = { /* list of property information for a vertex */
 	{"x", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,x), 0, 0, 0, 0},
 	{"y", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,y), 0, 0, 0, 0},
 	{"z", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,z), 0, 0, 0, 0},
 };
 
-PlyProperty face_props[] = { /* list of property information for a vertex */
+static PlyProperty face_props[] = { /* list of property information for a vertex */
 	{"vertex_indices", PLY_INT, PLY_INT, offsetof(Face,verts),
 	1, PLY_UCHAR, PLY_UCHAR, offsetof(Face,nverts)},
 };

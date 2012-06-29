@@ -5,10 +5,13 @@
  */
 
 #include "os_dependent.h"
+#include "windows.h"
 
 bool hCreateDir(char *dir_path)
 {
+	CreateDirectory(dir_path, NULL);
 
+	return true;
 }
 
 inline extern char* hPathSeperator()
