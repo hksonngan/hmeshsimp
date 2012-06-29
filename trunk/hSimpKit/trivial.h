@@ -24,6 +24,12 @@ extern string getFilename(char *filepath);
 // get the system endian mode
 extern EndianOrder getSystemEndianMode();
 
+inline void stringToCstr(string &str, char* cstr)
+{
+	memcpy(cstr, str.c_str(), str.size() * sizeof(char));
+	cstr[str.size()] = '\0';
+}
+
 // switch bytes for a variable
 inline void switchBytes(char* ptr, int size)
 {

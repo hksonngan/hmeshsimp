@@ -12,6 +12,9 @@
 
 // create a file directory using the os specific kernel call.
 // returns true is the directory has already existed
-extern bool createDir(char *dir_path);
+extern bool hCreateDir(char *dir_path);
+
+// '\' or '/'
+inline extern char* hPathSeperator();
 
 #endif //__OS_DEPENDENT__
