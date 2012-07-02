@@ -128,7 +128,6 @@ ERadixRecordType* HeapableIndex<ERadixRecordType>::container;
    'ERadixRecordType' must be a derivative of hERadixRecord */
 template<class ERadixRecordType>
 class hESortCommon {
-
 public:
 	bool set(
 		FILE*	_fin,

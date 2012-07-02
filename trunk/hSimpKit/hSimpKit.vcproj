@@ -239,6 +239,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\lru_cache.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ooc_vertex_clustering.cpp"
 			>
 		</File>
@@ -328,14 +332,6 @@
 		</File>
 		<File
 			RelativePath=".\util_common.h"
-			>
-		</File>
-		<File
-			RelativePath=".\vert_bin.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\vert_bin.h"
 			>
 		</File>
 		<File
