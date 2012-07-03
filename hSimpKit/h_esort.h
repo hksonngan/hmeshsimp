@@ -47,8 +47,7 @@ bool hERadixSort (
 	char*	infilename,
 	char*	outfilename,
 	int		records_in_a_patch, // count of records in a file patch
-	int		record_count = 0 // equals or less than 0 indicates that the terminate sign is end of file 
-	);
+	int		record_count = 0 ); // equals or less than 0 indicates that the terminate sign is end of file 
 
 
 /* ======================== $ CLASS & TEMPLATE DEFINITION $ ========================= */
@@ -82,7 +81,10 @@ public:
 	int* getIndex() { return index; }
 
 private:
-	bool bucketSort(ContainerType arr, int arr_count, int which_digit);
+	bool bucketSort(
+		ContainerType arr, 
+		int arr_count, 
+		int which_digit);
 
 private:
 	int		*index;
@@ -133,12 +135,20 @@ public:
 		FILE*	_fin,
 		char*	_infilename,
 		int		_records_in_a_patch, // count of records in a file patch
-		int		_record_count = 0 // equals or less than 0 indicates that the terminate sign is end of file 
-	);
+		int		_record_count = 0 ); // equals or less than 0 indicates that the terminate sign is end of file 
+
 	/*
 	 * return value: if the functions has ran right */
-	bool nextPatch(ERadixRecordType* arr, int &read_count, int &patch_id, bool &over);
-	bool writePatch(ERadixRecordType* arr, int* index, int arr_count, int patch_id);
+	bool nextPatch(
+		ERadixRecordType* arr, 
+		int &read_count, 
+		int &patch_id, 
+		bool &over);
+	bool writePatch(
+		ERadixRecordType* arr, 
+		int* index, 
+		int arr_count, 
+		int patch_id);
 	bool merge(char *outfilename);
 
 private:
@@ -203,7 +213,10 @@ bool hIRadixSort<ContainerType>::operator() (ContainerType arr, int arr_count) {
 }
 
 template<class ContainerType> 
-bool hIRadixSort<ContainerType>::bucketSort(ContainerType arr, int arr_count, int which_digit) {
+bool hIRadixSort<ContainerType>::bucketSort(
+	ContainerType arr, 
+	int arr_count, 
+	int which_digit) {
 
 	int digit_size = arr[0].getDigitSize(which_digit);
 
@@ -241,9 +254,8 @@ template<class ERadixRecordType>
 bool hESortCommon<ERadixRecordType>::set (
 	FILE*	_fin,
 	char*	_infilename,
-	int		_records_in_a_patch, // count of records in a file patch
-	int		_record_count = 0 // equals or less than 0 indicates that the terminate sign is end of file 
-	) {
+	int		_records_in_a_patch,	// count of records in a file patch
+	int		_record_count = 0 ) {	// equals or less than 0 indicates that the terminate sign is end of file 
 
 	fin = _fin;
 	infilename = _infilename;
@@ -264,7 +276,11 @@ bool hESortCommon<ERadixRecordType>::set (
 }
 
 template<class ERadixRecordType>
-bool hESortCommon<ERadixRecordType>::nextPatch(ERadixRecordType* arr, int &read_count, int &patch_id, bool &over) {
+bool hESortCommon<ERadixRecordType>::nextPatch(
+	ERadixRecordType* arr, 
+	int &read_count, 
+	int &patch_id, 
+	bool &over) {
 
 	over = false;
 
@@ -295,7 +311,11 @@ bool hESortCommon<ERadixRecordType>::nextPatch(ERadixRecordType* arr, int &read_
 }
 
 template<class ERadixRecordType>
-bool hESortCommon<ERadixRecordType>::writePatch(ERadixRecordType* arr, int* index, int arr_count, int patch_id) {
+bool hESortCommon<ERadixRecordType>::writePatch(
+	ERadixRecordType* arr, 
+	int* index, 
+	int arr_count, 
+	int patch_id) {
 
 	// get patch name
 	char buf[FILE_NAME_BUF_SIZE];
@@ -390,9 +410,8 @@ bool hERadixSort<ERadixRecordType> (
 	FILE*	fin,
 	char*	infilename,
 	char*	outfilename,
-	int		records_in_a_patch, // count of records in a file patch
-	int		record_count // equals or less than 0 indicates that the terminate sign is end of file 
-	) {
+	int		records_in_a_patch,	// count of records in a file patch
+	int		record_count ) {	// equals or less than 0 indicates that the terminate sign is end of file 
 
 	int read_count, patch_id, num;
 	ERadixRecordType *internal_records;

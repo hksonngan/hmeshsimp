@@ -336,6 +336,7 @@ bool HSpatialDivision2::toPly(char *filename)
 		return false;
 	}
 
+	htime.setCheckPoint();
 	generateIndexedMesh();
 
 	/* write head */
@@ -429,4 +430,17 @@ void HSpatialDivision2::searchConnectivity(Integer vIndex, Integer clusterIndex)
 		if (vertices[f.k].clusterIndex == -1) 
 			searchConnectivity(f.k, clusterIndex);
 	}
+}
+
+void HSpatialDivision2::startTotalTime() {
+	total_time.setCheckPoint();
+}
+
+void HSpatialDivision2::totalTime() {
+	// statistics
+	cout << "\t-----------------------------------------------" << endl
+		<< "\ttotal time:\t\t" << total_time.printElapseSec() << endl << endl;
+
+	flog << "\t-----------------------------------------------" << endl
+		<< "\ttotal time:\t\t" << total_time.printElapseSec() << endl << endl;
 }

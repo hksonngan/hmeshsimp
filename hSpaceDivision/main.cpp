@@ -110,6 +110,8 @@ int main(int argc, char** argv)
 	HTime htime;
 
 	HSpatialDivision2 sd;
+	sd.startTotalTime();
+
 	if (sd.readPly(infilename) == false) 
 		return 1;
 
@@ -117,8 +119,9 @@ int main(int argc, char** argv)
 		return 1;
 
 	if (sd.toPly(outfilename) == false) 
-		return 1;		 
-
+		return 1;
+	
+	sd.totalTime();
 	sd.clear();
 
 	return 0;
