@@ -246,6 +246,8 @@ public:
 	// clear the vertex indices allocated in the heap of HSDVertexCluster
 	void clear();
 	void generateIndexedMesh();
+	void startTotalTime();
+	void totalTime();
 
 	int getVertexCount() { return vertexCount; }
 	int getFaceCount() { return faceCount; }
@@ -301,6 +303,7 @@ private:
 	// log file
 	ofstream flog;
 	HTime htime;
+	HTime total_time;
 };
 
 inline void HSpatialDivision2::addVertex(HVertex v)
