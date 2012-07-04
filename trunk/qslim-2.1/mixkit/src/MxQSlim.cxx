@@ -393,6 +393,7 @@ void MxEdgeQSlim::compute_edge_info(MxQSlimEdge *info)
 {
     compute_target_placement(info);
 
+	// this function add the edge to the heap
     finalize_edge_update(info);
 }
 
@@ -416,7 +417,7 @@ void MxEdgeQSlim::collect_edges()
     for(MxVertexID i=0; i<m->vert_count(); i++)
     {
 	star.reset();
-	// this is base on that the faces star has been constructed - ht
+	// this is based on that the faces star has been constructed - ht
 	m->collect_vertex_star(i, star);
 
 	for(uint j=0; j<star.length(); j++)
