@@ -39,7 +39,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="-t 5000 F:\plys\bunny\bun_zipper.ply"
+				CommandArguments="-t 5000 F:\plys\bunny\bun_zipper_res3.ply"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"

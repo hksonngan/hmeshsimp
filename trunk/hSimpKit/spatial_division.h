@@ -15,18 +15,20 @@
 #ifndef __SPATIAL_DIVISION__
 #define __SPATIAL_DIVISION__
 
+#include <vector>
+#include <list>
+#include <ostream>
+#include <fstream>
+
+#include <boost/unordered_set.hpp>
+#include <Eigen/Eigenvalues>
+
 #include "util_common.h"
 #include "vertex_cluster.h"
 #include "hash_face.h"
-#include <vector>
-#include <list>
-#include <boost/unordered_set.hpp>
 #define PRINT_HEAP
 #include "double_heap.h"
-#include <ostream>
-#include <Eigen/Eigenvalues>
 #include "h_algorithm.h"
-#include <fstream>
 
 
 //#define INIT_HEAP_VOL 10000 //initial heap volume
@@ -43,6 +45,7 @@ using namespace Eigen;
 using std::ostream;
 using std::list;
 using std::ofstream;
+
 
 /* class defined */
 class HSDVertex;

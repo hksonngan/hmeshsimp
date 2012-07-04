@@ -40,6 +40,7 @@ class hERecord;
    record class must overload the
    operator '<' and '>' */
 class hERadixRecord;
+template<class ERadixRecordType> class HeapableIndex;
 template<class ERadixRecordType> class hESortCommon;
 template<class ERadixRecordType>
 bool hERadixSort (

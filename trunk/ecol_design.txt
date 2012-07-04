@@ -1,0 +1,85 @@
+==============================$ collapse sequence file format $==================================
+
+#head
+#endian: LE/BE
+#end
+<uint:sequential_id> <uint:patch_id> <uint:v1, uint:v2> <float:error> <float_3:new_vertex>
+<uint:sequential_id> <uint:patch_id> <uint:v1, uint:v2> <float:error> <float_3:new_vertex>
+<uint:sequential_id> <uint:patch_id> <uint:v1, uint:v2> <float:error> <float_3:new_vertex>
+...
+
+this file is stored as binary file, so note that there are no any special 'EOF' character as in the 
+text/ascii file, the END OF FILE occurred when the file come to be exhausted on the operating system 
+disk file table.
+
+field specification:
+<uint:sequential_id>	this can be viewed as the sequence denotion, and can be treated globally,
+						when different patches of collapse sequence merges, for generating progressive
+						meshes
+<uint:patch_id>			denotes which patch the collapse belongs to
+<uint:v1, uint:v2>		the ids of the two collapsed vertices, ignoring the order
+<float:error>			the local error incurred by the collapsing operation, any mesurement can be 
+						utilized such as the Quadric Error Metrics[M.Garland97], Progressive Meshes[H.Hoppe96],
+						or the volume preserving techniques by [Lindstrom&Turk98]
+<float_3:new_vertex>	the representative vertex calculated for the two collapsed vertices
+
+if you want to take the number of faces as the simplfication target, you can also add a field as 
+<uint:faces_decimated>, however our approach target the simplification process based on the number 
+vertices, so the fields above should be enough.
+
+========================================$ data structures $======================================
+
+$$ vertex $$
+
+/* out-of-core version */
+CollapsedVertex {
+	uint: 		new_id		// the id after the collapse
+	uint: 		output_id	// the id of the output model
+	float_3:	new_vertex	// the new vertex after the collapse
+}
+
+/* in-core version */
+CollapsableVertex: INHERIT CollapsedVertex {
+	// the linked collapsable edges in the heap, used for update
+	collapsable_edge_list:	adjacent_collapsable_edges
+	// use when decimated based on the face count, remove the face if needed
+	face_list:	adjacent_faces
+}
+
+HierarchyVertex: INHERIT CollapsableVertex {
+	face_list:	alter_faces		// faces need to be altered when the vertex is expaned or contracted
+	face_list:	removed_faces	// faces need to be removed or inserted when the vertex is expaned or contracted
+}
+
+QuadricVertex: INHERIT CollapsableVertex {
+	float_10:	quadrics	// quadric error matrix
+}
+
+HierarchyQuadricVertex: INHERIT HierarchyVertex {
+	float_10:	quadrics	// quadric error matrix
+}
+
+stored in continuous memory space with the index denoting the vertex index. this data structure can be 
+used in both the in-core edge collapse algorithm and the out-of-core simplified mesh generation phase 
+based on the collapse sequence file.
+
+==========================================$ algorithms $=========================================
+
+$$ vertex invalidation & output mesh generating $$
+
+consider the 'CollapsedVertex' array, which initially contains all the uncollapsed vertices:
+
+	new_id	output_id
+0	0		0
+1	1		1
+2	2		2
+3	3		3
+	...
+7	7		7
+
+the vertex index equals new_id denotes that that vertex hasn't been collapsed or chosen as the
+representative vertex after some sequence of collapse
+
+consider the 
+
+		
