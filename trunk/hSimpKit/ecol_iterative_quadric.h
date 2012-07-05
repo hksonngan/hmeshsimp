@@ -12,8 +12,18 @@
 
 class QuadricEdgeCollapse: public PairCollapse {
 public:
+	////////////////////////////////////////
+	// initializers
+	////////////////////////////////////////
 	void allocVerts(uint _vert_count);
 	inline void addFace(HTripleIndex face);
+	void collectPairs();
+	inline CollapsablePair* createPair(uint _vert1, uint _vert2);
+
+	///////////////////////////////////////
+	// computing
+	///////////////////////////////////////
+	inline HVertex optimizeNewVertex(CollapsablePair *pair);
 
 protected:
 	HDynamArray<q_matrix> quadrics;
@@ -33,6 +43,25 @@ void QuadricEdgeCollapse::addFace(HTripleIndex face) {
 	quadrics[face.i] += qMatrix;
 	quadrics[face.j] += qMatrix;
 	quadrics[face.k] += qMatrix;
+}
+
+CollapsablePair* QuadricEdgeCollapse::createPair(uint _vert1, uint _vert2) {
+	
+	CollapsablePair *new_pair = new CollapsablePair(_vert1, _vert2);
+	
+}
+
+inline HVertex QuadricEdgeCollapse::optimizeNewVertex(CollapsablePair *pair) {
+
+	qMatrix = quadrics[pair->vert1];
+	qMatrix += quadrics[pair->vert2];
+
+	// the matrix is not singular
+	if (qMatrix.calcRepresentativeVertex(pair->new_vertex)) {
+		return pair->new_vertex;
+	}
+
+	
 }
 
 #endif //__ITERATIVE_QUADRIC_EDGE_COLLAPSE__

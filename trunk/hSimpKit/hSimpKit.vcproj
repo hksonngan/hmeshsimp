@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply"
+				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply;../../libgfx/include;../;../libgfx/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -386,7 +386,63 @@
 			Name="edge_collapse"
 			>
 			<File
-				RelativePath=".\ecol_vertex.h"
+				RelativePath=".\ecol_iterative_quadric.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ecol_iterative_quadric.h"
+				>
+			</File>
+			<File
+				RelativePath=".\pcol_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\pcol_iterative.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\pcol_iterative.h"
+				>
+			</File>
+			<File
+				RelativePath=".\pcol_other_structures.h"
+				>
+			</File>
+			<File
+				RelativePath=".\pcol_vertex.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="MxMath"
+			>
+			<File
+				RelativePath=".\MxMath\MxMat2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxMath\MxMat3-jacobi.cxx"
+				>
+			</File>
+			<File
+				RelativePath=".\MxMath\MxMat3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxMath\MxMat4-jacobi.cxx"
+				>
+			</File>
+			<File
+				RelativePath=".\MxMath\MxMat4.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxMath\MxQMetric3.cxx"
+				>
+			</File>
+			<File
+				RelativePath=".\MxMath\MxQMetric3.h"
 				>
 			</File>
 		</Filter>

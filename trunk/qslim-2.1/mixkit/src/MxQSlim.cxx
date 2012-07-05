@@ -339,41 +339,42 @@ void MxEdgeQSlim::compute_target_placement(MxQSlimEdge *info)
     double e_min;
 
     if( placement_policy==MX_PLACE_OPTIMAL &&
-	Q.optimize(&info->vnew[X], &info->vnew[Y], &info->vnew[Z]) )
+		Q.optimize(&info->vnew[X], &info->vnew[Y], &info->vnew[Z]) )
     {
-	e_min = Q(info->vnew);
+		e_min = Q(info->vnew);
     }
     else
     {
-	Vec3 vi(m->vertex(i)), vj(m->vertex(j));	
-	Vec3 best;
+		Vec3 vi(m->vertex(i)), vj(m->vertex(j));	
+		Vec3 best;
 
-	if( placement_policy>=MX_PLACE_LINE && Q.optimize(best, vi, vj) )
-	    e_min = Q(best);
-	else
-	{
-	    double ei=Q(vi), ej=Q(vj);
+		if( placement_policy>=MX_PLACE_LINE && Q.optimize(best, vi, vj) )
+			e_min = Q(best);
+		else
+		{
+			double ei=Q(vi), ej=Q(vj);
 
-	    if( ei < ej ) { e_min = ei; best = vi; }
-	    else          { e_min = ej; best = vj; }
+			if( ei < ej ) { e_min = ei; best = vi; }
+			else          { e_min = ej; best = vj; }
 
-	    if( placement_policy>=MX_PLACE_ENDORMID )
-	    {
-		Vec3 mid = (vi+vj)/2.0;
-		double e_mid = Q(mid);
+			if( placement_policy>=MX_PLACE_ENDORMID )
+			{
+			Vec3 mid = (vi+vj)/2.0;
+			double e_mid = Q(mid);
 
-		if( e_mid < e_min ) { e_min = e_mid; best = mid; }
-	    }
-	}
+			if( e_mid < e_min ) { e_min = e_mid; best = mid; }
+			}
+		}
 
-	info->vnew[X] = best[X];
-	info->vnew[Y] = best[Y];
-	info->vnew[Z] = best[Z];
+		info->vnew[X] = best[X];
+		info->vnew[Y] = best[Y];
+		info->vnew[Z] = best[Z];
     }
 
     if( weighting_policy == MX_WEIGHT_AREA_AVG )
  	e_min /= Q.area();
 
+	// note this~
     info->heap_key(-e_min);
 }
 

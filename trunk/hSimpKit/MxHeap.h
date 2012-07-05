@@ -36,7 +36,7 @@ public:
     inline int get_heap_pos() { return token; }
     inline void set_heap_pos(int t) { token=t; }
 
-    inline void  heap_key(float k) { import=k; }
+    inline void  set_heap_key(float k) { import=k; }
     inline float heap_key() const  { return import; }
 };
 
