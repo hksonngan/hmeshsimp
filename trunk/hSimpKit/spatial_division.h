@@ -79,7 +79,7 @@ public:
 
 public:
 	// area weighted quadric matrix
-	HQEMatrix awQ;
+	HQEMatrix<float> awQ;
 	// area weighted normal
 	HNormal awN;
 	// area, in fact the area computed is 3 times the de facto area
@@ -137,7 +137,7 @@ private:
 	// mean vertex
 	HVertex meanVertex;
 	// accumulated area weighted quadric matrix
-	HQEMatrix awQ;
+	HQEMatrix<float> awQ;
 	// accumulated area weighted normal
 	HNormal awN;
 	// accumulated area

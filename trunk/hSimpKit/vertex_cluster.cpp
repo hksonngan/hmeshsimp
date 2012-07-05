@@ -88,7 +88,7 @@ bool HVertexClusterContainer::addFace(Integer i, Integer j, Integer k, HSoupTria
 	}
 
 	// add the qem of the triangle to the cluster
-	HQEMatrix new_qem(tri);
+	HQEMatrix<float> new_qem(tri);
 	(p_cluster->getQemRef()) += (new_qem);
 
 	return true;

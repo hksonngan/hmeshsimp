@@ -49,10 +49,10 @@ public:
 		qem.setZero();
 	}
 
-	HQEMatrix* getQem() {
+	HQEMatrix<float>* getQem() {
 		return &qem; }
 
-	HQEMatrix& getQemRef() {
+	HQEMatrix<float>& getQemRef() {
 		return qem; }
 
 	HVertex& calcRepresentativeVertex(RepCalcPolicy p, float c_max_x, float c_min_x, float c_max_y, 
@@ -79,7 +79,7 @@ public:
 private:
 	/* accumulated quadric error 
 	   metrics for the cluster */
-	HQEMatrix qem;
+	HQEMatrix<float> qem;
 	/* vertex index in the simplified mesh */
 	Integer v_index;
 	/* before inverting the qem to calculate the 

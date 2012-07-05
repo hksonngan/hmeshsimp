@@ -64,7 +64,7 @@ public:
 
 public:
 	// area weighted quadric matrix
-	HQEMatrix awQ;
+	HQEMatrix<float> awQ;
 	// area weighted normal
 	HNormal awN;
 	// area, in fact the area computed is 3 times the de facto area
@@ -112,7 +112,7 @@ private:
 	// mean vertex
 	HVertex meanVertex;
 	// accumulated area weighted quadric matrix
-	HQEMatrix awQ;
+	HQEMatrix<float> awQ;
 	// accumulated area weighted normal
 	HNormal awN;
 	// accumulated area
@@ -367,7 +367,7 @@ inline void HSpatialDivision2::addFace(HTripleIndex<Integer> i3)
 	vertices[i3.k].awN += HNormal(nm.x, nm.y, nm.z);
 
 	HFaceFormula::calcTriangleFaceFormula(vertices[i3.i], vertices[i3.j], vertices[i3.k]);
-	HQEMatrix qem;
+	HQEMatrix<float> qem;
 	qem.calcQem(HFaceFormula::a, HFaceFormula::b, HFaceFormula::c, HFaceFormula::d);
 	qem *= area;
 
