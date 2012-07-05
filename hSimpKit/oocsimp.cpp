@@ -1,3 +1,5 @@
+// !!!IMPORTANT this file is not updated, may not be valid due to the change from 'VertexBinary' to 'LRUCache'
+
 /*
  *	main algorithms implementation for hoocs
  *	author: ht
@@ -9,9 +11,7 @@
 #include <fstream>
 #include <string>
 
-//#include "ply/ply.h"
 #include "ply/ply_inc.h"
-//#include "_ply_include.h"
 
 #include "lru_cache.h"
 #include "tri_soup_stream.h"

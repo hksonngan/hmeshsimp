@@ -1,5 +1,10 @@
 /*
- *  dynamic array, enlarged * 2 everytime
+ *  dynamic array, enlarged * 2 everytime.
+ *  for detailed analysis, please refer to 
+ *	amortized analysis chapters in CLRS
+ *
+ *  author: ht
+ *  email:  waytofall916@gmail.com
  */
 
 #ifndef __H_DYNAM_ARRAY__
@@ -10,9 +15,22 @@ class HDynamArray {
 public:
 	HDynamArray(int _init_cap = DEFAULT_INIT_CAP);
 	~HDynamArray();
-	void push_back(ElemType e);
-	ElemType& operator[] (int i);
-	int count();
+	
+	/* accessors */
+	inline ElemType& operator[] (int i);
+	int count() { return size; }
+	int getCapacity() { return capacity; }
+	// return the index of the element value 
+	// equals to e, return 'size' if it doesn't
+	// exist
+	inline uint find(ElemType &e);
+	inline bool exist(ElemType &e);
+
+	/* modifiers */
+	inline void push_back(ElemType e);
+	inline void remove(uint &index);
+	void resize(int _capacity);
+	void clear() { size = 0; }
 
 private:
 	ElemType *data;
@@ -49,10 +67,7 @@ template<class ElemType>
 void HDynamArray<ElemType>::push_back(ElemType e)
 {
 	if (size >= capacity) {
-		ElemType *new_data = new ElemType[capacity * 2];
-		memcpy(new_data, data, size(ElemType) * capacity);
-		delete[] data;
-		data = new_data;
+		resize(capacity * 2);
 	}
 
 	data[size] = e;
@@ -62,16 +77,57 @@ void HDynamArray<ElemType>::push_back(ElemType e)
 template<class ElemType>
 ElemType& HDynamArray<ElemType>::operator[] (int i)
 {
-	if (i >= 0 && i < size)
-		return data[i];
-	else
-		return ElemType();
+	return data[i];
 }
 
 template<class ElemType>
-int HDynamArray<ElemType>::count()
+void HDynamArray<ElemType>::resize(int _capacity) 
 {
-	return size;
+	if (_capacity > capacity) {
+		ElemType *new_data = new ElemType[_capacity];
+		memcpy(new_data, data, size(ElemType) * capacity);
+		capacity = _capacity;
+		delete[] data;
+		data = new_data;
+	}
+}
+
+template<class ElemType>
+uint HDynamArray<ElemType>::find(ElemType &e) {
+	
+	int i;
+
+	for (i = 0; i < size; i ++)
+		if (data[i] == e)
+			break;
+
+	return i;
+}
+
+template<class ElemType>
+bool HDynamArray<ElemType>::exist(ElemType &e) {
+	
+	int i = find(e);
+
+	return i < size;
+}
+
+template<class ElemType>
+void HDynamArray<ElemType>::remove(uint &index) {
+
+	if (size <= 0)
+		return;
+
+	if (index >= size)
+		return;
+
+	int i;
+
+	for (i = index + 1; i < size; i --) {
+		data[i - 1] = data[i];
+	}
+
+	size --;
 }
 
 #endif //__H_DYNAM_ARRAY__

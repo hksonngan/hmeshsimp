@@ -233,7 +233,7 @@ void HSpatialDivision::addFace(HTripleIndex<Integer> i3)
 	vertices[i3.k].awN += HNormal(nm.x, nm.y, nm.z);
 
 	HFaceFormula::calcTriangleFaceFormula(vertices[i3.i], vertices[i3.j], vertices[i3.k]);
-	HQEMatrix qem;
+	HQEMatrix<float> qem;
 	qem.calcQem(HFaceFormula::a, HFaceFormula::b, HFaceFormula::c, HFaceFormula::d);
 	qem *= area;
 

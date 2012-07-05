@@ -245,6 +245,14 @@
 				RelativePath=".\oocsimp.cpp"
 				>
 				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -306,6 +314,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MxBlock.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxDynBlock.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MxHeap.cxx"
+				>
+			</File>
+			<File
+				RelativePath=".\MxHeap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\util_common.cpp"
 				>
 			</File>
@@ -318,6 +342,10 @@
 			Name="common"
 			>
 			<File
+				RelativePath=".\compiler_config.h"
+				>
+			</File>
+			<File
 				RelativePath=".\getopt.c"
 				>
 			</File>
@@ -327,6 +355,10 @@
 			</File>
 			<File
 				RelativePath=".\h_time.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Mx4H.h"
 				>
 			</File>
 			<File
@@ -347,6 +379,14 @@
 			</File>
 			<File
 				RelativePath=".\os_dependent.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="edge_collapse"
+			>
+			<File
+				RelativePath=".\ecol_vertex.h"
 				>
 			</File>
 		</Filter>
