@@ -96,7 +96,7 @@ vertices and look to the HIGHER vetex from the table for the 'new_vertex' field.
 Consider the 'VertexCollapsing' table, which initially contains all the uncollapsed vertices:
 
 		 new_id	 output_id
-	______________________
+	！！！！！！！！！！！！！！！！！！！！！！
 	0	|	0	|	0
 	1	|	1	|	1
 	2	|	2	|	2
@@ -108,7 +108,7 @@ Consider the collapsing sequence <4, 0> <5, 6> <5, 3> <0, 3> <1, 2>. First we co
 vertices <4, 0>. The table altered to:
 
 		 new_id	 output_id
-	______________________
+	！！！！！！！！！！！！！！！！！！！！！！
 	0	|	0	|	0
 	1	|	1	|	1
 	2	|	2	|	2
@@ -120,7 +120,7 @@ vertices <4, 0>. The table altered to:
 Then we collapse <5, 6> the table altered to:
 
 		 new_id	 output_id
-	______________________
+	！！！！！！！！！！！！！！！！！！！！！！
 	0	|	0	|	0
 	1	|	1	|	1
 	2	|	2	|	2
@@ -133,7 +133,7 @@ Then we collapse <5, 6> the table altered to:
 Then <5, 3> the table altered to:
 
 		 new_id	 output_id
-	______________________
+	！！！！！！！！！！！！！！！！！！！！！！
 	0	|	0	|	0
 	1	|	1	|	1
 	2	|	2	|	2
@@ -146,7 +146,7 @@ Then <5, 3> the table altered to:
 After collapsing the whole sequence, the table altered to:
 
 		 new_id	 output_id
-	______________________
+	！！！！！！！！！！！！！！！！！！！！！！
 	0	|	0	|	0
 	1	|	1	|	1
 	2	|	1	|	2
@@ -166,10 +166,10 @@ linked list, and note that the items in the table are in fact inversely linked t
 that all the vertices in a cluster is linked together). After the table is scanned up, the 'new_id'
 field happen to be the final contrated vertex id. 
 
-Take the example above, after the scanning, the talbe looks like:
+Take the example above, after the scanning, the table looks like:
 
 		 new_id	 output_id
-	______________________
+	！！！！！！！！！！！！！！！！！！！！！！
 	0	|	0	|	0
 	1	|	1	|	1
 	2	|	1	|	2

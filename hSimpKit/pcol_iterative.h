@@ -13,25 +13,38 @@
 
 class PairCollapse {
 public:
+
+	/////////////////////////////////////
+	// initializers
+	/////////////////////////////////////
+
 	// set the capacity for the container 
 	// and allocate the memory space
 	void allocVerts(uint _vert_count);
 	void allocFaces(uint _face_count);
-	void initialize();
-	
 	// DO add vertices first and completely
 	inline void addVertex(HVertex vert);
 	inline void addFace(HTripleIndex face);
-
 	inline void collectStarVertices(uint vert_index, vert_arr *starVertices);
+	// this function should be overrided
+	// in specific derivative class
+	void collectPairs() {}
+	// this function should be overrided
+	// in specific derivative class
+	CollapsablePair* createPair(uint _vert1, uint _vert2) {}
+	inline void addCollapsablePair(CollapsablePair *new_pair);
+
+	// clear heap
+	void clear();
 
 protected:
 	HDynamArray<CollapsableVertex>	vertices;
 	HDynamArray<CollapseFace>	faces;
 	MxHeap	pair_heap;
 
-	///////////////////////////////
-	// assisting temporal variables 
+	/////////////////////////////////////
+	// assisting temporal variables
+	/////////////////////////////////////
 	static CollapsableVertex cvert;
 	static CollapseFace cface;
 };
@@ -66,6 +79,16 @@ void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) 
 			starVertices->push_back(cface.j);
 		if (cface.k != vert_index && !starVertices->exist(cface.k))
 			starVertices->push_back(cface.k);
+	}
+}
+
+void PairCollapse::addCollapsablePair(CollapsablePair *new_pair) {
+
+	vertices[new_pair->vert1].adjacent_col_pairs.push_back(new_pair);
+	vertices[new_pair->vert2].adjacent_col_pairs.push_back(new_pair);
+
+	if (!new_pair->is_in_heap()) {
+		pair_heap.insert(new_pair);
 	}
 }
 

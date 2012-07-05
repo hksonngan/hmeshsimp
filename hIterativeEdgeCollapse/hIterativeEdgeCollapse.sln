@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hIterativeEdgeCollapse", "h
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hSimpKit", "..\hSimpKit\hSimpKit.vcproj", "{A03330D3-129A-4EB5-828C-0112EFE97B77}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgfx", "..\libgfx\vc6\libgfx\libgfx.vcproj", "{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -22,6 +24,10 @@ Global
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Debug|Win32.Build.0 = Debug|Win32
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Release|Win32.ActiveCfg = Release|Win32
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Release|Win32.Build.0 = Release|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Debug|Win32.Build.0 = Debug|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Release|Win32.ActiveCfg = Release|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

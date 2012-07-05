@@ -28,7 +28,12 @@ class CollapsedVertex: public HVertex {
 public:
 	uint	new_id;		// the id after the collapse
 	uint	output_id;	// the id of the output model
-	HVertex	new_vertex;	// the new vertex after the collapse
+	/// temporarily deprecated, can't quite figure
+	/// the use of it, if it's really useful. may
+	/// need some further design. I thought that
+	/// the new_vertex may not need to be explicitly
+	/// stored, just update the x, y, z filed will ok.
+	//HVertex	new_vertex;	// the new vertex after the collapse
 };
 
 /* in-core version */
