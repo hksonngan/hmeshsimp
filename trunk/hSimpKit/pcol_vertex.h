@@ -13,14 +13,16 @@
 
 #include "util_common.h"
 #include "h_dynamarray.h"
-#include "pcol_pair.h"
+#include "pcol_other_structures.h"
+#include "MxQMetric3.h"
 
-unsigned std::list;
+using std::list;
 
 typedef list<uint> face_list;
 typedef HDynamArray<CollapsablePair*> pair_arr;
 typedef HDynamArray<uint> face_arr;
-typedef HQEMatrix<float> q_matrix;
+//typedef HQEMatrix<float> q_matrix;
+typedef MxQuadric3 q_matrix;
 typedef HDynamArray<uint> vert_arr;
 
 /* out-of-core version */
@@ -28,11 +30,7 @@ class CollapsedVertex: public HVertex {
 public:
 	uint	new_id;		// the id after the collapse
 	uint	output_id;	// the id of the output model
-	/// temporarily deprecated, can't quite figure
-	/// the use of it, if it's really useful. may
-	/// need some further design. I thought that
-	/// the new_vertex may not need to be explicitly
-	/// stored, just update the x, y, z filed will ok.
+	// used for collapsing sequence file
 	//HVertex	new_vertex;	// the new vertex after the collapse
 };
 
@@ -44,15 +42,21 @@ public:
 public:
 
 	// the linked collapsable pairs
-	// in the heap, used for update
+	// in the heap, used for update.
 	// if it is edge collapse, it
 	// would be 'adjacent collapsable 
-	// edges'
+	// edges'. the adjacent pairs should
+	// be updated with the collapse
+	// operation
 	pair_arr	adjacent_col_pairs;
 	// use when decimated based on the 
 	// face count, remove the face if 
-	// needed
+	// needed. the adjacent faces should
+	// be updated with the collapse operation
 	face_arr	adjacent_faces;
+	// assisting variable use for linkage
+	// information operation
+	short	flag;
 
 private:
 	// the face star count is set to 6
@@ -72,17 +76,17 @@ public:
 
 public:
 	q_matrix	quadrics;	// quadric error matrix
-}
+};
 
 class HierarchyVertex: public CollapsableVertex {
 public:
 	face_list	alter_faces;	// faces need to alter when the vertex expand/contract
 	face_list	removed_faces;	// faces need to remove/insert when the vertex expand/contract
-}
+};
 
 class HierarchyQuadricVertex: public HierarchyVertex {
 public:
 	q_matrix	quadrics;	// quadric error matrix
-}
+};
 
 #endif //__PCOL_VERTEX__

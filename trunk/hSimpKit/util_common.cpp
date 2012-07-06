@@ -1,8 +1,4 @@
 #include "util_common.h"
-#include "math/vec3.h"
-#include "math/vec4.h"
-#include "math/mat44.h"
-
 
 /* --- HFaceFormula --- */
 

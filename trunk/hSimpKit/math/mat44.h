@@ -1,3 +1,10 @@
+/*****************************************************************************
+THE ORIGINAL Vec3 HAS CHANGED TO ChapillVec3
+THE ORIGINAL Vec4 HAS CHANGED TO ChapillVec4
+PLEASE REFER TO 'chapill_vec3'
+	-HT
+******************************************************************************/
+
 //------------------------------------------------------------------------------
 // File : mat44.hpp
 //------------------------------------------------------------------------------
@@ -20,8 +27,8 @@
 //============================================================================
 #pragma once
 
-#include "vec3.h"
-#include "vec4.h"
+#include "chapill_vec3.h"
+#include "chapill_vec4.h"
 
 namespace mymath{
 
@@ -64,10 +71,10 @@ class Mat44
     Mat44<Type>& operator = (const Type* a);                // ASSIGNMENT (=) FROM AN ARRAY OF TypeS 
     Mat44<Type> operator * (const Mat44& A) const;    // MULTIPLICATION (*)
     Mat44<Type>& operator *= (const Mat44& A);        // ACCUMULATE MATRIX MULTIPLY (*=)
-    Vec3<Type> operator * (const Vec3<Type>& V) const;      // MAT-VECTOR MULTIPLICATION (*) W/ PERSP DIV
-    Vec3<Type> multNormal(const Vec3<Type>& V) const;      // MAT-VECTOR MULTIPLICATION _WITHOUT_ PERSP DIV
-    Vec3<Type> multPoint(const Vec3<Type>& V) const;      // MAT-POINT MULTIPLICATION _WITHOUT_ PERSP DIV
-    Vec4<Type> operator * (const Vec4<Type>& V) const;      // MAT-VECTOR MULTIPLICATION (*)
+    ChapillVec3<Type> operator * (const ChapillVec3<Type>& V) const;      // MAT-VECTOR MULTIPLICATION (*) W/ PERSP DIV
+    ChapillVec3<Type> multNormal(const ChapillVec3<Type>& V) const;      // MAT-VECTOR MULTIPLICATION _WITHOUT_ PERSP DIV
+    ChapillVec3<Type> multPoint(const ChapillVec3<Type>& V) const;      // MAT-POINT MULTIPLICATION _WITHOUT_ PERSP DIV
+    ChapillVec4<Type> operator * (const ChapillVec4<Type>& V) const;      // MAT-VECTOR MULTIPLICATION (*)
     Mat44<Type> operator * (Type a) const;                  // SCALAR POST-MULTIPLICATION
     Mat44<Type>& operator *= (Type a);                    // ACCUMULATE MULTIPLY (*=)
 ////////////// NOT IMPLEMENTED YET. ANY TAKERS?
@@ -97,15 +104,15 @@ class Mat44
     void Identity();
     void Transpose();
     void Translate(Type Tx, Type Ty, Type Tz);
-    void Translate(const Vec3<Type>& T);
+    void Translate(const ChapillVec3<Type>& T);
     void invTranslate(Type Tx, Type Ty, Type Tz);
-    void invTranslate(const Vec3<Type>& T);
+    void invTranslate(const ChapillVec3<Type>& T);
     void Scale(Type Sx, Type Sy, Type Sz);
-    void Scale(const Vec3<Type>& S);
+    void Scale(const ChapillVec3<Type>& S);
     void invScale(Type Sx, Type Sy, Type Sz);
-    void invScale(const Vec3<Type>& S);
-    void Rotate(Type DegAng, const Vec3<Type>& Axis);
-    void invRotate(Type DegAng, const Vec3<Type>& Axis);
+    void invScale(const ChapillVec3<Type>& S);
+    void Rotate(Type DegAng, const ChapillVec3<Type>& Axis);
+    void invRotate(Type DegAng, const ChapillVec3<Type>& Axis);
     Type Trace(void) const;
     void Frustum(Type l, Type r, Type b, Type t, Type n, Type f);
     void invFrustum(Type l, Type r, Type b, Type t, Type n, Type f);
@@ -113,12 +120,12 @@ class Mat44
     void invPerspective(Type Yfov, Type Aspect, Type Ndist, Type Fdist);
     void Viewport(int WW, int WH);
     void invViewport(int WW, int WH);
-    void LookAt(const Vec3<Type>& Eye, 
-                const Vec3<Type>& LookAtPt,
-                const Vec3<Type>& ViewUp);
-    void invLookAt(const Vec3<Type>& Eye, 
-                   const Vec3<Type>& LookAtPt, 
-                   const Vec3<Type>& ViewUp);
+    void LookAt(const ChapillVec3<Type>& Eye, 
+                const ChapillVec3<Type>& LookAtPt,
+                const ChapillVec3<Type>& ViewUp);
+    void invLookAt(const ChapillVec3<Type>& Eye, 
+                   const ChapillVec3<Type>& LookAtPt, 
+                   const ChapillVec3<Type>& ViewUp);
     void Viewport2(int WW, int WH);
     void invViewport2(int WW, int WH);
     void Print() const;
@@ -228,10 +235,10 @@ Mat44<Type>& Mat44<Type>::operator *= (const Mat44& A)         // ACCUMULATE MAT
 
 
 template<class Type>
-Vec3<Type> Mat44<Type>::operator * (const Vec3<Type>& V) const  // MAT-VECTOR MULTIPLICATION (*) W/ PERSP DIV
+ChapillVec3<Type> Mat44<Type>::operator * (const ChapillVec3<Type>& V) const  // MAT-VECTOR MULTIPLICATION (*) W/ PERSP DIV
 {
 	Type       W = M[3]*V.x + M[7]*V.y + M[11]*V.z + M[15];
-	Vec3<Type> NewV( (M[0]*V.x + M[4]*V.y + M[8]*V.z  + M[12]) / W,
+	ChapillVec3<Type> NewV( (M[0]*V.x + M[4]*V.y + M[8]*V.z  + M[12]) / W,
 		(M[1]*V.x + M[5]*V.y + M[9]*V.z  + M[13]) / W,
 		(M[2]*V.x + M[6]*V.y + M[10]*V.z + M[14]) / W );
 	return(NewV);
@@ -242,9 +249,9 @@ Vec3<Type> Mat44<Type>::operator * (const Vec3<Type>& V) const  // MAT-VECTOR MU
 // For transforming normals or other pure vectors. 
 // Assumes matrix is affine, i.e. bottom row is 0,0,0,1
 template<class Type>
-Vec3<Type> Mat44<Type>::multNormal(const Vec3<Type>& N) const
+ChapillVec3<Type> Mat44<Type>::multNormal(const ChapillVec3<Type>& N) const
 {
-	Vec3<Type> NewN( (M[0]*N.x + M[4]*N.y + M[8]*N.z ),
+	ChapillVec3<Type> NewN( (M[0]*N.x + M[4]*N.y + M[8]*N.z ),
 		(M[1]*N.x + M[5]*N.y + M[9]*N.z ),
 		(M[2]*N.x + M[6]*N.y + M[10]*N.z) );
 	return (NewN);
@@ -254,9 +261,9 @@ Vec3<Type> Mat44<Type>::multNormal(const Vec3<Type>& N) const
 // (for transforming points in space)
 // Assumes matrix is affine, i.e. bottom row is 0,0,0,1
 template<class Type>
-Vec3<Type> Mat44<Type>::multPoint(const Vec3<Type>& P) const
+ChapillVec3<Type> Mat44<Type>::multPoint(const ChapillVec3<Type>& P) const
 {
-	Vec3<Type> NewP( (M[0]*P.x + M[4]*P.y + M[8]*P.z  + M[12]),
+	ChapillVec3<Type> NewP( (M[0]*P.x + M[4]*P.y + M[8]*P.z  + M[12]),
 		(M[1]*P.x + M[5]*P.y + M[9]*P.z  + M[13]),
 		(M[2]*P.x + M[6]*P.y + M[10]*P.z + M[14]) );
 	return (NewP);
@@ -264,9 +271,9 @@ Vec3<Type> Mat44<Type>::multPoint(const Vec3<Type>& P) const
 
 
 template<class Type>
-Vec4<Type> Mat44<Type>::operator * (const Vec4<Type>& V) const  // MAT-VECTOR MULTIPLICATION (*)
+ChapillVec4<Type> Mat44<Type>::operator * (const ChapillVec4<Type>& V) const  // MAT-VECTOR MULTIPLICATION (*)
 {
-	Vec4<Type> NewV;
+	ChapillVec4<Type> NewV;
 	NewV.x = M[0]*V.x + M[4]*V.y + M[8]*V.z  + M[12]*V.w;
 	NewV.y = M[1]*V.x + M[5]*V.y + M[9]*V.z  + M[13]*V.w;
 	NewV.z = M[2]*V.x + M[6]*V.y + M[10]*V.z + M[14]*V.w;
@@ -438,7 +445,7 @@ void Mat44<Type>::Translate(Type Tx, Type Ty, Type Tz)
 }
 
 template<class Type>
-void Mat44<Type>::Translate(const Vec3<Type>& T)
+void Mat44<Type>::Translate(const ChapillVec3<Type>& T)
 {
 	M[0]=1; M[4]=0;  M[8]=0;  M[12]=T.x;
 	M[1]=0; M[5]=1;  M[9]=0;  M[13]=T.y;
@@ -456,7 +463,7 @@ void Mat44<Type>::invTranslate(Type Tx, Type Ty, Type Tz)
 }
 
 template<class Type>
-void Mat44<Type>::invTranslate(const Vec3<Type>& T)
+void Mat44<Type>::invTranslate(const ChapillVec3<Type>& T)
 {
 	M[0]=1; M[4]=0;  M[8]=0;  M[12]=-T.x;
 	M[1]=0; M[5]=1;  M[9]=0;  M[13]=-T.y;
@@ -474,7 +481,7 @@ void Mat44<Type>::Scale(Type Sx, Type Sy, Type Sz)
 }
 
 template<class Type>
-void Mat44<Type>::Scale(const Vec3<Type>& S)
+void Mat44<Type>::Scale(const ChapillVec3<Type>& S)
 {
 	M[0]=S.x; M[4]=0;   M[8]=0;    M[12]=0;
 	M[1]=0;   M[5]=S.y; M[9]=0;    M[13]=0;
@@ -492,7 +499,7 @@ void Mat44<Type>::invScale(Type Sx, Type Sy, Type Sz)
 }
 
 template<class Type>
-void Mat44<Type>::invScale(const Vec3<Type>& S)
+void Mat44<Type>::invScale(const ChapillVec3<Type>& S)
 {
 	M[0]=1/S.x; M[4]=0;     M[8]=0;      M[12]=0;
 	M[1]=0;     M[5]=1/S.y; M[9]=0;      M[13]=0;
@@ -501,7 +508,7 @@ void Mat44<Type>::invScale(const Vec3<Type>& S)
 }
 
 template<class Type>
-void Mat44<Type>::Rotate(Type DegAng, const Vec3<Type>& Axis)
+void Mat44<Type>::Rotate(Type DegAng, const ChapillVec3<Type>& Axis)
 {
 	Type RadAng = DegAng*Mat44TORADS;
 	Type ca=(Type)cos(RadAng),
@@ -548,7 +555,7 @@ void Mat44<Type>::Rotate(Type DegAng, const Vec3<Type>& Axis)
 }
 
 template<class Type>
-void Mat44<Type>::invRotate(Type DegAng, const Vec3<Type>& Axis)
+void Mat44<Type>::invRotate(Type DegAng, const ChapillVec3<Type>& Axis)
 {
 	Rotate(DegAng,Axis);
 	Transpose();
@@ -643,14 +650,14 @@ void Mat44<Type>::invViewport(int WW, int WH)
 // Same as gluLookAt()
 //---------------------------------------------------------------------------
 template<class Type>
-void Mat44<Type>::LookAt(const Vec3<Type>& Eye, 
-						 const Vec3<Type>& LookAtPt, 
-						 const Vec3<Type>& ViewUp)
+void Mat44<Type>::LookAt(const ChapillVec3<Type>& Eye, 
+						 const ChapillVec3<Type>& LookAtPt, 
+						 const ChapillVec3<Type>& ViewUp)
 {
-	Vec3<Type> Z = Eye-LookAtPt;  Z.Normalize(); // CALC CAM AXES ("/" IS CROSS-PROD)
-	Vec3<Type> X = ViewUp/Z;      X.Normalize();
-	Vec3<Type> Y = Z/X;           Y.Normalize();
-	Vec3<Type> Tr = -Eye;
+	ChapillVec3<Type> Z = Eye-LookAtPt;  Z.Normalize(); // CALC CAM AXES ("/" IS CROSS-PROD)
+	ChapillVec3<Type> X = ViewUp/Z;      X.Normalize();
+	ChapillVec3<Type> Y = Z/X;           Y.Normalize();
+	ChapillVec3<Type> Tr = -Eye;
 	M[0]=X.x;  M[4]=X.y;   M[8]=X.z; M[12]=X*Tr;  // TRANS->ROT
 	M[1]=Y.x;  M[5]=Y.y;   M[9]=Y.z; M[13]=Y*Tr;
 	M[2]=Z.x;  M[6]=Z.y;  M[10]=Z.z; M[14]=Z*Tr;
@@ -658,13 +665,13 @@ void Mat44<Type>::LookAt(const Vec3<Type>& Eye,
 }
 
 template<class Type>
-void Mat44<Type>::invLookAt(const Vec3<Type>& Eye, 
-							const Vec3<Type>& LookAtPt,
-							const Vec3<Type>& ViewUp)
+void Mat44<Type>::invLookAt(const ChapillVec3<Type>& Eye, 
+							const ChapillVec3<Type>& LookAtPt,
+							const ChapillVec3<Type>& ViewUp)
 {
-	Vec3<Type> Z = Eye-LookAtPt;  Z.Normalize(); // CALC CAM AXES ("/" IS CROSS-PROD)
-	Vec3<Type> X = ViewUp/Z;      X.Normalize();
-	Vec3<Type> Y = Z/X;           Y.Normalize();
+	ChapillVec3<Type> Z = Eye-LookAtPt;  Z.Normalize(); // CALC CAM AXES ("/" IS CROSS-PROD)
+	ChapillVec3<Type> X = ViewUp/Z;      X.Normalize();
+	ChapillVec3<Type> Y = Z/X;           Y.Normalize();
 	M[0]=X.x;  M[4]=Y.x;   M[8]=Z.x; M[12]=Eye.x;  // ROT->TRANS
 	M[1]=X.y;  M[5]=Y.y;   M[9]=Z.y; M[13]=Eye.y;
 	M[2]=X.z;  M[6]=Y.z;  M[10]=Z.z; M[14]=Eye.z;

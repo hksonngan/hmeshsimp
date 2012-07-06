@@ -8,7 +8,10 @@
 #ifndef __UTIL_COMMON__
 #define __UTIL_COMMON__
 
-#include "math/vec3.h"
+#include "math/chapill_vec3.h"
+#include "math/chapill_vec4.h"
+#include "math/mat44.h"
+
 
 /* -- types & constants -- */
 
@@ -28,8 +31,8 @@ class HSoupTriangle;
 template<class ElemType> class HTripleIndex;
 class HFaceIndex;
 
-typedef Vec3<float> HVertex;
-typedef Vec3<float> HNormal;
+typedef ChapillVec3<float> HVertex;
+typedef ChapillVec3<float> HNormal;
 
 /* 3 vector */
 template<class T>
@@ -191,7 +194,7 @@ bool HQEMatrix<FloatType>::calcRepresentativeVertex(HVertex& vertex)
 	if (!mat.Inverse(inv, mymath::Mat44INV_TOLERANCE))
 		return false;
 
-	mymath::Vec4<float> new_vertex = inv * mymath::Vec4<float>(0, 0, 0, 1);
+	mymath::ChapillVec4<float> new_vertex = inv * mymath::ChapillVec4<float>(0, 0, 0, 1);
 
 	vertex.Set(new_vertex.x, new_vertex.y, new_vertex.z);
 
