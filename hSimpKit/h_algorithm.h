@@ -125,4 +125,39 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 
 /* ----------------------------------------- */
 
+/* quick sort */
+inline template<class T>
+void swap(T a, T b) {
+	T temp;
+
+	temp = a;
+	a = b;
+	b = temp;
+}
+
+template<class ElemType, class ContainerType> 
+int partition2(ContainerType arr, int start, int end, ElemType pivot) {
+
+	if (start >= end) 
+		return;
+
+	int i = start - 1, j;
+
+	for (j = start; j <= end; j ++) {
+		
+		if (arr[j] < pivot) {
+			swap(arr[j], arr[i + 1]);
+			i ++;
+		}
+	}
+
+	return i;
+}
+
+template<class ElemType, class ContainerType>
+void quick_sort(ContainerType arr, int arr_count) {
+
+	
+}
+
 #endif //__H_ALGORITHM__

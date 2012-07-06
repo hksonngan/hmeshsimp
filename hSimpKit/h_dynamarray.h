@@ -17,7 +17,8 @@ public:
 	~HDynamArray();
 	
 	/* accessors */
-	inline ElemType& operator[] (int i);
+	ElemType& operator[] (int i) { return data[i]; }
+	ElemType& elem(int i) { return data[i]; }
 	int count() { return size; }
 	int getCapacity() { return capacity; }
 	// return the index of the element value 
@@ -31,6 +32,10 @@ public:
 	inline void remove(uint &index);
 	void resize(int _capacity);
 	void clear() { size = 0; }
+	// merge with another arr, the capacity
+	// is at least size1 + size2
+	void merge(HDynamArray &arr2);
+	void qsort();
 
 private:
 	ElemType *data;
@@ -72,12 +77,6 @@ void HDynamArray<ElemType>::push_back(ElemType e)
 
 	data[size] = e;
 	size ++;
-}
-
-template<class ElemType>
-ElemType& HDynamArray<ElemType>::operator[] (int i)
-{
-	return data[i];
 }
 
 template<class ElemType>
@@ -128,6 +127,12 @@ void HDynamArray<ElemType>::remove(uint &index) {
 	}
 
 	size --;
+}
+
+template<class ElemType>
+void HDynamArray<ElemType>::merge(HDynamArray &arr2) {
+
+
 }
 
 #endif //__H_DYNAM_ARRAY__
