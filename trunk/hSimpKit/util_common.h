@@ -33,6 +33,7 @@ class HFaceIndex;
 
 typedef ChapillVec3<float> HVertex;
 typedef ChapillVec3<float> HNormal;
+typedef HTripleIndex<uint> HFace;
 
 /* 3 vector */
 template<class T>
@@ -346,5 +347,4 @@ public:
 public:
 	HTripleIndex<Integer> v1CIndex, v2CIndex, v3CIndex;
 };
-
 #endif //__UTIL_COMMON__

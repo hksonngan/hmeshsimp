@@ -12,6 +12,7 @@
 #include "MxQMetric3.h"
 // for some constants and typedefs
 #include "MxStdSlim.h"
+#include "gfx/geom3d.h"
 
 typedef MxQuadric3 Quadric;
 
@@ -23,7 +24,7 @@ public:
 
 	QuadricEdgeCollapse();
 	void allocVerts(uint _vert_count);
-	inline void addFace(HTripleIndex face);
+	inline void addFace(HFace face);
 	void collectPairs();
 	inline CollapsablePair* createPair(uint _vert1, uint _vert2);
 	// init after the vertices and faces are ready
@@ -48,10 +49,10 @@ protected:
 	int weighting_policy;
 	int placement_policy;
 
-	static q_matrix	qMatrix;
+	//static q_matrix	qMatrix;
 };
 
-void QuadricEdgeCollapse::addFace(HTripleIndex face) {
+void QuadricEdgeCollapse::addFace(HFace face) {
 
 	PairCollapse::addFace(face);
 
@@ -172,6 +173,8 @@ inline HVertex QuadricEdgeCollapse::evaluatePair(CollapsablePair *pair) {
 
 	// note this~ it set the key
 	pair->heap_key(- e_min);
+
+	return pair->new_vertex;
 }
 
 #endif //__ITERATIVE_QUADRIC_EDGE_COLLAPSE__

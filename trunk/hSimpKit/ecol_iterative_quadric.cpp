@@ -52,4 +52,6 @@ bool QuadricEdgeCollapse::targetVert(uint target_count) {
 		
 		pair = extractTopPair();
 	}
+
+	return true;
 }

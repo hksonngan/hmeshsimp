@@ -1,5 +1,10 @@
 #include "pcol_iterative.h"
 
+CollapsableVertex PairCollapse::cvert;
+CollapseFace PairCollapse::cface;
+vert_arr PairCollapse::starVerts1;
+vert_arr PairCollapse::starVerts2;
+
 PairCollapse::PairCollapse() {
 
 }

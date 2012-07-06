@@ -7,9 +7,14 @@
 #ifndef __H_ITERATIVE_PAIR_COLLAPSE__
 #define __H_ITERATIVE_PAIR_COLLAPSE__ 
 
+// for MxBlock
+#define HAVE_CASTING_LIMITS
+
 #include "pcol_vertex.h"
 #include "pcol_other_structures.h"
 #include "util_common.h"
+#include "h_dynamarray.h"
+#include "MxHeap.h"
 
 class PairCollapse {
 public:
@@ -25,7 +30,7 @@ public:
 	void allocFaces(uint _face_count);
 	// DO add vertices first and completely
 	inline void addVertex(HVertex vert);
-	inline void addFace(HTripleIndex face);
+	inline void addFace(HFace face);
 	// collect all valid pairs based on
 	// specific measurement after the 
 	// vertices and faces are ready
@@ -92,7 +97,7 @@ void PairCollapse::addVertex(HVertex vert) {
 	vertices.push_back(cvert);
 }
 
-void PairCollapse::addFace(HTripleIndex face) {
+void PairCollapse::addFace(HFace face) {
 
 	cface.set(face.i, face.j, face.k);
 	faces.push_back(cface);
@@ -109,7 +114,7 @@ void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) 
 	cvert = vertices[vert_index];
 
 	for (int i = 0; i < cvert.adjacent_faces.count(); i ++) {
-		cface = cvert.adjacent_faces[i];
+		cface = faces[cvert.adjacent_faces[i]];
 		
 		if (cface.i != vert_index && !starVertices->exist(cface.i))
 			starVertices->push_back(cface.i);

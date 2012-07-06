@@ -10,14 +10,14 @@ float HFaceFormula::d = 0;
 /* calculate face formula */
 void HFaceFormula::calcTriangleFaceFormula(HVertex _v1, HVertex _v2, HVertex _v3)
 {
-	Vec3<float> v1(_v1.x, _v1.y, _v1.z), 
+	ChapillVec3<float> v1(_v1.x, _v1.y, _v1.z), 
 		v2(_v2.x, _v2.y, _v2.z), 
 		v3(_v3.x, _v3.y, _v3.z);
 
-	Vec3<float> edge1(v1 - v2), 
+	ChapillVec3<float> edge1(v1 - v2), 
 		edge2(v2 - v3);
 
-	Vec3<float> normal = edge1 ^ edge2; // cross product
+	ChapillVec3<float> normal = edge1 ^ edge2; // cross product
 
 	normal.Normalize();
 
@@ -30,14 +30,14 @@ void HFaceFormula::calcTriangleFaceFormula(HVertex _v1, HVertex _v2, HVertex _v3
 
 float HFaceFormula::calcTriangleFaceArea(HVertex &_v1, HVertex &_v2, HVertex &_v3)
 {
-	Vec3<float> v1(_v1.x, _v1.y, _v1.z), 
+	ChapillVec3<float> v1(_v1.x, _v1.y, _v1.z), 
 		v2(_v2.x, _v2.y, _v2.z), 
 		v3(_v3.x, _v3.y, _v3.z);
 
-	Vec3<float> edge1(v1 - v2), 
+	ChapillVec3<float> edge1(v1 - v2), 
 		edge2(v2 - v3);
 
-	Vec3<float> normal = edge1 ^ edge2; // cross product
+	ChapillVec3<float> normal = edge1 ^ edge2; // cross product
 
 	return normal.Length();
 }

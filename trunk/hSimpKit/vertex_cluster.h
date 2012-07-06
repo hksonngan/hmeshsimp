@@ -14,8 +14,8 @@
 //#include <unordered_set>
 #include <cstddef>
 #include <iostream>
-#include "math/vec3.h"
-#include "math/vec4.h"
+#include "math/chapill_vec3.h"
+#include "math/chapill_vec4.h"
 #include "math/mat44.h"
 #include "util_common.h"
 #include "hash_face.h"
