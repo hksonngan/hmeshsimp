@@ -1,14 +1,14 @@
 /*
- *  multi-way merge external sort
+ *  Multi-way Merge External Sort
  *
- *  the fundamental knowledge concerning external sort
+ *  The fundamental knowledge concerning external sort
  *  or even internal sort can be retrieved from books,
  *  like say, TAOCP Volume 3, which is an encyclopedia
- *  for computer science. though most of the contents
+ *  for computer science. Though most of the contents
  *  are about tape-based external sort, the thoughts
  *  look the same.
  *  have fun.
- *    -ht waytofall916@gmail.com
+ *    -Ht waytofall916@gmail.com
  */
 
 #ifndef __H_E_SORT__
@@ -139,7 +139,8 @@ public:
 		int		_record_count = 0 ); // equals or less than 0 indicates that the terminate sign is end of file 
 
 	/*
-	 * return value: if the functions has ran right */
+	 * return value: if the functions has ran right 
+	 */
 	bool nextPatch(
 		ERadixRecordType* arr, 
 		int &read_count, 
@@ -155,8 +156,8 @@ public:
 private:
 	FILE*	fin;
 	char*	infilename;
-	int		records_in_a_patch; // count of records in a file patch
-	int		record_count; // equals or less than 0 indicates that the terminate sign is end of file 
+	int		records_in_a_patch;	// count of records in a file patch
+	int		record_count;		// equals or less than 0 indicates that the terminate sign is end of file 
 	int		patches_count;
 	char	name_buf[500];
 	string	dir_name;

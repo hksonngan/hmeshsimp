@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ply"
-	ProjectGUID="{FC919909-CEB7-4332-AB64-589E8979973F}"
+	ProjectGUID="{5CB663CB-A752-463C-BB7C-78BD4AFC8843}"
 	RootNamespace="ply"
 	Keyword="Win32Proj"
 	>

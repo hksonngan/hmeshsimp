@@ -1,8 +1,9 @@
 /*
-	a timer
-	author: ht
-	email : waytofall016@gmail.com
-*/
+ *	a timer
+ *
+ *	author: ht
+ *	email : waytofall016@gmail.com
+ */
 
 #ifndef __H_TIME__
 #define __H_TIME__
@@ -23,8 +24,20 @@ public:
 		time_stamp = clock();
 	}
 
-	const char* printElapseSec() {
+	void setStartPoint() {
+		time_stamp = clock();
+	}
+
+	void setEndPoint() {
 		sprintf(buf, "%f sec", (clock() - (float)time_stamp) / CLOCKS_PER_SEC);
+	}
+
+	char* getElapseStr() {
+		return buf;
+	}
+
+	const char* printElapseSec() {
+		setEndPoint();
 		return buf;
 	}
 
