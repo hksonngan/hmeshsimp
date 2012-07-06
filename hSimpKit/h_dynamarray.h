@@ -84,7 +84,7 @@ void HDynamArray<ElemType>::resize(int _capacity)
 {
 	if (_capacity > capacity) {
 		ElemType *new_data = new ElemType[_capacity];
-		memcpy(new_data, data, size(ElemType) * capacity);
+		memcpy(new_data, data, sizeof(ElemType) * capacity);
 		capacity = _capacity;
 		delete[] data;
 		data = new_data;

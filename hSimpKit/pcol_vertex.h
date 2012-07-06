@@ -21,9 +21,9 @@ using std::list;
 typedef list<uint> face_list;
 typedef HDynamArray<CollapsablePair*> pair_arr;
 typedef HDynamArray<uint> face_arr;
+typedef HDynamArray<uint> vert_arr;
 //typedef HQEMatrix<float> q_matrix;
 typedef MxQuadric3 q_matrix;
-typedef HDynamArray<uint> vert_arr;
 
 /* out-of-core version */
 class CollapsedVertex: public HVertex {

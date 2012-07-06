@@ -126,8 +126,8 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 /* ----------------------------------------- */
 
 /* quick sort */
-inline template<class T>
-void swap(T a, T b) {
+template<class T>
+inline void hswap(T a, T b) {
 	T temp;
 
 	temp = a;
@@ -146,7 +146,7 @@ int partition2(ContainerType arr, int start, int end, ElemType pivot) {
 	for (j = start; j <= end; j ++) {
 		
 		if (arr[j] < pivot) {
-			swap(arr[j], arr[i + 1]);
+			hswap(arr[j], arr[i + 1]);
 			i ++;
 		}
 	}

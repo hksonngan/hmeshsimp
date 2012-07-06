@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include "util_common.h"
-#include "math/vec3.h"
+#include "math/chapill_vec3.h"
 #include "ply_stream.h"
 #include <fstream>
 
@@ -210,13 +210,13 @@ void HSpatialDivision::addFace(HTripleIndex<Integer> i3)
 
 	/* alter the vertices */
 
-	Vec3<float> v1, v2, v3;
+	ChapillVec3<float> v1, v2, v3;
 	v1.Set(vertices[i3.i].x, vertices[i3.i].y, vertices[i3.i].z);
 	v2.Set(vertices[i3.j].x, vertices[i3.j].y, vertices[i3.j].z);
 	v3.Set(vertices[i3.k].x, vertices[i3.k].y, vertices[i3.k].z);
-	Vec3<float> e1 = v1 - v2;
-	Vec3<float> e2 = v2 - v3;
-	Vec3<float> nm = e1 ^ e2;
+	ChapillVec3<float> e1 = v1 - v2;
+	ChapillVec3<float> e2 = v2 - v3;
+	ChapillVec3<float> nm = e1 ^ e2;
 	float area = nm.Length(); // triangle's area is length of cross product of the two edge vectors
 
 	// add area to the corresponding vertices

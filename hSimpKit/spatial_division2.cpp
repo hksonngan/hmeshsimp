@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include "util_common.h"
-#include "math/vec3.h"
+#include "math/chapill_vec3.h"
 #include "ply_stream.h"
 #include "stdio.h"
 
