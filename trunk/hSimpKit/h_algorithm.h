@@ -8,6 +8,9 @@
 #ifndef __H_ALGORITHM__
 #define __H_ALGORITHM__
 
+#include "random.h"
+
+enum SortType { ASCEND, DESCEND };
 
 /* ---------- array partitioning ---------- */
 
@@ -125,9 +128,9 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 
 /* ----------------------------------------- */
 
-/* quick sort */
+/* quick sort in ascending order */
 template<class T>
-inline void hswap(T a, T b) {
+inline void hswap(T &a, T &b) {
 	T temp;
 
 	temp = a;
@@ -136,28 +139,75 @@ inline void hswap(T a, T b) {
 }
 
 template<class ElemType, class ContainerType> 
-int partition2(ContainerType arr, int start, int end, ElemType pivot) {
+inline int partition2(ContainerType arr, int start, int end) {
 
 	if (start >= end) 
-		return;
+		return start;
 
-	int i = start - 1, j;
+	// get the randomized pivot position
+	int i = urand() % (end - start + 1);
+	i += start;
 
-	for (j = start; j <= end; j ++) {
+	// swap the first element with the pivot
+	hswap(arr[start], arr[i]);
+
+	i = start;
+	int j;
+
+	for (j = start + 1; j <= end; j ++) {
 		
-		if (arr[j] < pivot) {
+		if (arr[j] < arr[start]) {
 			hswap(arr[j], arr[i + 1]);
 			i ++;
 		}
 	}
 
+	hswap(arr[start], arr[i]);
+
 	return i;
 }
 
 template<class ElemType, class ContainerType>
-void quick_sort(ContainerType arr, int arr_count) {
+void recursive_partition(ContainerType arr, int start, int end) {
 
-	
+	if (start < 0)
+		return;
+	if (start >= end)
+		return;
+
+	int i;
+
+	i = partition2<ElemType, ContainerType>(arr, start, end);
+	recursive_partition<ElemType, ContainerType>(arr, start, i - 1);
+	recursive_partition<ElemType, ContainerType>(arr, i + 1, end);
 }
+
+template<class ElemType, class ContainerType>
+void h_quick_sort(ContainerType arr, int arr_count) {
+
+	srand(0);
+	recursive_partition<ElemType, ContainerType>(arr, 0, arr_count - 1);
+}
+
+/* merge two ascending array */
+template<class ElemType, class ContainerType>
+void merge_sorted_arr(
+	ContainerType arr1, int arr1_count, 
+	ContainerType arr2, int arr2_count, 
+	ContainerType dst) {
+	
+	int i, j, k;
+
+	for (i = 0, j = 0, k = 0; i < arr1_count || j < arr2_count; k ++) {
+		if (j >= arr2_count || i < arr1_count && arr1[i] <= arr2[j]) {
+			dst[k] = arr1[i];
+			i ++;
+		}
+		else {
+			dst[k] = arr2[j];
+			j ++;
+		}
+	}
+};
 
 #endif //__H_ALGORITHM__
