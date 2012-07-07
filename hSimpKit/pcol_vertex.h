@@ -31,7 +31,10 @@ public:
 	uint	new_id;		// the id after the collapse
 	uint	output_id;	// the id of the output model
 	// used for collapsing sequence file
-	//HVertex	new_vertex;	// the new vertex after the collapse
+	HVertex	new_vertex;	// the new vertex after the collapse
+
+public:
+	void setNewId(uint _id) { new_id = _id; }
 };
 
 /* in-core version */
@@ -56,7 +59,7 @@ public:
 	face_arr	adjacent_faces;
 	// assisting variable use for linkage
 	// information operation
-	short	flag;
+	//short	flag;
 
 private:
 	// the face star count is set to 6

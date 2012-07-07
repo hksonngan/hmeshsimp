@@ -24,10 +24,11 @@ public:
 	~HDynamArray();
 	
 	/* accessors */
-	ElemType& operator[] (int i) const { return data[i]; }
-	ElemType& elem(int i) const { return data[i]; }
-	int count() const { return size; }
-	int getCapacity() { return capacity; }
+	inline ElemType& operator[] (unsigned int i) const { return data[i]; }
+	inline ElemType& elem(unsigned int i) const { return data[i]; }
+	inline ElemType* pointer(unsigned int i) { return data + i; }
+	inline int count() const { return size; }
+	inline int getCapacity() { return capacity; }
 	// return the index of the element value 
 	// equals to e, return 'size' if it doesn't
 	// exist
@@ -36,9 +37,10 @@ public:
 
 	/* modifiers */
 	inline void push_back(ElemType e);
-	inline void remove(unsigned int &index);
-	void resize(int _capacity);
+	inline void remove(unsigned int index);
+	inline void resize(int _capacity);
 	void clear() { size = 0; }
+	inline void freeSpace();
 	void quick_sort() {	h_quick_sort<ElemType, ElemType*>(data, size); }
 	// merge with another arr, the capacity
 	// is at least size1 + size2
@@ -61,25 +63,32 @@ private:
 template<class ElemType>
 HDynamArray<ElemType>::HDynamArray(int _init_cap) {
 
-	if (_init_cap <= 0) {
-		_init_cap = DEFAULT_INIT_CAP;
+	if (_init_cap < 0) {
+		_init_cap = 0;
 	}
 
 	init_cap = _init_cap;
 	capacity = init_cap;
 	size = 0;
-	data = new ElemType[capacity];
+	data = NULL;
+	if (capacity != 0) {
+		data = new ElemType[capacity];
+	}
 }
 
 template<class ElemType>
 HDynamArray<ElemType>::~HDynamArray() {
-	delete[] data;
+	
+	freeSpace();
 }
 
 template<class ElemType>
 void HDynamArray<ElemType>::push_back(ElemType e) {
 
 	if (size >= capacity) {
+		if (capacity == 0) {
+			capacity = 1;
+		}
 		resize(capacity * 2);
 	}
 
@@ -92,10 +101,23 @@ void HDynamArray<ElemType>::resize(int _capacity)  {
 
 	if (_capacity > capacity) {
 		ElemType *new_data = new ElemType[_capacity];
-		memcpy(new_data, data, sizeof(ElemType) * capacity);
+		if (capacity != 0)
+			memcpy(new_data, data, sizeof(ElemType) * capacity);
 		capacity = _capacity;
-		delete[] data;
+		if (data)
+			delete[] data;
 		data = new_data;
+	}
+}
+
+template<class ElemType>
+void HDynamArray<ElemType>::freeSpace() {
+
+	size = 0;
+	capacity = 0;
+	if (data) {
+		delete[] data;
+		data = NULL;
 	}
 }
 
@@ -120,7 +142,7 @@ bool HDynamArray<ElemType>::exist(ElemType &e) {
 }
 
 template<class ElemType>
-void HDynamArray<ElemType>::remove(unsigned int &index) {
+void HDynamArray<ElemType>::remove(unsigned int index) {
 
 	if (size <= 0)
 		return;
@@ -167,6 +189,9 @@ void HDynamArray<ElemType>::randGen(unsigned int count, unsigned int range) {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////
+////
+
 template<class ElemType>
 ostream& operator <<(ostream& out, const HDynamArray<ElemType> &arr) {
 	
@@ -175,6 +200,13 @@ ostream& operator <<(ostream& out, const HDynamArray<ElemType> &arr) {
 	out << endl;
 
 	return out;
+}
+
+template<class ElemType>
+void merge_dynam_arr(HDynamArray<ElemType> &arr1, HDynamArray<ElemType> &arr2, HDynamArray<ElemType> &dst) {
+
+	dst.resize(arr1.count() + arr2.count());
+	merge_arr<ElemType, HDynamArray<ElemType>>(arr1, arr1.count(), arr2, arr2.count(), dst);
 }
 
 #endif //__H_DYNAM_ARRAY__
