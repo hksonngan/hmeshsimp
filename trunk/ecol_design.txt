@@ -75,6 +75,13 @@ Stored in continuous memory space with the index denoting the vertex index. This
 can be used in both the in-core edge collapse algorithm and the out-of-core simplified mesh 
 generation phase based on the collapsing sequence file.
 
+The pairs stored in the priority queue should always point to the valid vertices, such that the
+deprecated pairs should be freed. Note that the pair_heap only stores a pointer to the real struct, 
+and the 'adjacent_col_pairs' field also stores a pointer to the real 'CollapsablePair' structure
+located in operating system HEAP, so 'adjacent_col_pairs' field of different vertices in fact point 
+to the same struct if they are the same. This is similar to 'adjacent_faces' field which storing
+the index of the face in the faces array.
+
 =========================================$ algorithms $==========================================
 
 $$ vertex invalidation & collasping sequence footprint $$

@@ -128,7 +128,8 @@ int* ArraySelfPartition<ElemType, ContainerType>::operator() (
 
 /* ----------------------------------------- */
 
-/* quick sort in ascending order */
+/* quick sort */
+
 template<class T>
 inline void hswap(T &a, T &b) {
 	T temp;
@@ -192,9 +193,9 @@ void h_quick_sort(ContainerType arr, int arr_count) {
 /* merge two ascending array */
 template<class ElemType, class ContainerType>
 void merge_sorted_arr(
-	ContainerType arr1, int arr1_count, 
-	ContainerType arr2, int arr2_count, 
-	ContainerType dst) {
+	ContainerType &arr1, int arr1_count, 
+	ContainerType &arr2, int arr2_count, 
+	ContainerType &dst) {
 	
 	int i, j, k;
 
@@ -209,5 +210,16 @@ void merge_sorted_arr(
 		}
 	}
 };
+
+template<class ElemType, class ContainerType>
+void merge_arr(
+	ContainerType &arr1, int arr1_count, 
+	ContainerType &arr2, int arr2_count, 
+	ContainerType &dst) {
+
+	h_quick_sort<ElemType, ContainerType>(arr1, arr1_count);
+	h_quick_sort<ElemType, ContainerType>(arr2, arr2_count);
+	merge_sorted_arr<ElemType, ContainerType>(arr1, arr1_count, arr2, arr2_count, dst);
+}
 
 #endif //__H_ALGORITHM__
