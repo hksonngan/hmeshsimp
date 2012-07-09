@@ -20,7 +20,7 @@ using std::endl;
 template<class ElemType>
 class HDynamArray {
 public:
-	HDynamArray(int _init_cap = DEFAULT_INIT_CAP);
+	HDynamArray(int _init_cap = 0);
 	~HDynamArray();
 	
 	/* accessors */
@@ -71,7 +71,7 @@ HDynamArray<ElemType>::HDynamArray(int _init_cap) {
 	capacity = init_cap;
 	size = 0;
 	data = NULL;
-	if (capacity != 0) {
+	if (capacity > 0) {
 		data = new ElemType[capacity];
 	}
 }

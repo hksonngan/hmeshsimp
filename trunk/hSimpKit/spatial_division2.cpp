@@ -109,13 +109,7 @@ bool HSpatialDivision2::readPly(char *filename)
 	vertices = new HSDVertex2[plyStream.getVertexCount()];
 	faces = new HTripleIndex<Integer>[plyStream.getFaceCount()];
 
-	float float_val = 5.89458;
-	
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
-		if (i == 26) {
-			int k = 0;
-			k ++;
-		}
 
 		if (plyStream.nextVertex(v) == false) {
 			return false;

@@ -40,11 +40,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\hSimpKit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;"
+				AdditionalIncludeDirectories="..\hSimpKit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;../libgfx/include;../mixkit/src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(OutDir)\hSimpKit.lib"
+				AdditionalDependencies="$(OutDir)\hSimpKit.lib $(OutDir)\libgfx.lib $(OutDir)\MixKit.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -117,8 +117,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\hSimpKit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;../libgfx/include;../mixkit/src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -135,6 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="$(OutDir)\hSimpKit.lib libgfx.lib MixKit.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"

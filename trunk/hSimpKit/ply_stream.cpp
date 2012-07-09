@@ -1,24 +1,6 @@
 #include "ply_stream.h"
 #include "ply.h"
-#include <iostream>
 #include "trivial.h"
-
-extern /*"C" {*/ PlyElement *find_element(PlyFile *plyfile, char *element); /*}*/
-
-using std::cerr;
-using std::endl;
-
-static PlyProperty vert_props[] = { /* list of property information for a vertex */
-	{"x", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,x), 0, 0, 0, 0},
-	{"y", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,y), 0, 0, 0, 0},
-	{"z", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,z), 0, 0, 0, 0},
-};
-
-static PlyProperty face_props[] = { /* list of property information for a vertex */
-	{"vertex_indices", PLY_INT, PLY_INT, offsetof(Face,verts),
-	1, PLY_UCHAR, PLY_UCHAR, offsetof(Face,nverts)},
-};
-
 
 PlyStream::PlyStream()
 {
@@ -113,61 +95,6 @@ bool PlyStream::openForRead(char *filename)
 bool PlyStream::close()
 {
 	ply_close(ply);
-
-	return true;
-}
-
-bool PlyStream::nextVertex(HVertex &v)
-{
-	if (readVCount >= vCount) {
-		return false;
-	}
-
-	ply->which_elem = vertexElem;
-	
-	vertex.other_props = NULL;
-	ply_get_element (ply, (void *) &vertex);
-
-	v.Set(vertex.x, vertex.y, vertex.z);
-	readVCount ++;
-
-	if (vertex.other_props) {
-		free(vertex.other_props);
-	}
-
-	return true;
-}
-
-static void freePointersInFace(Face *face) {
-	if (face->verts) {
-		free(face->verts);
-	}
-	if (face->other_props) {
-		free(face->other_props);
-	}
-}
-
-bool PlyStream::nextFace(HTripleIndex<Integer> &f)
-{
-	if (readFCount >= fCount) {
-		return false;
-	}
-
-	ply->which_elem = faceElem;
-
-	face.nverts = NULL;
-	face.other_props = NULL;
-	ply_get_element (ply, (void *) &face);
-
-	if (face.nverts != 3) {
-		cerr << "#error: non-tirangle in ply file" << endl;
-		return false;
-	}
-
-	f.set(face.verts[0], face.verts[1], face.verts[2]);
-	readFCount ++;
-
-	freePointersInFace(&face);
 
 	return true;
 }

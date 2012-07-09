@@ -19,6 +19,63 @@ void QuadricEdgeCollapse::allocVerts(uint _vert_count) {
 	quadrics.resize(_vert_count);
 }
 
+bool QuadricEdgeCollapse::addFace(HFace face) {
+
+	if (!PairCollapse::addFace(face))
+		return false;
+
+	// add the quadric matrix
+	//qMatrix.calcQem(vertices[face.i], vertices[face.j], vertices[face.k]);
+	float area = HFaceFormula::calcTriangleFaceArea(vertices[face.i], vertices[face.j], vertices[face.k]);
+	//qMatrix *= area;
+
+	//quadrics[face.i] += qMatrix;
+	//quadrics[face.j] += qMatrix;
+	//quadrics[face.k] += qMatrix;
+
+	/// below altered from _QSLIM_2.1_
+	uint i;
+
+	//Vec3 v1(m->vertex(f(0)));
+	//Vec3 v2(m->vertex(f(1)));
+	//Vec3 v3(m->vertex(f(2)));
+
+	Vec3 v1(vertices[face.i].x, vertices[face.i].y, vertices[face.i].z);
+	Vec3 v2(vertices[face.j].x, vertices[face.j].y, vertices[face.j].z);
+	Vec3 v3(vertices[face.k].x, vertices[face.k].y, vertices[face.k].z);
+
+	// calculating triangle plane formula
+	Vec4 p = (weighting_policy == MX_WEIGHT_RAWNORMALS) ?
+		triangle_raw_plane<Vec3,Vec4>(v1, v2, v3):
+	triangle_plane<Vec3,Vec4>(v1, v2, v3);
+	// retrieve the quadric matrix
+	Quadric Q(p[X], p[Y], p[Z], p[W], area);
+
+	switch( weighting_policy )
+	{
+	case MX_WEIGHT_ANGLE:
+		for(i = 0; i < 3; i ++)
+		{
+			Quadric Q_j = Q;
+			// by ht
+			//Q_j *= m->compute_corner_angle(i, j);
+			//quadrics(face[i]) += Q_j;
+		}
+		break;
+	case MX_WEIGHT_AREA:
+	case MX_WEIGHT_AREA_AVG:
+		Q *= Q.area();
+		// no break: fallthrough
+	default:
+		quadrics[face.i] += Q;
+		quadrics[face.j] += Q;
+		quadrics[face.k] += Q;
+		break;
+	}
+
+	return true;
+}
+
 void QuadricEdgeCollapse::collectPairs() {
 
 	int i, j;
@@ -41,7 +98,6 @@ void QuadricEdgeCollapse::collectPairs() {
 void QuadricEdgeCollapse::initialize() {
 
 	PairCollapse::intialize();
-	
 }
 
 //bool QuadricEdgeCollapse::targetVert(uint target_count) {
