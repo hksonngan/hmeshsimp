@@ -385,13 +385,6 @@
 			<File
 				RelativePath=".\ecol_iterative_quadric.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\ecol_iterative_quadric.h"
@@ -432,13 +425,6 @@
 			<File
 				RelativePath=".\pcol_iterative.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\pcol_iterative.h"
@@ -514,10 +500,6 @@
 					Name="VCCLCompilerTool"
 				/>
 			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\hIterativeEdgeCollapse\main.cpp"
-			>
 		</File>
 		<File
 			RelativePath=".\merge_arr_test.cpp"

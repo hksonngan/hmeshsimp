@@ -68,8 +68,8 @@ private:
 };
 
 CollapsableVertex::CollapsableVertex():
-adjacent_faces(INIT_ADJACENT_FACES_COUNT),
-adjacent_col_pairs(INIT_ADJACENT_FACES_COUNT)
+adjacent_faces(0),
+adjacent_col_pairs(0)
 {
 
 }

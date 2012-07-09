@@ -12,13 +12,19 @@
 
 #include <algorithm>
 #include <string.h>
+#include <iostream>
+#include <fstream>
 #include "pcol_vertex.h"
 #include "pcol_other_structures.h"
 #include "util_common.h"
 #include "h_dynamarray.h"
 #include "MxHeap.h"
 
-#define INFO_BUF_CAPACITY 2000
+using std::ofstream;
+using std::cout;
+using std::endl;
+
+#define INFO_BUF_CAPACITY 1
 
 typedef CollapsablePair* pCollapsablePair;
 
@@ -47,27 +53,26 @@ public:
 	// initializers
 
 	PairCollapse();
+	~PairCollapse();
 	// set the capacity for the container 
 	// and allocate the memory space
-	void allocVerts(uint _vert_count);
-	void allocFaces(uint _face_count);
+	virtual void allocVerts(uint _vert_count);
+	virtual void allocFaces(uint _face_count);
 	// DO add vertices first and completely
-	inline void addVertex(HVertex vert);
-	inline bool addFace(HFace face);
+	virtual void addVertex(HVertex vert);
+	virtual bool addFace(HFace face);
 	// collect all valid pairs based on
 	// specific measurement after the 
 	// vertices and faces are ready
 	// this function should be overrided
 	// in specific derivative class
 	virtual void collectPairs() = 0;
-	// this function should be overrided
-	// in specific derivative class
-	CollapsablePair* createPair(uint _vert1, uint _vert2) {}
 	// add the pair to the heap and update the pair adjacent
 	// information of the vertices
 	inline void addCollapsablePair(CollapsablePair *new_pair);
 	// init after the vertices and faces are ready
-	void intialize();
+	virtual void intialize();
+	bool readPly(char* filename);
 
 	////////////////////////////////////
 	// computing
@@ -127,6 +132,8 @@ protected:
 	char	INFO_BUF[INFO_BUF_CAPACITY];
 	uint	info_buf_size;
 
+	ofstream flog;
+
 	/////////////////////////////////////
 	// assisting temporal variables
 
@@ -134,36 +141,6 @@ protected:
 	static CollapsableFace cface;
 	static vert_arr starVerts1, starVerts2;
 };
-
-void PairCollapse::addVertex(HVertex vert) {
-	cvert.Set(vert.x, vert.y, vert.z);
-	// set the new id, this is important!!
-	cvert.setNewId(vertices.count());
-	vertices.push_back(cvert);
-}
-
-bool PairCollapse::addFace(HFace face) {
-
-	cface.set(face.i, face.j, face.k);
-
-	if (!cface.valid()) {
-		addInfo("#error: duplicate vertices in input face\n");
-		return false;
-	}
-	if (!cface.indicesInRange(0, vertices.count() - 1)) {
-		addInfo("#error: vertex out of range in input face\n");
-		return false;
-	}
-
-	faces.push_back(cface);
-
-	// add the face index to the vertices
-	vertices[face.i].adjacent_faces.push_back(faces.count() - 1);
-	vertices[face.j].adjacent_faces.push_back(faces.count() - 1);
-	vertices[face.k].adjacent_faces.push_back(faces.count() - 1);
-
-	return true;
-}
 
 void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) {
 
@@ -198,7 +175,7 @@ void PairCollapse::keepPairArrOrder(pair_arr &pairs) {
 		pairs[i]->keepOrder();
 }
 
-void changePairsOneVert(pair_arr &pairs, uint orig, uint dst) {
+void PairCollapse::changePairsOneVert(pair_arr &pairs, uint orig, uint dst) {
 
 	for (int i = 0; i < pairs.count(); i ++) {
 		pairs[i]->changeOneVert(orig, dst);
