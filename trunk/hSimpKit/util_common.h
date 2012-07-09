@@ -248,7 +248,8 @@ public:
 	}
 
 	// equals without considering the sequence
-	bool unsequncedEqual(const HTripleIndex &trip) const {
+	bool unsequencedEqual(const HTripleIndex &trip) const {
+
 		this->sortIndex(arr1);
 		trip.sortIndex(arr2);
 
@@ -259,9 +260,32 @@ public:
 	{
 		if (this->i < trip_ind.i)
 			return true;
+		else (this->i < trip_ind.i)
+			return false;
 		else if (this->j < trip_ind.j)
 			return true;
+		else if (this->j > trip_ind.j)
+			return false;
 		else if (this->k < trip_ind.k)
+			return true;
+
+		return false;
+	}
+
+	bool unsequencedLessThan(const HTripleIndex &trip_ind) const {
+		
+		this->sortIndex(arr1);
+		trip_ind.sortIndex(arr2);
+		
+		if (arr1[0] < arr2[0])
+			return true;
+		else if (arr1[0] > arr2[0])
+			return false;
+		else if (arr1[1] < arr2[1])
+			return true;
+		else if (arr1[1] > arr2[1])
+			return false;
+		else if (arr1[2] < arr2[2])
 			return true;
 
 		return false;

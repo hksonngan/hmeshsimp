@@ -1,8 +1,8 @@
 /*
- *  vertex data structures for edge collapse
- *  for detail, please refer to 'ecol_design.txt'
+ *  Vertex data structures for edge collapse
+ *  For more detail, please refer to 'ECOL_DESIGN'
  *
- *  author: ht
+ *  author: Ht
  *  email : waytofall916@gmail.com
  */
 
@@ -30,8 +30,8 @@ class CollapsedVertex: public HVertex {
 public:
 	uint	new_id;		// the id after the collapse
 	uint	output_id;	// the id of the output model
-	// used for collapsing sequence file
 	HVertex	new_vertex;	// the new vertex after the collapse
+						// used for collapsing sequence file
 
 public:
 	void setNewId(uint _id) { new_id = _id; }

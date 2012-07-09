@@ -6,7 +6,7 @@ of Massive Meshes
 
 基于空间分割分片与全局边收缩的启发式大规模网格简化
 
-==============================$ collapse sequence file format $==================================
+==============================$ Collapse Sequence File Format $==================================
 
 The collapsing sequence file looks like:
 
@@ -84,7 +84,7 @@ the index of the face in the faces array.
 
 =========================================$ algorithms $==========================================
 
-$$ vertex invalidation & collasping sequence footprint $$
+$$ Vertex Invalidation & Collasping Sequence Footprint $$
 
 Note that when collapsing two vertices, the two vertices "MERGE" into one. Here we set one vertex
 dead while keep another alive. The one alive is always the vertex with the LOWER index, and the 
@@ -163,7 +163,7 @@ After collapsing the whole sequence, the table altered to:
 	6	|	5	|	6
 	7	|	7	|	7
 
-$$ output mesh generation $$
+$$ Output Mesh Generation $$
 
 In order to retrieve the final contrated vertices id instead of the collapsing sequence footprint
 stored currently, you should look up the the table top down. Whenever you come to an item in which
@@ -193,3 +193,41 @@ out-of-core model which is divided into patches before the in-core iterative edg
 performed, there are faces that belong to no patch and are part of the initial spatial division 
 model. These faces should be updated after all the patches is contrated and the results merged,
 the clustering information is used then.
+
+$$ Collapsing Vertices Pair $$
+ 
+$$$ Collapsable Pair Array Merge $$$
+
+When merging the the two pair arrays, we first alter the vertex with the HIGHER index to the LOWER index.
+This may cause some duplications, invalidations and order-broken for pairs. We first fix the broken-order
+pairs and conduct the merge. During merging, we first perform sorting for non-duplicated result. When 
+sorting the pair_arr, the array is sorted based on the two vertices indices. So there may result in two 
+types of equals (equal elements reside continuously in the sorted array), one is the value equal, which 
+means that they point to different structs which have the same value in vert1, vert2 field, one is pointer 
+equal which means the two different pointer points to the same struct. So these may need some special 
+treatment when merging.
+
+The compare function when sorting the vertices pair is: 
+
+	bool pair_comp(CollapsablePair *pair1, const CollapsablePair *pair2)
+
+		return vert1 < pair.vert1 || 
+			vert1 == pair.vert1 && vert2 < pair.vert2;
+
+We simply returns the strict weak order of the sequence <vert1, vert2> which must guarantee that vert1 < 
+vert2, while vert1 field act as the more significant one. While merging, we assume that the two arrays 
+have no duplications and the only the merged arrays have duplications. This is true because we carefully 
+maintain the 'adjacent_col_pairs' field to guarantee that it's unique. But if it's not, the compare 
+function should be like:
+
+	bool pair_comp(CollapsablePair *pair1, const CollapsablePair *pair2)
+
+			return vert1 < pair.vert1 || 
+				vert1 == pair.vert1 && vert2 < pair.vert2 || 
+				pair1 < pair2;
+				
+In case that two different pair pointer pointing to different structs in the same array while having
+the same value, and we should also add some more trivial special treatment in order to keep the array
+clean and right. So in fact, when collapsing, there are two kinds of invalid pairs, one is invalidates
+by vert1 == vert2, one is invalidates by duiplicates to another pair. This is the same case when 
+collapsing faces.

@@ -76,7 +76,7 @@ class HTripleIndexEqual
 {
 public:
 	bool operator()(const HTripleIndex<Integer>& h1, const HTripleIndex<Integer>& h2) const {
-		return h1.unsequncedEqual(h2);
+		return h1.unsequencedEqual(h2);
 	}
 };
 

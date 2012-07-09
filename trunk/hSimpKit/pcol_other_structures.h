@@ -23,9 +23,11 @@ public:
 	CollapsablePair(uint _v1, uint _v2) { set(_v1, _v2); }
 	void set(uint _v1, uint _v2) { vert1 = _v1; vert2 = _v2; }
 
+	// verts indices equals
 	bool operator== (const CollapsablePair &pair) const {
 		return vert1 == pair.vert1 && vert2 == pair.vert2;
 	}
+	// verts indices less than
 	bool operator< (const CollapsablePair &pair) const {
 		return vert1 < pair.vert1 || 
 			vert1 == pair.vert1 && vert2 < pair.vert2;
@@ -54,17 +56,41 @@ public:
 	HVertex	new_vertex;
 };
 
-class QuadricPair: public CollapsablePair {
-public:
-	
-public:
-	
-};
+//class QuadricPair: public CollapsablePair {
+//public:
+//	
+//public:
+//	
+//};
 
-class CollapseFace: public HTripleIndex<uint> {
+/* Like the pairs, the vertex indices always point
+   to the valid vertices, so the indices may be
+   changed along the collapse. But if it is invalidated,
+   it will never change. */
+class CollapsableFace: public HTripleIndex<uint> {
 public:
-	void	invalidate() { _valid = false; }
-	bool	valid() { return _valid; }
+	CollapsableFace() { _valid = true; }
+	void invalidate() { _valid = false; }
+	bool Valid() { return _valid; }
+
+	void changeOneVert(uint orig, uint dst) {
+		if (i == orig)
+			i = dst;
+		else if (j == orig) 
+			j = dst;
+		else if (k == orig)
+			k = dst;
+	}
+
+	bool valid() {
+		return i != j && i != k && j != k;
+	}
+
+	bool indicesInRange(uint _min, uint _max) {
+		return i >= _min && i <= _max &&
+			j >= _min && j <= _max &&
+			k >= _min && k <= _max;
+	}
 
 private:
 	bool	_valid;
