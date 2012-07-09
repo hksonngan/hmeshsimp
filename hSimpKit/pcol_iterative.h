@@ -29,7 +29,7 @@ static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePa
 
 class FaceIndexComp {
 public:
-	bool operator(const uint &face_index1, const uint &face_index2) {
+	bool operator() (const uint &face_index1, const uint &face_index2) {
 
 		return faces->elem(face_index1).unsequencedLessThan(faces->elem(face_index2));
 	}
@@ -59,7 +59,7 @@ public:
 	// vertices and faces are ready
 	// this function should be overrided
 	// in specific derivative class
-	void collectPairs() {}
+	virtual void collectPairs() = 0;
 	// this function should be overrided
 	// in specific derivative class
 	CollapsablePair* createPair(uint _vert1, uint _vert2) {}
@@ -72,11 +72,6 @@ public:
 	////////////////////////////////////
 	// computing
 	
-	// evaluate the target placement and error incurred,
-	// and update the pair's content
-	// this function should be overrided
-	// in specific derivative class
-	HVertex evaluatePair(CollapsablePair *pair) {}
 	// simplify targeting vertex
 	// this function should be overrided
 	// in specific derivative class
@@ -84,22 +79,30 @@ public:
 	// simplify targeting face
 	// this function should be overrided
 	// in specific derivative class
-	bool targetFace(uint targe_count) {}
-	CollapsablePair* extractTopPair() { return (CollapsablePair *)pair_heap.extract(); }
+	bool targetFace(uint targe_count);
 
 	////////////////////////////////////
 	// collapsing & linkage operation
 
+	// evaluate the target placement and error incurred,
+	// and update the pair's content
+	// this function should be overrided
+	// in specific derivative class
+	virtual HVertex evaluatePair(CollapsablePair *pair) = 0;
 	// collect start vertices from adjacent faces
 	inline void collectStarVertices(uint vert_index, vert_arr *starVertices);
-	inline void collapsePair(pCollapsablePair &pair);
+	// !!an important function
+	virtual void collapsePair(pCollapsablePair &pair);
 	// guarantee vert1 < vert2 for all pairs in the arr
 	inline void keepPairArrOrder(pair_arr &pairs);
 	// change one vertex index to another for all pairs in the arr
 	inline void changePairsOneVert(pair_arr &pairs,  uint orig, uint dst);
-	// update valid pair in the heap and remove invalid pair
-	inline void updateValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_pairs);
+	// push valid pair to the new array and remove invalid pair from heap
+	inline void pushValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_pairs);
+	// check invalid and duplicated pairs and discard them, leaving
+	// the valid and unique pairs into the new pair array
 	inline void mergePairs(pair_arr &pairs1, pair_arr &pairs2, pair_arr &new_pairs);
+	inline void reevaluatePairs(pair_arr &pairs);
 	// change one vertex index to another for all faces in the arr
 	inline void changeFacesOneVert(face_arr &face_indices, uint orig, uint dst);
 	inline void mergeFaces(face_arr &faces1, face_arr &faces2, face_arr &new_faces);
@@ -203,11 +206,11 @@ void changePairsOneVert(pair_arr &pairs, uint orig, uint dst) {
 	}
 }
 
-void PairCollapse::updateValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_pairs) {
+void PairCollapse::pushValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_pairs) {
 
 	if (pair->valid()) {
 		new_pairs.push_back(pair);
-		pair_heap.update(pair);
+		//pair_heap.update(pair);
 	}
 	else {
 		pair_heap.remove(pair);
@@ -255,7 +258,7 @@ void PairCollapse::mergePairs(pair_arr &pairs1, pair_arr &pairs2, pair_arr &new_
 			// these are the duplicated pairs
 			// update arbitrary one and remove another 
 			new_pairs.push_back(pairs1[i]);
-			pair_heap.update(pairs1[i]);
+			//pair_heap.update(pairs1[i]);
 			pair_heap.remove(pairs2[j]);
 			delete[] pairs2[j];
 			i ++; j ++;
@@ -265,16 +268,24 @@ void PairCollapse::mergePairs(pair_arr &pairs1, pair_arr &pairs2, pair_arr &new_
 			//updateValidPairOrRemove(pairs1[i], new_pairs);
 
 			new_pairs.push_back(pairs1[i]);
-			pair_heap.update(pairs1[i]);
+			//pair_heap.update(pairs1[i]);
 			i ++;
 		}
 		else {
 			//updateValidPairOrRemove(pairs2[j], new_pairs);
 
 			new_pairs.push_back(pairs2[j]);
-			pair_heap.update(pairs2[j]);
+			//pair_heap.update(pairs2[j]);
 			j ++;
 		}
+	}
+}
+
+void PairCollapse::reevaluatePairs(pair_arr &pairs) {
+
+	for (int i = 0; i < pairs.count(); i ++) {
+		evaluatePair(pairs[i]);
+		pair_heap.update(pairs[i]);
 	}
 }
 
@@ -295,36 +306,37 @@ void PairCollapse::mergeFaces(face_arr &faces1, face_arr &faces2, face_arr &new_
 	int i, j;
 
 	for (i = 0, j = 0; i < faces1.count() || j < faces2.count(); ) {
-
+		
+		if (i < faces1.count() && j < faces2.count() && faces1[i] == faces2[j]) {
+			if (faces[faces1[i]].valid()) 
+				new_faces.push_back(faces1[i]);
+			else
+				valid_faces --;
+			i ++; j ++;
+		}
+		if (i < faces1.count() && j < faces2.count() && faces[faces1[i]] == faces[faces2[j]]) {
+			if (faces[faces1[i]].valid()) {
+				new_faces.push_back(faces1[i]);
+				valid_faces --;
+			}
+			else
+				valid_faces -= 2;
+			i ++; j ++;
+		}
+		else if (j >= faces2.count() || i < faces1.count() && faces[faces1[i]] < faces[faces2[j]]) {
+			if (faces[faces1[i]].valid()) 
+				new_faces.push_back(faces1[i]);
+			else 
+				valid_faces --;
+			i ++;
+		}
+		else {
+			if (faces[faces2[j]].valid()) 
+				new_faces.push_back(faces2[j]);
+			else valid_faces --;
+			j ++;
+		}
 	}
-}
-
-void PairCollapse::collapsePair(pCollapsablePair &pair) {
-
-	int i;
-
-	// set the new_id field in order to invalidate
-	// vert2 as well as some faces and pairs, this 
-	// may cause the order 'vert1 < vert2' broken
-	vertices[pair->vert2].setNewId(pair->vert1);
-
-	pair_arr &pairs1 = vertices[pair->vert1].adjacent_col_pairs;
-	pair_arr &pairs2 = vertices[pair->vert2].adjacent_col_pairs;
-	changePairsOneVert(pairs2, pair->vert2, pair->vert1);
-
-	pair_arr new_pairs;
-	mergePairs(pairs1, pairs2, new_pairs);
-	hswap(pairs1, new_pairs);
-	pairs2.freeSpace();
-
-	face_arr &faces1 = vertices[pair->vert1].adjacent_faces;
-	face_arr &faces2 = vertices[pair->vert2].adjacent_faces;
-	changeFacesOneVert(faces2, pair->vert2, pair->vert1);
-
-	face_arr new_faces;
-	mergeFaces(faces1, faces2, new_faces);
-	hswap(faces1, new_faces);
-	faces2.freeSpace();
 }
 
 ///////////////////////////////////////////////////////////////

@@ -260,7 +260,7 @@ public:
 	{
 		if (this->i < trip_ind.i)
 			return true;
-		else (this->i < trip_ind.i)
+		else if (this->i < trip_ind.i)
 			return false;
 		else if (this->j < trip_ind.j)
 			return true;

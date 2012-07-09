@@ -30,6 +30,7 @@ class CollapsedVertex: public HVertex {
 public:
 	uint	new_id;		// the id after the collapse
 	uint	output_id;	// the id of the output model
+	/// I think it's useless!!!
 	HVertex	new_vertex;	// the new vertex after the collapse
 						// used for collapsing sequence file
 

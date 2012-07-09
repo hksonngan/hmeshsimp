@@ -25,7 +25,7 @@ public:
 	QuadricEdgeCollapse();
 	void allocVerts(uint _vert_count);
 	inline void addFace(HFace face);
-	void collectPairs();
+	virtual void collectPairs();
 	inline CollapsablePair* createPair(uint _vert1, uint _vert2);
 	// init after the vertices and faces are ready
 	void initialize();
@@ -34,13 +34,16 @@ public:
 	// computing
 	////////////////////////////////////////
 
+	// simplify targeting vertex
+	//bool targetVert(uint target_count);
+
 	// evaluate the target placement and error incurred,
 	// and update the pair's content
-	inline HVertex evaluatePair(CollapsablePair *pair);
-	// simplify targeting vertex
-	bool targetVert(uint target_count);
+	virtual HVertex evaluatePair(CollapsablePair *pair);
+	virtual void collapsePair(pCollapsablePair &pair);
 
 protected:
+	// every vertex has a quadric
 	HDynamArray<q_matrix> quadrics;
 
 	////////////////////////////////////////
@@ -112,69 +115,6 @@ CollapsablePair* QuadricEdgeCollapse::createPair(uint _vert1, uint _vert2) {
 	evaluatePair(new_pair);
 
 	return new_pair;
-}
-
-inline HVertex QuadricEdgeCollapse::evaluatePair(CollapsablePair *pair) {
-
-	//qMatrix = quadrics[pair->vert1];
-	//qMatrix += quadrics[pair->vert2];
-
-	// the matrix is not singular
-	//if (qMatrix.calcRepresentativeVertex(pair->new_vertex)) {
-	//	return pair->new_vertex;
-	//}
-
-	/// below altered from _QSLIM_2.1_
-
-	const Quadric &Qi = quadrics[pair->vert1], &Qj=quadrics[pair->vert2];
-
-	Quadric Q = Qi;  Q += Qj;
-	double e_min;
-
-	// the matrix is not singular
-	if( placement_policy == MX_PLACE_OPTIMAL &&
-		Q.optimize(&pair->new_vertex.x, &pair->new_vertex.y, &pair->new_vertex.y) ) {
-
-		e_min = Q.evaluate(pair->new_vertex.x, pair->new_vertex.y, pair->new_vertex.z);
-	}
-	else {
-
-		Vec3 vi(vertices[pair->vert1].x, vertices[pair->vert1].y, vertices[pair->vert1].z), 
-			vj(vertices[pair->vert2].x, vertices[pair->vert2].y, vertices[pair->vert2].z);
-		Vec3 best;
-
-		// evaluate along the line formed by vi, vj
-		if( placement_policy >= MX_PLACE_LINE && Q.optimize(best, vi, vj) )
-			e_min = Q(best);
-		else {
-
-			double ei = Q(vi), ej = Q(vj);
-
-			if( ei < ej ) { e_min = ei; best = vi; }
-			else          { e_min = ej; best = vj; }
-
-			// evaluate the mid point
-			if( placement_policy >= MX_PLACE_ENDORMID )
-			{
-				Vec3 mid = (vi + vj) / 2.0;
-				double e_mid = Q(mid);
-
-				if( e_mid < e_min ) { e_min = e_mid; best = mid; }
-			}
-		}
-
-		pair->new_vertex.x = best[X];
-		pair->new_vertex.y = best[Y];
-		pair->new_vertex.z = best[Z];
-	}
-
-	if( weighting_policy == MX_WEIGHT_AREA_AVG )
-		e_min /= Q.area();
-
-	// note this~ it set the key
-	pair->heap_key(- e_min);
-
-	return pair->new_vertex;
 }
 
 #endif //__ITERATIVE_QUADRIC_EDGE_COLLAPSE__
