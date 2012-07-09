@@ -62,15 +62,7 @@ $$ vertex $$
 		face_list:	alter_faces		// faces need to alter when the vertex expand/contract
 		face_list:	removed_faces	// faces need to remove/insert when the vertex expand/contract
 	}
-
-	QuadricVertex: INHERIT CollapsableVertex {
-		float_10:	quadrics	// quadric error matrix
-	}
-
-	HierarchyQuadricVertex: INHERIT HierarchyVertex {
-		float_10:	quadrics	// quadric error matrix
-	}
-
+	
 Stored in continuous memory space with the index denoting the vertex index. This data structure 
 can be used in both the in-core edge collapse algorithm and the out-of-core simplified mesh 
 generation phase based on the collapsing sequence file.

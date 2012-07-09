@@ -37,7 +37,7 @@ public:
 	}
 
 	bool valid() { return vert1 != vert2; }
-	bool keepOrder() {
+	void keepOrder() {
 		if (vert1 > vert2) 
 			hswap(vert1, vert2);
 	}
