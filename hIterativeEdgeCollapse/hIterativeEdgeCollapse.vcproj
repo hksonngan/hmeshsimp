@@ -172,6 +172,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\ECOL_DESIGN"
+			>
+		</File>
+		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>
