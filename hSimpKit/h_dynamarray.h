@@ -20,7 +20,7 @@ using std::endl;
 template<class ElemType>
 class HDynamArray {
 public:
-	HDynamArray(int _init_cap = 0);
+	HDynamArray(char* _id = NULL, int _init_cap = 0);
 	~HDynamArray();
 	
 	/* accessors */
@@ -39,12 +39,22 @@ public:
 	inline void push_back(ElemType e);
 	inline void remove(unsigned int index);
 	inline void resize(int _capacity);
+	// this may cause the array to be trimmed
+	inline void setCount(int _new_count);
 	void clear() { size = 0; }
 	inline void freeSpace();
 	void quick_sort() {	h_quick_sort<ElemType, ElemType*>(data, size); }
 	// merge with another arr, the capacity
 	// is at least size1 + size2
 	void merge(HDynamArray<ElemType> &arr2);
+	// CAUTION!!: all the value assign is a shallow
+	// copy which may cause a 'data' field deleted
+	// when the argument is destructed, thus causing
+	// problems. so when using HDynamArray as a parameter,
+	// DO USE REFERENCES OR POINTERS.
+	void swap(HDynamArray<ElemType> &arr2);
+	// !!this may cause memory leakage
+	void setNULL();
 
 	void randGen(unsigned int count, unsigned int range);
 
@@ -56,24 +66,32 @@ private:
 	int capacity;
 	// size
 	int size;
+	// name for debug
+	char ID[100];
 
 	static const int DEFAULT_INIT_CAP = 8;
 };
 
 template<class ElemType>
-HDynamArray<ElemType>::HDynamArray(int _init_cap) {
+HDynamArray<ElemType>::HDynamArray(char *_id, int _init_cap) {
 
-	if (_init_cap < 0) {
-		_init_cap = 0;
+	if (_init_cap <= 0) {
+		init_cap = DEFAULT_INIT_CAP;
+		capacity = 0;
+	}
+	else {
+		init_cap = _init_cap;
+		capacity = _init_cap;
 	}
 
-	init_cap = _init_cap;
-	capacity = init_cap;
 	size = 0;
 	data = NULL;
 	if (capacity > 0) {
 		data = new ElemType[capacity];
 	}
+
+	if (_id)
+		memcpy(ID, _id, strlen(_id) + 1);
 }
 
 template<class ElemType>
@@ -86,10 +104,10 @@ template<class ElemType>
 void HDynamArray<ElemType>::push_back(ElemType e) {
 
 	if (size >= capacity) {
-		if (capacity == 0) {
-			capacity = 1;
-		}
-		resize(capacity * 2);
+		if (capacity == 0) 
+			resize(init_cap);
+		else
+			resize(capacity * 2);
 	}
 
 	data[size] = e;
@@ -101,13 +119,22 @@ void HDynamArray<ElemType>::resize(int _capacity)  {
 
 	if (_capacity > capacity) {
 		ElemType *new_data = new ElemType[_capacity];
-		if (capacity != 0)
+		if (data) {
 			memcpy(new_data, data, sizeof(ElemType) * capacity);
-		capacity = _capacity;
-		if (data)
 			delete[] data;
+		}
+		capacity = _capacity;
 		data = new_data;
 	}
+}
+
+template<class ElemType>
+void HDynamArray<ElemType>::setCount(int _new_count) {
+
+	if (_new_count > capacity)
+		resize(_new_count);
+	
+	size = _new_count;
 }
 
 template<class ElemType>
@@ -175,6 +202,33 @@ void HDynamArray<ElemType>::merge(HDynamArray<ElemType> &arr2) {
 	size += arr2.size;
 	delete[] data;
 	data = new_data;
+}
+
+template<class ElemType>
+void HDynamArray<ElemType>::swap(HDynamArray<ElemType> &arr2) {
+
+	ElemType *_data = data;
+	int _init_cap = init_cap;
+	int _capacity = capacity;
+	int _size = size;
+
+	data = arr2.data;
+	init_cap = arr2.init_cap;
+	capacity = arr2.capacity;
+	size = arr2.size;
+
+	arr2.data = _data;
+	arr2.init_cap = _init_cap;
+	arr2.capacity = _capacity;
+	arr2.size = _size;
+}
+
+template<class ElemType>
+void HDynamArray<ElemType>::setNULL() {
+
+	size = 0;
+	capacity = 0;
+	data = NULL;
 }
 
 template<class ElemType>

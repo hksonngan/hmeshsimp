@@ -140,7 +140,7 @@ inline void hswap(T &a, T &b) {
 }
 
 template<class ElemType, class ContainerType> 
-inline int partition2(ContainerType arr, int start, int end) {
+inline int partition2(ContainerType &arr, int start, int end) {
 
 	if (start >= end) 
 		return start;
@@ -169,7 +169,7 @@ inline int partition2(ContainerType arr, int start, int end) {
 }
 
 template<class ElemType, class ContainerType>
-void recursive_partition(ContainerType arr, int start, int end) {
+void recursive_partition(ContainerType &arr, int start, int end) {
 
 	if (start < 0)
 		return;
@@ -184,7 +184,7 @@ void recursive_partition(ContainerType arr, int start, int end) {
 }
 
 template<class ElemType, class ContainerType>
-void h_quick_sort(ContainerType arr, int arr_count) {
+void h_quick_sort(ContainerType &arr, int arr_count) {
 
 	srand(0);
 	recursive_partition<ElemType, ContainerType>(arr, 0, arr_count - 1);

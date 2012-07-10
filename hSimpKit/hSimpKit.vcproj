@@ -405,24 +405,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\pcol_common.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\pcol_iterative.cpp"
 				>
 			</File>

@@ -30,12 +30,25 @@ typedef CollapsablePair* pCollapsablePair;
 
 static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePair &pair2) {
 
+	// the pointer in 'adjacent_col_pairs' may contain NULL pointer
+	// let the NULL pointers go to the end of sorted array
+	if (pair1 == NULL) 
+		return false;
+	else if (pair2 == NULL)
+		return true;
+
 	return (*pair1) < (*pair2);
 };
 
 class FaceIndexComp {
 public:
 	bool operator() (const uint &face_index1, const uint &face_index2) {
+
+		// let invalid faces go the end
+		//if (!faces->elem(face_index1).valid())
+		//	return false;
+		//else (!faces->elem(face_index2).valid())
+		//	return true;
 
 		return faces->elem(face_index1).unsequencedLessThan(faces->elem(face_index2));
 	}
@@ -73,7 +86,10 @@ public:
 	// init after the vertices and faces are ready
 	virtual void intialize();
 	bool readPly(char* filename);
+	bool writePly(char* filename);
 
+	
+	
 	////////////////////////////////////
 	// computing
 	
@@ -85,6 +101,8 @@ public:
 	// this function should be overrided
 	// in specific derivative class
 	bool targetFace(uint targe_count);
+
+
 
 	////////////////////////////////////
 	// collapsing & linkage operation
@@ -98,19 +116,26 @@ public:
 	inline void collectStarVertices(uint vert_index, vert_arr *starVertices);
 	// !!an important function
 	virtual void collapsePair(pCollapsablePair &pair);
+
 	// guarantee vert1 < vert2 for all pairs in the arr
-	inline void keepPairArrOrder(pair_arr &pairs);
+	//inline void keepPairArrOrder(pair_arr &pairs);
 	// change one vertex index to another for all pairs in the arr
 	inline void changePairsOneVert(pair_arr &pairs,  uint orig, uint dst);
 	// push valid pair to the new array and remove invalid pair from heap
 	inline void pushValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_pairs);
+	// set one pair null in the 'adjacent_col_pairs' array
+	// for the vert
+	inline void setOnePairNull(uint vert, pCollapsablePair pair);
 	// check invalid and duplicated pairs and discard them, leaving
 	// the valid and unique pairs into the new pair array
-	inline void mergePairs(pair_arr &pairs1, pair_arr &pairs2, pair_arr &new_pairs);
+	inline void mergePairs(uint vert1, uint vert2);
 	inline void reevaluatePairs(pair_arr &pairs);
+
 	// change one vertex index to another for all faces in the arr
 	inline void changeFacesOneVert(face_arr &face_indices, uint orig, uint dst);
-	inline void mergeFaces(face_arr &faces1, face_arr &faces2, face_arr &new_faces);
+	inline void mergeFaces(uint vert1, uint vert2);
+
+
 
 	///////////////////////////////////////
 	// other than simplification
@@ -135,11 +160,15 @@ protected:
 	ofstream flog;
 
 	/////////////////////////////////////
-	// assisting temporal variables
+	// constants
+	static const uint DFLT_STAR_FACES = 6;
+	static const uint DFLT_STAR_PAIRS = 6;
 
-	static CollapsableVertex cvert;
-	static CollapsableFace cface;
-	static vert_arr starVerts1, starVerts2;
+	/////////////////////////////////////
+	// assisting temporal variables
+	CollapsableVertex cvert;
+	CollapsableFace cface;
+	vert_arr starVerts1, starVerts2;
 };
 
 void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) {
@@ -169,18 +198,13 @@ void PairCollapse::addCollapsablePair(CollapsablePair *new_pair) {
 	}
 }
 
-void PairCollapse::keepPairArrOrder(pair_arr &pairs) {
-
-	for (int i = 0; i < pairs.count(); i ++)
-		pairs[i]->keepOrder();
-}
-
 void PairCollapse::changePairsOneVert(pair_arr &pairs, uint orig, uint dst) {
 
-	for (int i = 0; i < pairs.count(); i ++) {
-		pairs[i]->changeOneVert(orig, dst);
-		pairs[i]->keepOrder();
-	}
+	for (int i = 0; i < pairs.count(); i ++) 
+		if (pairs[i]) {
+			pairs[i]->changeOneVert(orig, dst);
+			pairs[i]->keepOrder();
+		}
 }
 
 void PairCollapse::pushValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_pairs) {
@@ -195,9 +219,29 @@ void PairCollapse::pushValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_p
 	}
 }
 
-void PairCollapse::mergePairs(pair_arr &pairs1, pair_arr &pairs2, pair_arr &new_pairs) {
+void PairCollapse::setOnePairNull(uint vert, pCollapsablePair pair) {
 	
+	if (vert >= 0 && vert < vertices.count()) {
+
+		pair_arr &pairs = vertices[vert].adjacent_col_pairs;
+		for	(int i = 0; i < pairs.count(); i ++)
+			if (pairs[i] == pair) 
+				pairs[i] = NULL;
+	}
+}
+
+void PairCollapse::mergePairs(uint vert1, uint vert2) {
+
 	int i, j;
+
+	/* pre process */
+
+	pair_arr &pairs1 = vertices[vert1].adjacent_col_pairs;
+	pair_arr &pairs2 = vertices[vert2].adjacent_col_pairs;
+	// change the index of vert2 to vert1 for all pairs adjacent
+	// to vert2, this may cause the order 'vert1 < vert2' broken
+	// and some pairs to be invalid or duplicated
+	changePairsOneVert(pairs2, vert2, vert1);
 
 	// Sort in case of non-duplicated merge
 	// When sorting the pair_arr, the array is sorted based on the two vertices
@@ -208,19 +252,26 @@ void PairCollapse::mergePairs(pair_arr &pairs1, pair_arr &pairs2, pair_arr &new_
 	// in vert1, vert2 field, one is pointer equal which means the two different
 	// pointer points to the same struct. So these may need some special treatment
 	// when merging
-	sort(pairs1.pointer(0), pairs1.pointer(pairs1.count() - 1), pair_comp);
-	sort(pairs2.pointer(0), pairs2.pointer(pairs2.count() - 1), pair_comp);
+	sort(pairs1.pointer(0), pairs1.pointer(pairs1.count()), pair_comp);
+	sort(pairs2.pointer(0), pairs2.pointer(pairs2.count()), pair_comp);
 
+	// trim the NULL pointers in the end
+	for (i = pairs1.count() - 1; i >= 0 && pairs1[i] == NULL; i --) ;
+	pairs1.setCount(i + 1);
+	for (i = pairs2.count() - 1; i >= 0 && pairs2[i] == NULL; i --) ;
+	pairs2.setCount(i + 1);
+
+	pair_arr new_pairs;
 	new_pairs.clear();
 	new_pairs.resize(pairs1.count() + pairs2.count());
 
-	// merge
+	/* merge */
 	for (i = 0, j = 0; i < pairs1.count() || j < pairs2.count();) {
 
 		// pairs[i] and pairs[j] points to the same struct
 		if (i < pairs1.count() && j < pairs2.count() && pairs1[i] == pairs2[j]) {
 			
-			//updateValidPairOrRemove(pairs1[i], new_pairs);
+			///updateValidPairOrRemove(pairs1[i], new_pairs);
 
 			// this is the collapsed pair
 			pair_heap.remove(pairs1[i]);
@@ -230,32 +281,42 @@ void PairCollapse::mergePairs(pair_arr &pairs1, pair_arr &pairs2, pair_arr &new_
 		// pairs[i] and pairs[j] points to different value equal structs
 		else if (i < pairs1.count() && j < pairs2.count() && *pairs1[i] == *pairs2[j]) {
 			
-			//updateValidPairOrRemove(pairs1[i], new_pairs);
+			///updateValidPairOrRemove(pairs1[i], new_pairs);
 
 			// these are the duplicated pairs
 			// update arbitrary one and remove another 
 			new_pairs.push_back(pairs1[i]);
-			//pair_heap.update(pairs1[i]);
 			pair_heap.remove(pairs2[j]);
+
+			// the pairs2[j] refers to another vertex which also maintains
+			// a pointer to the same structure pairs2[j] points to, when
+			// decimating the structure pairs2[j] points to, set the pointer
+			// of the corresponding vertex to NULL
+			setOnePairNull(pairs2[j]->getAnotherVert(vert1), pairs2[j]);
 			delete[] pairs2[j];
+
 			i ++; j ++;
 		}
 		else if (j >= pairs2.count() || i < pairs1.count() && *pairs1[i] < *pairs2[j]) {
 
-			//updateValidPairOrRemove(pairs1[i], new_pairs);
+			///updateValidPairOrRemove(pairs1[i], new_pairs);
 
 			new_pairs.push_back(pairs1[i]);
-			//pair_heap.update(pairs1[i]);
 			i ++;
 		}
 		else {
-			//updateValidPairOrRemove(pairs2[j], new_pairs);
+			///updateValidPairOrRemove(pairs2[j], new_pairs);
 
 			new_pairs.push_back(pairs2[j]);
-			//pair_heap.update(pairs2[j]);
 			j ++;
 		}
 	}
+
+	/* post process */
+	// the variable 'pair' is invalid now!!
+	reevaluatePairs(new_pairs);
+	pairs1.swap(new_pairs);
+	pairs2.freeSpace();
 }
 
 void PairCollapse::reevaluatePairs(pair_arr &pairs) {
@@ -269,51 +330,74 @@ void PairCollapse::reevaluatePairs(pair_arr &pairs) {
 void PairCollapse::changeFacesOneVert(face_arr &face_indices, uint orig, uint dst) {
 	
 	for (int i = 0; i < face_indices.count(); i ++) 
-		faces[face_indices[i]].changeOneVert(orig, dst);
+		if (faces[face_indices[i]].valid()) {
+
+			faces[face_indices[i]].changeOneVert(orig, dst);
+			if (!faces[face_indices[i]].indexValid()) 
+				valid_faces --;
+		}
 }
 
-void PairCollapse::mergeFaces(face_arr &faces1, face_arr &faces2, face_arr &new_faces) {
+void PairCollapse::mergeFaces(uint vert1, uint vert2) {
+
+	int i, j;
+
+	/* pre process */
+
+	face_arr &faces1 = vertices[vert1].adjacent_faces;
+	face_arr &faces2 = vertices[vert2].adjacent_faces;
+	// change the index of vert2 to vert1 for all faces adjacent
+	// to vert2, this may cause some faces to be invalid or duplicated
+	changeFacesOneVert(faces2, vert2, vert1);
 
 	sort(faces1.pointer(0), faces1.pointer(faces1.count()), faceIndexComp);
 	sort(faces2.pointer(0), faces2.pointer(faces2.count()), faceIndexComp);
 
+	face_arr new_faces;
 	new_faces.clear();
 	new_faces.resize(faces1.count() + faces2.count());
 
-	int i, j;
-
+	/* merge */
 	for (i = 0, j = 0; i < faces1.count() || j < faces2.count(); ) {
 		
+		// the same face
 		if (i < faces1.count() && j < faces2.count() && faces1[i] == faces2[j]) {
 			if (faces[faces1[i]].valid()) 
 				new_faces.push_back(faces1[i]);
-			else
-				valid_faces --;
+			//else
+			//	valid_faces --;
 			i ++; j ++;
 		}
-		if (i < faces1.count() && j < faces2.count() && faces[faces1[i]] == faces[faces2[j]]) {
+		// two faces equal after the collapse
+		else if (i < faces1.count() && j < faces2.count() && faces[faces1[i]] == faces[faces2[j]]) {
 			if (faces[faces1[i]].valid()) {
 				new_faces.push_back(faces1[i]);
+				faces[faces2[j]].invalidate();
 				valid_faces --;
 			}
-			else
-				valid_faces -= 2;
+			//else
+			//	valid_faces -= 2;
 			i ++; j ++;
 		}
 		else if (j >= faces2.count() || i < faces1.count() && faces[faces1[i]] < faces[faces2[j]]) {
 			if (faces[faces1[i]].valid()) 
 				new_faces.push_back(faces1[i]);
-			else 
-				valid_faces --;
+			//else 
+			//	valid_faces --;
 			i ++;
 		}
 		else {
 			if (faces[faces2[j]].valid()) 
 				new_faces.push_back(faces2[j]);
-			else valid_faces --;
+			//else 
+			//	valid_faces --;
 			j ++;
 		}
 	}
+
+	/* post process */
+	faces1.swap(new_faces);
+	faces2.freeSpace();
 }
 
 ///////////////////////////////////////////////////////////////
