@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(OutDir)\hSimpKit.lib libgfx.lib MixKit.lib"
+				AdditionalDependencies="$(OutDir)\hSimpKit.lib $(OutDir)\libgfx.lib $(OutDir)\MixKit.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"

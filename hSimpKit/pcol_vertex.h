@@ -36,15 +36,16 @@ public:
 
 public:
 	void setNewId(uint _id) { new_id = _id; }
+	bool valid(uint v_index) { return v_index == new_id; }
 };
 
 /* in-core version */
 class CollapsableVertex: public CollapsedVertex {
 public:
 	inline CollapsableVertex();
-	void allocAdjacents(uint faces = DFLT_STARS, uint pairs = DFLT_STARS) {
-		adjacent_col_pairs.resize(pairs);
-		adjacent_faces.resize(faces);
+	void allocAdjacents(uint faces_count = DFLT_STARS, uint pairs_count = DFLT_STARS) {
+		adjacent_col_pairs.resize(pairs_count);
+		adjacent_faces.resize(faces_count);
 	}
 
 public:
