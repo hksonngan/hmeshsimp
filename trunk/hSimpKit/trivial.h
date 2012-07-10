@@ -16,6 +16,7 @@ using std::string;
 enum EndianOrder { H_BIG_ENDIAN, H_LITTLE_ENDIAN };
 
 // trim the extention of the file name and append some str
+// the dst must have some memory space already
 extern void trimExtAndAppend(char *src, char *dst, char *app);
 
 // get file name without extensions

@@ -63,7 +63,7 @@ class PairCollapse {
 public:
 
 	/////////////////////////////////////
-	// initializers
+	// Initializers
 
 	PairCollapse();
 	~PairCollapse();
@@ -85,27 +85,23 @@ public:
 	inline void addCollapsablePair(CollapsablePair *new_pair);
 	// init after the vertices and faces are ready
 	virtual void intialize();
-	bool readPly(char* filename);
-	bool writePly(char* filename);
-
 	
 	
 	////////////////////////////////////
-	// computing
+	// Computing
 	
 	// simplify targeting vertex
 	// this function should be overrided
 	// in specific derivative class
-	bool targetVert(uint targe_count) {}
+	bool targetVert(uint targe_count);
 	// simplify targeting face
 	// this function should be overrided
 	// in specific derivative class
 	bool targetFace(uint targe_count);
 
 
-
 	////////////////////////////////////
-	// collapsing & linkage operation
+	// Collapsing & Linkage operation
 
 	// evaluate the target placement and error incurred,
 	// and update the pair's content
@@ -136,11 +132,22 @@ public:
 	inline void mergeFaces(uint vert1, uint vert2);
 
 
+	///////////////////////////////////////
+	// File I/O & Output Generation
+
+	bool readPly(char* filename);
+	bool writePly(char* filename);
+	void generateOutputId();
+	// for debug
+	void outputIds(char* filename);
+
 
 	///////////////////////////////////////
-	// other than simplification
+	// Other Than Simplification
 
 	inline void addInfo(char *s);
+	uint vertexCount() { return vertices.count(); }
+	uint faceCount() { return faces.count(); }
 
 	// clear heap
 	void clear();
@@ -152,23 +159,25 @@ protected:
 	uint	valid_faces;
 	MxHeap	pair_heap;
 
-	FaceIndexComp faceIndexComp;
+	uint	valid_vert_count;
+
+	FaceIndexComp	faceIndexComp;
 
 	char	INFO_BUF[INFO_BUF_CAPACITY];
 	uint	info_buf_size;
 
-	ofstream flog;
+	ofstream	flog;
 
 	/////////////////////////////////////
 	// constants
-	static const uint DFLT_STAR_FACES = 6;
-	static const uint DFLT_STAR_PAIRS = 6;
+	static const uint	DFLT_STAR_FACES = 6;
+	static const uint	DFLT_STAR_PAIRS = 6;
 
 	/////////////////////////////////////
 	// assisting temporal variables
-	CollapsableVertex cvert;
-	CollapsableFace cface;
-	vert_arr starVerts1, starVerts2;
+	CollapsableVertex	cvert;
+	CollapsableFace	cface;
+	vert_arr	starVerts1, starVerts2;
 };
 
 void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) {
