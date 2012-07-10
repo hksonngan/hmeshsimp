@@ -150,16 +150,16 @@ bool PairCollapse::readPly(char* filename) {
 	intialize();
 
 	flog << "\t-----------------------------------------------" << endl
-		<< "\tread file successfully" << endl
+		<< "\tread file completed" << endl
 		<< "\tfile name:\t" << filename << endl
 		<< "\tvertex count:\t" << plyStream.getVertexCount() << "\tface count:\t" << plyStream.getFaceCount() << endl
-		<< "\tread file time:\t" << htime.printElapseSec() << endl << endl;
+		<< "\tread time:\t" << htime.printElapseSec() << endl << endl;
 
 	cout << "\t-----------------------------------------------" << endl
-		<< "\tread file successfully" << endl
+		<< "\tread file completed" << endl
 		<< "\tfile name:\t" << filename << endl
 		<< "\tvertex count:\t" << plyStream.getVertexCount() << "\tface count:\t" << plyStream.getFaceCount() << endl
-		<< "\tread file time:\t" << htime.printElapseSec() << endl << endl;
+		<< "\tread time:\t" << htime.printElapseSec() << endl << endl;
 
 	return true;
 }
@@ -206,16 +206,16 @@ bool PairCollapse::writePly(char* filename) {
 
 	// statistics
 	cout << "\t-----------------------------------------------" << endl
-		<< "\twrite simplified mesh successfully" << endl
+		<< "\tsimplified mesh written" << endl
 		<< "\tfile name:\t" << filename << endl
 		<< "\tvertex count:\t" << valid_vert_count << "\tface count:\t" << valid_face_count << endl
-		<< "\twrite file time:\t\t" << htime.getElapseStr() << endl << endl;
+		<< "\twrite time:\t\t" << htime.getElapseStr() << endl << endl;
 
 	flog << "\t-----------------------------------------------" << endl
-		<< "\twrite simplified mesh successfully" << endl
+		<< "\tsimplified mesh written" << endl
 		<< "\tfile name:\t" << filename << endl
 		<< "\tvertex count:\t" << valid_vert_count << "\tface count:\t" << valid_face_count << endl
-		<< "\twrite file time:\t\t" << htime.getElapseStr() << endl << endl;
+		<< "\twrite time:\t\t" << htime.getElapseStr() << endl << endl;
 
 	return true;
 }
