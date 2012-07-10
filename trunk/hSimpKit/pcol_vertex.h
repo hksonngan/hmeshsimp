@@ -42,29 +42,39 @@ public:
 class CollapsableVertex: public CollapsedVertex {
 public:
 	inline CollapsableVertex();
+	void allocAdjacents(uint faces = DFLT_STARS, uint pairs = DFLT_STARS) {
+		adjacent_col_pairs.resize(pairs);
+		adjacent_faces.resize(faces);
+	}
 
 public:
 
-	// the linked collapsable pairs
-	// in the heap, used for update.
-	// if it is edge collapse, it
-	// would be 'adjacent collapsable 
-	// edges'. the adjacent pairs should
-	// be updated with the collapse
-	// operation
+	/* The linked collapsable pairs
+	 * in the heap, used for update.
+	 * If it is edge collapse, it
+	 * would be 'adjacent collapsable 
+	 * edges'. The adjacent pairs should
+	 * be updated with the collapse
+	 * operation
+	 * One of the element is NULL means
+	 * that it has been decimated during
+	 * the collapse of the corresponding
+	 * vertex */ 
 	pair_arr	adjacent_col_pairs;
-	// use when decimated based on the 
-	// face count, remove the face if 
-	// needed. the adjacent faces should
-	// be updated with the collapse operation
+
+	/* use when decimated based on the 
+	 * face count, remove the face if 
+	 * needed. the adjacent faces should
+	 * be updated with the collapse operation */
 	face_arr	adjacent_faces;
+
 	// assisting variable use for linkage
 	// information operation
 	//short	flag;
 
 private:
-	// the face star count is set to 6
-	static const uint INIT_ADJACENT_FACES_COUNT = 6; 
+	// default star faces & pairs count
+	static const uint DFLT_STARS = 6; 
 };
 
 CollapsableVertex::CollapsableVertex():

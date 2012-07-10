@@ -9,10 +9,6 @@
 using std::ostringstream;
 using std::endl;
 
-CollapsableVertex PairCollapse::cvert;
-CollapsableFace PairCollapse::cface;
-vert_arr PairCollapse::starVerts1;
-vert_arr PairCollapse::starVerts2;
 
 PairCollapse::PairCollapse() {
 	info_buf_size = 0;
@@ -22,6 +18,8 @@ PairCollapse::PairCollapse() {
 
 PairCollapse::~PairCollapse() {
 	flog.close();
+	cvert.adjacent_col_pairs.setNULL();
+	cvert.adjacent_faces.setNULL();
 }
 
 void PairCollapse::allocVerts(uint _vert_count) {
@@ -37,6 +35,7 @@ void PairCollapse::addVertex(HVertex vert) {
 	// set the new id, this is important!!
 	cvert.setNewId(vertices.count());
 	vertices.push_back(cvert);
+	vertices[vertices.count() - 1].allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
 }
 
 bool PairCollapse::addFace(HFace face) {
@@ -71,38 +70,23 @@ void PairCollapse::intialize() {
 void PairCollapse::collapsePair(pCollapsablePair &pair) {
 
 	int i;
+	uint vert1 = pair->vert1, vert2 = pair->vert2;
 
 	// set the new_id field and new_vertex field in order 
 	// to invalidate vert2 and maintain the collapse footprint
-	vertices[pair->vert2].setNewId(pair->vert1);
+	vertices[vert2].setNewId(vert1);
 	//vertices[pair->vert2].new_vertex.Set(pair->new_vertex);
 	// vert1 will be the collapsed vertex, set to the new position
-	vertices[pair->vert1].Set(pair->new_vertex);
+	vertices[vert1].Set(pair->new_vertex);
 	valid_verts --;
 
-	pair_arr &pairs1 = vertices[pair->vert1].adjacent_col_pairs;
-	pair_arr &pairs2 = vertices[pair->vert2].adjacent_col_pairs;
-	// change the index of vert2 to vert1 for all pairs adjacent
-	// to vert2, this may cause the order 'vert1 < vert2' broken
-	// and some pairs to be invalid or duplicated
-	changePairsOneVert(pairs2, pair->vert2, pair->vert1);
+	if(/*vert1 == 701 || vert2 == 701*/ vert1 == 1164 || vert2 == 1164 /*vert2 == 1164*/) {
+		int k = 0;
+		k ++;
+	}
 
-	pair_arr new_pairs;
-	mergePairs(pairs1, pairs2, new_pairs);
-	reevaluatePairs(new_pairs);
-	hswap(pairs1, new_pairs);
-	pairs2.freeSpace();
-
-	face_arr &faces1 = vertices[pair->vert1].adjacent_faces;
-	face_arr &faces2 = vertices[pair->vert2].adjacent_faces;
-	// change the index of vert2 to vert1 for all faces adjacent
-	// to vert2, this may cause some faces to be invalid or duplicated
-	changeFacesOneVert(faces2, pair->vert2, pair->vert1);
-
-	face_arr new_faces;
-	mergeFaces(faces1, faces2, new_faces);
-	hswap(faces1, new_faces);
-	faces2.freeSpace();
+	mergePairs(vert1, vert2);
+	mergeFaces(vert1, vert2);
 }
 
 bool PairCollapse::targetFace(uint target_count) {
@@ -138,11 +122,18 @@ bool PairCollapse::readPly(char* filename) {
 	HFace f;
 	HTime htime;
 
-	if (!plyStream.openForRead(filename))
+	if (!plyStream.openForRead(filename)) {
+
+		flog << "\t#ERROR: open file " << filename << " failed" << endl;
+		cout << "\t#ERROR: open file " << filename << " failed" << endl;
 		return false;
+	}
 
 	this->allocVerts(plyStream.getVertexCount());
 	this->allocFaces(plyStream.getFaceCount());
+
+	cvert.adjacent_col_pairs.setNULL();
+	cvert.adjacent_faces.setNULL();
 
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 
@@ -171,4 +162,9 @@ bool PairCollapse::readPly(char* filename) {
 		<< "\tfile name:\t" << filename << endl
 		<< "\tvertex count:\t" << plyStream.getVertexCount() << "\tface count:\t" << plyStream.getFaceCount() << endl
 		<< "\tread file time:\t" << htime.printElapseSec() << endl << endl;
+}
+
+bool PairCollapse::writePly(char* filename) {
+
+	return true;
 }

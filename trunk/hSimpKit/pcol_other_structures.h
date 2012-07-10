@@ -48,6 +48,16 @@ public:
 			vert2 = dst;
 	}
 
+	uint getAnotherVert(uint one_vert) {
+		
+		if (vert1 == one_vert)
+			return vert2;
+		if (vert2 == one_vert)
+			return vert1;
+
+		return -1;
+	}
+
 public:
 	// indices of the two collapsable vertices
 	uint	vert1, vert2;
@@ -71,9 +81,13 @@ class CollapsableFace: public HTripleIndex<uint> {
 public:
 	CollapsableFace() { _valid = true; }
 	void invalidate() { _valid = false; }
-	bool Valid() { return _valid; }
+	bool valid() { return _valid && indexValid(); }
 
+	// this may cause the face to be invalid
 	void changeOneVert(uint orig, uint dst) {
+		if (!indexValid())
+			return;
+
 		if (i == orig)
 			i = dst;
 		else if (j == orig) 
@@ -82,7 +96,7 @@ public:
 			k = dst;
 	}
 
-	bool valid() {
+	bool indexValid() {
 		return i != j && i != k && j != k;
 	}
 
@@ -93,6 +107,8 @@ public:
 	}
 
 private:
+	// this flag is set false if it duplicates
+	// with other face during the collapse
 	bool	_valid;
 };
 

@@ -23,6 +23,7 @@ public:
 	////////////////////////////////////////
 
 	QuadricEdgeCollapse();
+	~QuadricEdgeCollapse();
 	virtual void allocVerts(uint _vert_count);
 	virtual bool addFace(HFace face);
 	virtual void collectPairs();

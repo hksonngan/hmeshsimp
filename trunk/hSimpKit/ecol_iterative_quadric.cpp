@@ -13,6 +13,10 @@ QuadricEdgeCollapse::QuadricEdgeCollapse() {
 	//will_join_only = false;
 }
 
+QuadricEdgeCollapse::~QuadricEdgeCollapse() {
+
+}
+
 void QuadricEdgeCollapse::allocVerts(uint _vert_count) {
 
 	PairCollapse::allocVerts(_vert_count);
@@ -88,6 +92,7 @@ void QuadricEdgeCollapse::collectPairs() {
 		for (j = 0; j < starVertices.count(); j ++)
 			// add specific edge only once
 			if (i < starVertices[j]) {
+
 				CollapsablePair *new_pair = new CollapsablePair(i, starVertices[j]);
 				evaluatePair(new_pair);
 				addCollapsablePair(new_pair);
