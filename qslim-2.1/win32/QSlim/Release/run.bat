@@ -8,5 +8,5 @@
 ::d:/Armadillo.ply
 ::d:/happy_recon/happy_vrip.ply
 ::d:/Armadillo_ascii.ply
-QSlim.exe -t 8000 d:/Armadillo_ascii.ply
+QSlim.exe -t 200 d:/bunny/bun_zipper.ply
 pause 

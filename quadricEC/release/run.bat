@@ -8,5 +8,5 @@
 ::d:/Armadillo.ply
 ::d:/happy_recon/happy_vrip.ply
 ::d:/Armadillo_ascii.ply
-quadricEC.exe -t 300000 d:/Armadillo.ply
+quadricEC.exe -t 500 d:/bunny/bun_zipper.ply
 pause 
