@@ -10,12 +10,14 @@
 #include "getopt.h"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using std::cerr;
 using std::cout;
 using std::endl;
 using std::string;
+using std::ofstream;
 
 #define BUF_SIZE 1000
 
@@ -86,6 +88,8 @@ int main(int argc, char** argv) {
 	process_cmdline(argc, argv);
 
 	QuadricEdgeCollapse qec;
+	bool r;
+	ofstream flog("ec.log", fstream::out | fstream::app);
 
 	//F:/plys/dragon_recon/dragon_vrip.ply
 	//F:/plys/bunny/bun_zipper.ply
@@ -95,18 +99,33 @@ int main(int argc, char** argv) {
 	//d:/dragon_recon/dragon_vrip.ply
 	//d:/bunny/bun_zipper.ply
 
-	if (!qec.readPly(infilename))
+	r = qec.readPly(infilename);
+
+	flog << qec.getInfo();
+	cout << qec.getInfo();
+	qec.clearInfo();
+	if (!r)
 		return 1;
 
 	if (target ==  -1) 
 		target = qec.faceCount() / 2;
 
-	if (!qec.targetFace(target))
+	r = qec.targetFace(target);
+
+	flog << qec.getInfo();
+	cout << qec.getInfo();
+	qec.clearInfo();
+	if (!r)
 		return 1;
 
 	//qec.outputIds("ids");
 
-	if (!qec.writePly(outfilename))
+	r = qec.writePly(outfilename);
+
+	flog << qec.getInfo();
+	cout << qec.getInfo();
+	qec.clearInfo();
+	if (!r)
 		return 1;
 
 	return 0;

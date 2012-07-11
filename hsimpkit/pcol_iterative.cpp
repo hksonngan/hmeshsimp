@@ -10,13 +10,12 @@ using std::endl;
 
 
 PairCollapse::PairCollapse() {
-	info_buf_size = 0;
+	info_buf_len = 0;
+	INFO_BUF[0] = '\0';
 	faceIndexComp.setFaces(&faces);
-	flog.open("ec.log", fstream::out | fstream::app);
 }
 
 PairCollapse::~PairCollapse() {
-	flog.close();
 	cvert.adjacent_col_pairs.setNULL();
 	cvert.adjacent_faces.setNULL();
 }
@@ -42,11 +41,11 @@ bool PairCollapse::addFace(HFace face) {
 	cface.set(face.i, face.j, face.k);
 
 	if (!cface.valid()) {
-		addInfo("#error: duplicate vertices in input face\n");
+		addInfo("#ERROR: duplicate verts in input face\n");
 		return false;
 	}
 	if (!cface.indicesInRange(0, vertices.count() - 1)) {
-		addInfo("#error: vertex out of range in input face\n");
+		addInfo("#ERROR: vertex out of range in input face\n");
 		return false;
 	}
 
@@ -58,9 +57,9 @@ bool PairCollapse::addFace(HFace face) {
 	vertices[face.k].adjacent_faces.push_back(faces.count() - 1);
 
 	// set the new_id field
-	vertices[faces.i].setNewId(faces.i);
-	vertices[faces.j].setNewId(faces.j);
-	vertices[faces.k].setNewId(faces.k);
+	vertices[face.i].setNewId(face.i);
+	vertices[face.j].setNewId(face.j);
+	vertices[face.k].setNewId(face.k);
 
 	return true;
 }
@@ -106,15 +105,14 @@ bool PairCollapse::targetFace(uint target_count) {
 		collapsePair(top_pair);
 	}
 
-	flog << "\t-----------------------------------------------" << endl
-		<< "\tmodel simplified" << endl
-		<< "\tvertex count:\t" << valid_verts << "\tface count:\t" << valid_faces << endl
+	htime.setEndPoint();
+	ostringstream ostr;
+
+	ostr << "\tmodel simplified" << endl
+		<< "\tverts:\t" << valid_verts << "\tfaces:\t" << valid_faces << endl
 		<< "\ttime consuming:\t" << htime.printElapseSec() << endl << endl;
 
-	cout << "\t-----------------------------------------------" << endl
-		<< "\tmodel simplified" << endl
-		<< "\tvertex count:\t" << valid_verts << "\tface count:\t" << valid_faces << endl
-		<< "\ttime consuming:\t" << htime.printElapseSec() << endl << endl;
+	addInfo(ostr.str().c_str());
 
 	return true;
 }
@@ -129,8 +127,9 @@ bool PairCollapse::readPly(char* filename) {
 
 	if (!plyStream.openForRead(filename)) {
 
-		flog << "\t#ERROR: open file " << filename << " failed" << endl;
-		cout << "\t#ERROR: open file " << filename << " failed" << endl;
+		ostringstream oss;
+		oss << "\t#ERROR: open file " << filename << " failed" << endl;
+		addInfo(oss.str().c_str());
 		return false;
 	}
 
@@ -156,17 +155,15 @@ bool PairCollapse::readPly(char* filename) {
 
 	intialize();
 
-	flog << "\t-----------------------------------------------" << endl
-		<< "\tread file completed" << endl
-		<< "\tfile name:\t" << filename << endl
-		<< "\tvertex count:\t" << plyStream.getVertexCount() << "\tface count:\t" << plyStream.getFaceCount() << endl
-		<< "\tread time:\t" << htime.printElapseSec() << endl << endl;
+	htime.setEndPoint();
+	ostringstream ostr;
 
-	cout << "\t-----------------------------------------------" << endl
-		<< "\tread file completed" << endl
+	ostr << "\tread complete" << endl
 		<< "\tfile name:\t" << filename << endl
-		<< "\tvertex count:\t" << plyStream.getVertexCount() << "\tface count:\t" << plyStream.getFaceCount() << endl
-		<< "\tread time:\t" << htime.printElapseSec() << endl << endl;
+		<< "\treferred verts:\t" << valid_verts << "\tfaces:\t" << plyStream.getFaceCount() << endl
+		<< "\tread time:\t" << htime.getElapseStr() << endl << endl;
+
+	addInfo(ostr.str().c_str());
 
 	return true;
 }
@@ -212,17 +209,15 @@ bool PairCollapse::writePly(char* filename) {
 	htime.setEndPoint();
 
 	// statistics
-	cout << "\t-----------------------------------------------" << endl
-		<< "\tsimplified mesh written" << endl
-		<< "\tfile name:\t" << filename << endl
-		<< "\tvertex count:\t" << valid_vert_count << "\tface count:\t" << valid_face_count << endl
-		<< "\twrite time:\t\t" << htime.getElapseStr() << endl << endl;
+	htime.setEndPoint();
+	ostringstream ostr;
 
-	flog << "\t-----------------------------------------------" << endl
-		<< "\tsimplified mesh written" << endl
+	ostr << "\tsimplified mesh written" << endl
 		<< "\tfile name:\t" << filename << endl
-		<< "\tvertex count:\t" << valid_vert_count << "\tface count:\t" << valid_face_count << endl
-		<< "\twrite time:\t\t" << htime.getElapseStr() << endl << endl;
+		//<< "\tverts:\t" << valid_vert_count << "\tfaces:\t" << valid_face_count << endl
+		<< "\twrite time:\t" << htime.getElapseStr() << endl << endl;
+
+	addInfo(ostr.str().c_str());
 
 	return true;
 }
@@ -247,4 +242,15 @@ void PairCollapse::generateOutputId() {
 			vertices[i].output_id = valid_vert_count;
 			valid_vert_count ++;
 		}
+}
+
+///////////////////////////////////////////////////////////////
+// operations other than simplification
+
+void PairCollapse::addInfo(const char *s) {
+
+	int l = strlen(s);
+	memcpy(INFO_BUF + info_buf_len, s, l);
+	info_buf_len += l;
+	INFO_BUF[l] = '\0';
 }

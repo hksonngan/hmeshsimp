@@ -146,9 +146,11 @@ public:
 	///////////////////////////////////////
 	// Other Than Simplification
 
-	inline void addInfo(char *s);
-	uint vertexCount() { return vertices.count(); }
-	uint faceCount() { return faces.count(); }
+	void addInfo(const char *s);
+	char* getInfo() { return INFO_BUF; };
+	void clearInfo() { info_buf_len = 0; INFO_BUF[0] = '\0'; };
+	uint vertexCount() const { return vertices.count(); }
+	uint faceCount() const { return faces.count(); }
 
 	// clear heap
 	void clear();
@@ -165,9 +167,7 @@ protected:
 	FaceIndexComp	faceIndexComp;
 
 	char	INFO_BUF[INFO_BUF_CAPACITY];
-	uint	info_buf_size;
-
-	ofstream	flog;
+	uint	info_buf_len;
 
 	/////////////////////////////////////
 	// constants
@@ -186,7 +186,7 @@ void PairCollapse::unreferVertsCheck() {
 	valid_verts = 0;
 
 	for (int i = 0; i < vertices.count(); i ++) 
-		if (vertices[i].valid()) 
+		if (vertices[i].valid(i)) 
 			valid_verts ++;
 }
 
@@ -417,14 +417,6 @@ void PairCollapse::mergeFaces(uint vert1, uint vert2) {
 	/* post process */
 	faces1.swap(new_faces);
 	faces2.freeSpace();
-}
-
-///////////////////////////////////////////////////////////////
-// operations other than simplification
-
-void PairCollapse::addInfo(char *s) {
-
-	memcpy(INFO_BUF + info_buf_size, s, strlen(s));
 }
 
 #endif //__H_ITERATIVE_PAIR_COLLAPSE__ 

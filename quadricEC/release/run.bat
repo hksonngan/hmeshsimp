@@ -5,5 +5,8 @@
 ::F:\plys\horse.ply
 ::d:/dragon_recon/dragon_vrip.ply
 ::d:/bunny/bun_zipper.ply
-hSpaceDivision.exe -t 1500 F:\plys\dragon_recon\dragon_vrip.ply
+::d:/Armadillo.ply
+::d:/happy_recon/happy_vrip.ply
+::d:/Armadillo_ascii.ply
+quadricEC.exe -t 300000 d:/Armadillo.ply
 pause 
