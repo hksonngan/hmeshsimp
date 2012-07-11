@@ -12,7 +12,7 @@ using std::endl;
 PairCollapse::PairCollapse() {
 	info_buf_size = 0;
 	faceIndexComp.setFaces(&faces);
-	flog.open("ec.log");
+	flog.open("ec.log", fstream::out | fstream::app);
 }
 
 PairCollapse::~PairCollapse() {
@@ -32,7 +32,7 @@ void PairCollapse::allocFaces(uint _face_count) {
 void PairCollapse::addVertex(HVertex vert) {
 	cvert.Set(vert.x, vert.y, vert.z);
 	// set the new id, this is important!!
-	cvert.setNewId(vertices.count());
+	cvert.setNewId(INVALID_VERT);
 	vertices.push_back(cvert);
 	vertices[vertices.count() - 1].allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
 }
@@ -57,12 +57,19 @@ bool PairCollapse::addFace(HFace face) {
 	vertices[face.j].adjacent_faces.push_back(faces.count() - 1);
 	vertices[face.k].adjacent_faces.push_back(faces.count() - 1);
 
+	// set the new_id field
+	vertices[faces.i].setNewId(faces.i);
+	vertices[faces.j].setNewId(faces.j);
+	vertices[faces.k].setNewId(faces.k);
+
 	return true;
 }
 
 void PairCollapse::intialize() {
+
 	valid_verts = vertices.count();
 	valid_faces = faces.count();
+	unreferVertsCheck();
 	collectPairs();
 }
 
