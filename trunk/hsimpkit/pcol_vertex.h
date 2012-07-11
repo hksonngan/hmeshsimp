@@ -10,11 +10,14 @@
 #define __PCOL_VERTEX__
 
 #include <list>
+#include <climits>
 
 #include "util_common.h"
 #include "h_dynamarray.h"
 #include "pcol_other_structures.h"
 #include "MxQMetric3.h"
+
+#define INVALID_VERT UINT_MAX
 
 using std::list;
 

@@ -24,7 +24,7 @@ using std::ofstream;
 using std::cout;
 using std::endl;
 
-#define INFO_BUF_CAPACITY 1
+#define INFO_BUF_CAPACITY 4000
 
 typedef CollapsablePair* pCollapsablePair;
 
@@ -85,6 +85,7 @@ public:
 	inline void addCollapsablePair(CollapsablePair *new_pair);
 	// init after the vertices and faces are ready
 	virtual void intialize();
+	inline void unreferVertsCheck();
 	
 	
 	////////////////////////////////////
@@ -179,6 +180,15 @@ protected:
 	CollapsableFace	cface;
 	vert_arr	starVerts1, starVerts2;
 };
+
+void PairCollapse::unreferVertsCheck() {
+	
+	valid_verts = 0;
+
+	for (int i = 0; i < vertices.count(); i ++) 
+		if (vertices[i].valid()) 
+			valid_verts ++;
+}
 
 void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) {
 
