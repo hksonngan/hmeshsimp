@@ -26,9 +26,8 @@ int		target = -1;
 static char *options = "t:h";
 
 static char *usage_string = 
-"\n"
-"\t-t <n>\ttarget faces of the simplified mesh\n\n"
-"\t-h\tprint help\n\n";
+"\t-t <n>\ttarget faces of the simplified mesh\n"
+"\t-h\tprint help\n";
 
 static void print_usage()
 {

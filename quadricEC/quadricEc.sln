@@ -1,18 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hIterativeEdgeCollapse", "hIterativeEdgeCollapse.vcproj", "{85327E25-7A2B-462D-A2D1-7C21143FE2B6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6} = {448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}
-		{7B147D9E-02DA-4094-B2B9-A71CB1E75D65} = {7B147D9E-02DA-4094-B2B9-A71CB1E75D65}
-		{A03330D3-129A-4EB5-828C-0112EFE97B77} = {A03330D3-129A-4EB5-828C-0112EFE97B77}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hSimpKit", "..\hSimpKit\hSimpKit.vcproj", "{A03330D3-129A-4EB5-828C-0112EFE97B77}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsimpkit", "..\hsimpkit\hSimpKit.vcproj", "{A03330D3-129A-4EB5-828C-0112EFE97B77}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgfx", "..\libgfx\vc6\libgfx\libgfx.vcproj", "{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MixKit", "..\mixkit\MixKit.vcproj", "{7B147D9E-02DA-4094-B2B9-A71CB1E75D65}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quadricEC", "quadricEC.vcproj", "{85327E25-7A2B-462D-A2D1-7C21143FE2B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,10 +15,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Debug|Win32.ActiveCfg = Debug|Win32
-		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Debug|Win32.Build.0 = Debug|Win32
-		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Release|Win32.ActiveCfg = Release|Win32
-		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Release|Win32.Build.0 = Release|Win32
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Debug|Win32.Build.0 = Debug|Win32
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Release|Win32.ActiveCfg = Release|Win32
@@ -36,6 +27,10 @@ Global
 		{7B147D9E-02DA-4094-B2B9-A71CB1E75D65}.Debug|Win32.Build.0 = Debug|Win32
 		{7B147D9E-02DA-4094-B2B9-A71CB1E75D65}.Release|Win32.ActiveCfg = Release|Win32
 		{7B147D9E-02DA-4094-B2B9-A71CB1E75D65}.Release|Win32.Build.0 = Release|Win32
+		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Debug|Win32.Build.0 = Debug|Win32
+		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Release|Win32.ActiveCfg = Release|Win32
+		{85327E25-7A2B-462D-A2D1-7C21143FE2B6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

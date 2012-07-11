@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="hIterativeEdgeCollapse"
+	Name="quadricEC"
 	ProjectGUID="{85327E25-7A2B-462D-A2D1-7C21143FE2B6}"
 	RootNamespace="hIterativeEdgeCollapse"
 	Keyword="Win32Proj"
