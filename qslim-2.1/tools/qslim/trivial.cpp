@@ -11,7 +11,7 @@ void trimExtAndAppend(char *src, char *dst, char *app)
 	dst[s.size()] = '\0';
 }
 
-string getFilename(char *filepath)
+string getFilename(const char *filepath)
 {
 	string filename(filepath);
 
@@ -38,6 +38,13 @@ string getFilename(char *filepath)
 	}
 
 	return filename.substr(start, end - start);
+}
+
+string getFileExtension(const char *filepath) {
+
+	string filename(filepath);
+	int i = filename.find_last_of('.');
+	return filename.substr(i + 1);
 }
 
 EndianOrder getSystemEndianMode()
