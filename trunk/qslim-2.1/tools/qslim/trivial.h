@@ -19,7 +19,9 @@ enum EndianOrder { H_BIG_ENDIAN, H_LITTLE_ENDIAN };
 extern void trimExtAndAppend(char *src, char *dst, char *app);
 
 // get file name without extensions
-extern string getFilename(char *filepath);
+extern string getFilename(const char *filepath);
+
+extern string getFileExtension(const char *filepath);
 
 // get the system endian mode
 extern EndianOrder getSystemEndianMode();

@@ -1,6 +1,6 @@
 /*
  *  iterative edge collapse using quadric error metrics
- *  refer to THE PAPER (you must know it)
+ *  you can refer to THE PAPER (you must have known it)
  *
  *  author: ht
  */
@@ -49,8 +49,10 @@ protected:
 	////////////////////////////////////////
 	// configuration variables
 	////////////////////////////////////////
+
 	int weighting_policy;
 	int placement_policy;
+	double boundary_weight;
 
 	//static q_matrix	qMatrix;
 };

@@ -723,8 +723,10 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
   // get_words alloc an array space char** for the returned value words
   // so the returned value must be freed after using
   words = get_words (plyfile->fp, &nwords, &orig_line);
-  if (!words || !equal_strings (words[0], "ply"))
+  if (!words || !equal_strings (words[0], "ply")) {
+	fprintf(stderr, "ply_read: no magic word \"ply\" in the head\n");
     return (NULL);
+  }
 
   while (words) {
 
@@ -831,6 +833,11 @@ PlyFile *ply_open_for_reading(
   /* create the PlyFile data structure */
 
   plyfile = ply_read (fp, nelems, elem_names);
+
+  if (!plyfile) {
+	  fprintf(stderr, "ply_open_for_reading: get a null PlyFile pointer\n");
+	  return NULL;
+  }
 
   /* determine the file type and version */
 
@@ -1770,6 +1777,10 @@ char **get_words(FILE *fp, int *nwords, char **orig_line)
       *ptr = ' ';
       *ptr2 = ' ';
     }
+	else if (*ptr == '\r') {
+		*ptr = ' ';
+		*ptr2 = ' ';
+	}
     else if (*ptr == '\n') {
       *ptr = ' ';
       *ptr2 = '\0';

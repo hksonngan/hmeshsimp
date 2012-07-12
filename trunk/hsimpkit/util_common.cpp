@@ -39,7 +39,7 @@ float HFaceFormula::calcTriangleFaceArea(HVertex &_v1, HVertex &_v2, HVertex &_v
 
 	ChapillVec3<float> normal = edge1 ^ edge2; // cross product
 
-	return normal.Length();
+	return normal.Length() / 2;
 }
 
 float HFaceFormula::calcD(HNormal nm, HVertex v)

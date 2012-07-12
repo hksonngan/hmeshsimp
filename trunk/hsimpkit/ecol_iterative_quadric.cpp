@@ -5,7 +5,7 @@ QuadricEdgeCollapse::QuadricEdgeCollapse() {
 	// Externally visible variables
 	placement_policy = MX_PLACE_OPTIMAL;
 	weighting_policy = MX_WEIGHT_AREA;
-	//boundary_weight = 1000.0;
+	boundary_weight = 1000.0;
 	//compactness_ratio = 0.0;
 	//meshing_penalty = 1.0;
 	//local_validity_threshold = 0.0;
@@ -136,7 +136,7 @@ HVertex QuadricEdgeCollapse::evaluatePair(CollapsablePair *pair) {
 
 	// the matrix is not singular
 	if( placement_policy == MX_PLACE_OPTIMAL &&
-		Q.optimize(&pair->new_vertex.x, &pair->new_vertex.y, &pair->new_vertex.y) ) {
+		Q.optimize(&pair->new_vertex.x, &pair->new_vertex.y, &pair->new_vertex.z) ) {
 
 			e_min = Q.evaluate(pair->new_vertex.x, pair->new_vertex.y, pair->new_vertex.z);
 	}
