@@ -24,11 +24,13 @@ using std::ofstream;
 char*	infilename;
 char	outfilename[BUF_SIZE];
 int		target = -1;
+double	boundary_weight = INIT_BOUND_WEIGHT;
 
-static char *options = "t:h";
+static char *options = "t:b:h";
 
 static char *usage_string = 
 "\t-t <n>\ttarget faces of the simplified mesh\n"
+"\t-b <n>\tboundary weight\n"
 "\t-h\tprint help\n";
 
 static void print_usage()
@@ -50,7 +52,7 @@ static void usage_error(char *msg = NULL)
 void process_cmdline(int argc, char **argv)
 {
 	int opt, ival;
-	float fval;
+	double fval;
 
 	getopt_init();
 	while( (opt = getopt(argc, argv, options)) != EOF )
@@ -63,6 +65,13 @@ void process_cmdline(int argc, char **argv)
 			if( ival <= 0 )
 				usage_error("target count should be positive\n");
 			else target = ival;
+			break;
+
+		case 'b':
+			fval = atof(optarg);
+			if( fval <= 0 )
+				usage_error("boundary weight should be positive\n");
+			else boundary_weight = fval;
 			break;
 
 		case 'h':  print_usage(); exit(0); break;
@@ -91,16 +100,9 @@ int main(int argc, char** argv) {
 	bool r;
 	ofstream flog("ec.log", fstream::out | fstream::app);
 
-	//F:/plys/dragon_recon/dragon_vrip.ply
-	//F:/plys/bunny/bun_zipper.ply
-	//F:/plys/happy_recon/happy_vrip.ply
-	//F:/plys/Armadillo.ply
-	//F:/plys/horse.ply
-	//d:/dragon_recon/dragon_vrip.ply
-	//d:/bunny/bun_zipper.ply
+	qec.boundary_weight = boundary_weight;
 
 	r = qec.readPly(infilename);
-
 	flog << qec.getInfo();
 	cout << qec.getInfo();
 	qec.clearInfo();
@@ -111,7 +113,6 @@ int main(int argc, char** argv) {
 		target = qec.faceCount() / 2;
 
 	r = qec.targetFace(target);
-
 	flog << qec.getInfo();
 	cout << qec.getInfo();
 	qec.clearInfo();
@@ -121,12 +122,16 @@ int main(int argc, char** argv) {
 	//qec.outputIds("ids");
 
 	r = qec.writePly(outfilename);
-
 	flog << qec.getInfo();
 	cout << qec.getInfo();
 	qec.clearInfo();
 	if (!r)
 		return 1;
+
+	qec.totalTime();
+	flog << qec.getInfo();
+	cout << qec.getInfo();
+	qec.clearInfo();
 
 	return 0;
 }

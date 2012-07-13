@@ -1,11 +1,29 @@
 /*
- *	vertex cluster and some concerning classes
- *  the algorithm presented here please refer to
+ *	Vertex cluster and some concerning classes
+ *  The algorithm presented here please refer to
  *    [Lindstrom] Out-of-Core Simplification of Large Polygonal Models
  *
- *	author: ht
- *  email : waytofall916@gmail.com
+ *  Author: Ht
+ *  Email : waytofall916@gmail.com
+ *
+ *  Copyright (C) Ht-waytofall. All rights reserved.
+ *	
+ *  This file is part of hmeshsimp.
+ *
+ *  hmeshsimp is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  hmeshsimp is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef __VERTEX_CLUSTER__
 #define __VERTEX_CLUSTER__
@@ -19,7 +37,6 @@
 #include "math/mat44.h"
 #include "util_common.h"
 #include "hash_face.h"
-
 
 
 /* =================== type & constants ================== */

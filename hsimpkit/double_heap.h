@@ -1,19 +1,37 @@
 /*
- *  a maximum/minimum heap with an array as a container
+ *  A maximum/minimum heap with an array as a container
  *
- *  constructor:
+ *  Constructor:
  *    DoubleHeap(
  *      int _size, // initial volume of the heap
  *      int _type // 1 : max heap 2 : min heap
  *    );
  *
- *  the element type T should overload
+ *  The element type T should overload
  *  operator '<' for max heap,
  *           '>' for min heap
  *
- *  author : ht
- *  email  : waytofall916@gmail.com
+ *  Author: Ht
+ *  Email : waytofall916@gmail.com
+ *
+ *  Copyright (C) Ht-waytofall. All rights reserved.
+ *	
+ *  This file is part of hmeshsimp.
+ *
+ *  hmeshsimp is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  hmeshsimp is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef __DOUBLE_HEAP__
 #define __DOUBLE_HEAP__

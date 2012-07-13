@@ -346,6 +346,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\h_aug_time.h"
+				>
+			</File>
+			<File
 				RelativePath=".\h_time.h"
 				>
 			</File>
@@ -453,6 +457,62 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<Filter
+				Name="MixKit"
+				>
+				<File
+					RelativePath=".\MixKit\mixmsg.cxx"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\mixmsg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxBlock.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxDynBlock.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxHeap.cxx"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxHeap.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxMat3-jacobi.cxx"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxMat3.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxMat4-jacobi.cxx"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxMat4.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxQMetric3.cxx"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\MxQMetric3.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MixKit\stdmix.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\esorttest.cpp"

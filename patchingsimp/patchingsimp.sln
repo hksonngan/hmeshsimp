@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "patchingsimp", "patchingsimp.vcproj", "{437FA071-1E60-43B1-A481-93EE9CD8B238}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{437FA071-1E60-43B1-A481-93EE9CD8B238}.Debug|Win32.ActiveCfg = Debug|Win32
+		{437FA071-1E60-43B1-A481-93EE9CD8B238}.Debug|Win32.Build.0 = Debug|Win32
+		{437FA071-1E60-43B1-A481-93EE9CD8B238}.Release|Win32.ActiveCfg = Release|Win32
+		{437FA071-1E60-43B1-A481-93EE9CD8B238}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,16 +1,38 @@
 /*
- *  other data structures
+ *  Other data structures
  *		-the collapsable vertex pair
  *		-the face in vertex collapse
  *
- *  author: ht
+ *  Author: Ht
+ *  Email : waytofall916@gmail.com
+ *
+ *  Copyright (C) Ht-waytofall. All rights reserved.
+ *	
+ *  This file is part of hmeshsimp.
+ *
+ *  hmeshsimp is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  hmeshsimp is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __PCOL_OTHER__
 #define __PCOL_OTHER__
 
-#include "MxHeap.h"
+#include "MixKit/MxHeap.h"
 #include "util_common.h"
+
+#define MAX_CHAR 0xff
+#define FACE_INVALID MAX_CHAR
+
 
 /* The pairs stored in the priority queue should always point to the valid vertices, such that the
 deprecated pairs should be freed. Note that the pair_heap only stores a pointer to the real struct, 
@@ -79,9 +101,11 @@ public:
    it will never change. */
 class CollapsableFace: public HTripleIndex<uint> {
 public:
-	CollapsableFace() { _valid = true; }
-	void invalidate() { _valid = false; }
-	bool valid() { return _valid && indexValid(); }
+	CollapsableFace() { mark = 0; }
+	void markFace(unsigned char m) { mark = m; }
+	bool markIs(unsigned char m) { return mark == m; }
+	void invalidate() { markFace(FACE_INVALID); }
+	bool valid() { return mark != FACE_INVALID && indexValid(); }
 
 	// this may cause the face to be invalid
 	void changeOneVert(uint orig, uint dst) {
@@ -107,9 +131,8 @@ public:
 	}
 
 private:
-	// this flag is set false if it duplicates
-	// with other face during the collapse
-	bool	_valid;
+	// face marking
+	unsigned char	mark;
 };
 
 #endif //__PCOL_OTHER__
