@@ -5,7 +5,7 @@ QuadricEdgeCollapse::QuadricEdgeCollapse() {
 	// Externally visible variables
 	placement_policy = MX_PLACE_OPTIMAL;
 	weighting_policy = MX_WEIGHT_AREA;
-	boundary_weight = 1000.0;
+	boundary_weight = INIT_BOUND_WEIGHT;
 	//compactness_ratio = 0.0;
 	//meshing_penalty = 1.0;
 	//local_validity_threshold = 0.0;
@@ -85,6 +85,7 @@ void QuadricEdgeCollapse::collectPairs() {
 	int i, j;
 	vert_arr starVertices;
 	CollapsablePair *pair;
+	face_arr _faces;
 
 	for (i = 0; i < vertices.count(); i ++) {
 
@@ -96,6 +97,13 @@ void QuadricEdgeCollapse::collectPairs() {
 				CollapsablePair *new_pair = new CollapsablePair(i, starVertices[j]);
 				evaluatePair(new_pair);
 				addCollapsablePair(new_pair);
+
+				if (boundary_weight > 0) {
+					collectEdgeFaces(i, starVertices[j], _faces);
+					// is the boundary edge
+					if (_faces.count() == 1)
+						addDiscontinuityConstraint(i, starVertices[j], _faces[0]);
+				}
 			}
 	}
 }

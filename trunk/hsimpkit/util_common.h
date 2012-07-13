@@ -1,9 +1,27 @@
 /*
- *  uitility & common classes for algorithms
+ *  Utility & common classes for algorithms
  *
- *  author: ht
- *  email : waytofall916@gmail.com
+ *  Author: Ht
+ *  Email : waytofall916@gmail.com
+ *
+ *  Copyright (C) Ht-waytofall. All rights reserved.
+ *	
+ *  This file is part of hmeshsimp.
+ *
+ *  hmeshsimp is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  hmeshsimp is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef __UTIL_COMMON__
 #define __UTIL_COMMON__
@@ -11,6 +29,7 @@
 #include "math/chapill_vec3.h"
 #include "math/chapill_vec4.h"
 #include "math/mat44.h"
+#include "gfx/vec3.h"
 
 
 /* -- types & constants -- */
@@ -22,61 +41,26 @@ typedef unsigned int uint;
 enum WhichSide
 { Side1, Side2 };
 
+typedef ChapillVec3<float> HVector3f;
+typedef HVector3f HVertex;
+typedef HVector3f HNormal;
 
-/* class defined */
-template<class T> class HVec3;
-class HFaceFormula;
-template<class FloatType> class HQEMatrix;
-class HSoupTriangle;
-template<class ElemType> class HTripleIndex;
-class HFaceIndex;
+template<class T1, class T2>
+inline void assign(TVec3<T1> &v1, const ChapillVec3<T2> &v2) {
 
-typedef ChapillVec3<float> HVertex;
-typedef ChapillVec3<float> HNormal;
-typedef HTripleIndex<uint> HFace;
+	v1[0] = v2.x;
+	v1[1] = v2.y;
+	v1[2] = v2.z;
+}
 
-/* 3 vector */
-template<class T>
-class HVec3
-{
-public:
-	HVec3() {}
 
-	HVec3(T _x, T _y, T _z) {
-		x = _x; y = _y; z = _z; }
+template<class T1, class T2>
+inline void assign(ChapillVec3<T1> &v1, const TVec3<T2> &v2) {
 
-	void set(T _x, T _y, T _z) {
-		x = _x; y = _y; z = _z; }
-
-	void set(const HVec3 v) {
-		x = v.x; y = v.y; z = v.z; }
-
-	HVec3& operator+= (const HVec3 v) {
-		x += v.x; y += v.y; z += v.z; 
-		return *this;
-	}
-
-	HVec3 operator* (T n) const {
-		HVec3 v(x * n, y * n, z * n);		
-		return v;
-	}
-
-	HVec3 operator+ (HVec3 &vec) const {
-		HVec3 v(x + vec.x, y + vec.y, z + vec.z);
-		return v;
-	}
-
-	bool operator== (const HVec3 &vec) const {
-		return x == vec.x && y == vec.y && z == vec.z;
-	}
-
-	bool operator!= (const HVec3 &vec) const {
-		return !operator==(vec);
-	}
-
-public:
-	T x, y, z;
-};
+	v1.x = v2[0];
+	v1.y = v2[1];
+	v1.z = v2[2];
+}
 
 /* calculate face formula */
 class HFaceFormula
@@ -88,6 +72,7 @@ public:
 	static WhichSide sideOfPlane(HNormal, float d, HVertex v);
 	static WhichSide sideOfPlane(float a, float b, float c, float d, HVertex v) {
 		return sideOfPlane(HNormal(a, b, c), d, v); }
+	static void calcFaceNormal(HVertex v1, HVertex v2, HVertex v3, HNormal &n);
 
 	void setStatic() {
 		_a = a; _b = b; _c = c; _d = d; }
@@ -332,6 +317,8 @@ template<class ElemType> ElemType HTripleIndex<ElemType>::temp;
 template<class ElemType> int HTripleIndex<ElemType>::index1;
 template<class ElemType> int HTripleIndex<ElemType>::index2;
 template<class ElemType> int HTripleIndex<ElemType>::index3;
+
+typedef HTripleIndex<uint> HFace;
 
 /* face index: three HTripleIndex as cluster index */
 class HFaceIndex

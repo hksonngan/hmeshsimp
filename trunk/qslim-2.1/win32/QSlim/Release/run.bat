@@ -9,5 +9,5 @@
 ::d:/Armadillo.ply
 ::d:/happy_recon/happy_vrip.ply
 ::d:/Armadillo_ascii.ply
-QSlim.exe -t 5000 F:\plys\Armadillo_ascii.ply
+QSlim.exe -t 69000 F:\plys\bunny\bun_zipper.ply
 pause 

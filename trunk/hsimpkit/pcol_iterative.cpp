@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "h_time.h"
 #include "ply_stream.h"
 
 using std::ostringstream;
@@ -97,7 +96,7 @@ bool PairCollapse::targetFace(uint target_count) {
 	
 	CollapsablePair* top_pair;
 
-	HTime htime;
+	run_time.setStartPoint();
 
 	while(valid_faces > target_count) {
 
@@ -105,12 +104,12 @@ bool PairCollapse::targetFace(uint target_count) {
 		collapsePair(top_pair);
 	}
 
-	htime.setEndPoint();
+	run_time.setEndPoint();
 	ostringstream ostr;
 
 	ostr << "\tmodel simplified" << endl
 		<< "\tverts:\t" << valid_verts << "\tfaces:\t" << valid_faces << endl
-		<< "\ttime consuming:\t" << htime.printElapseSec() << endl << endl;
+		<< "\ttime consuming:\t" << run_time.getElapseStr() << endl << endl;
 
 	addInfo(ostr.str().c_str());
 
@@ -123,7 +122,8 @@ bool PairCollapse::readPly(char* filename) {
 	int i;
 	HVertex v;
 	HFace f;
-	HTime htime;
+
+	read_time.setStartPoint();
 
 	if (!plyStream.openForRead(filename)) {
 
@@ -155,13 +155,13 @@ bool PairCollapse::readPly(char* filename) {
 
 	intialize();
 
-	htime.setEndPoint();
+	read_time.setEndPoint();
 	ostringstream ostr;
 
 	ostr << "\tread complete" << endl
 		<< "\tfile name:\t" << filename << endl
 		<< "\treferred verts:\t" << valid_verts << "\tfaces:\t" << plyStream.getFaceCount() << endl
-		<< "\tread time:\t" << htime.getElapseStr() << endl << endl;
+		<< "\tread time:\t" << read_time.getElapseStr() << endl << endl;
 
 	addInfo(ostr.str().c_str());
 
@@ -173,7 +173,8 @@ bool PairCollapse::writePly(char* filename) {
 	ofstream fout(filename);
 	if (fout.bad())
 		return false;
-	HTime htime;
+
+	write_time.setStartPoint();
 
 	/* write head */
 	fout << "ply" << endl;
@@ -206,16 +207,14 @@ bool PairCollapse::writePly(char* filename) {
 			valid_face_count ++;
 		}
 
-	htime.setEndPoint();
 
 	// statistics
-	htime.setEndPoint();
+	write_time.setEndPoint();
 	ostringstream ostr;
 
 	ostr << "\tsimplified mesh written" << endl
 		<< "\tfile name:\t" << filename << endl
-		//<< "\tverts:\t" << valid_vert_count << "\tfaces:\t" << valid_face_count << endl
-		<< "\twrite time:\t" << htime.getElapseStr() << endl << endl;
+		<< "\twrite time:\t" << write_time.getElapseStr() << endl << endl;
 
 	addInfo(ostr.str().c_str());
 
@@ -253,4 +252,13 @@ void PairCollapse::addInfo(const char *s) {
 	memcpy(INFO_BUF + info_buf_len, s, l);
 	info_buf_len += l;
 	INFO_BUF[l] = '\0';
+}
+
+void PairCollapse::totalTime() {
+
+	HAugTime total_time = read_time + run_time + write_time;
+	
+	ostringstream ostr;
+	ostr << "\ttotal time:\t" << total_time.getElapseStr() << endl << endl;
+	addInfo(ostr.str().c_str());
 }

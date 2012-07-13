@@ -39,7 +39,7 @@
 			<DebugSettings
 				Command="$(TargetPath)"
 				WorkingDirectory=""
-				CommandArguments="-t 5000 F:\plys\Armadillo_ascii.smf"
+				CommandArguments="-t 1000 F:\plys\bunny\bun_zipper.smf"
 				Attach="false"
 				DebuggerType="3"
 				Remote="1"

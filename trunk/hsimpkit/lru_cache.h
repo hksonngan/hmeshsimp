@@ -1,9 +1,9 @@
 /*
-	manipulations for the LRU cache file.
+	Manipulations for the LRU cache file.
 
-	there is a least recent used hash cache
+	There is a least recent used hash cache
 	for reading, the hashed value is the index 
-	of the value. so the using scenario is that
+	of the value. So the using scenario is that
 	there are some values that is too big to 
 	fit in the main memory while residing one
 	by one in the binary file, and there are
@@ -11,10 +11,10 @@
 	based on the location that they are residing 
 	in the disk (the index)
 
-	for writing, this is simple binary(!) stream 
+	For writing, this is simple binary(!) stream 
 	writing.
 
-	the hash bucket with LRU list is like this
+	The hash bucket with LRU list is like this
 
 	_____________        _____          _____
 	|bucket_head| ---->  |   | -> .. -> |   | -> Null
@@ -27,13 +27,31 @@
 	_____________        _____          _____
 	|bucket_head| ---->  |   | -> .. -> |   | -> Null
 
-	while all the nodes in the buckets are linked
+	While all the nodes in the buckets are linked
 	based on the time they are accessed, thus the
 	newly accessed node are inserted into the head
-	of the lru list, if it has already existed in
+	of the LRU list, if it has already existed in
 	the list, it will be deleted from the list first
 
-	author: houtao
+    Author: Ht
+    Email : waytofall916@gmail.com
+  
+    Copyright (C) Ht-waytofall. All rights reserved.
+  	
+    This file is part of hmeshsimp.
+  
+    hmeshsimp is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+  
+    hmeshsimp is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+  
+    You should have received a copy of the GNU General Public License
+    along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef __VERT_BIN__

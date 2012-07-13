@@ -1,7 +1,25 @@
 /*
- *  iteratively perform the vertex pair collapse
+ *  Iteratively perform the vertex pair collapse
  *
- *  author: ht
+ *  Author: Ht
+ *  Email : waytofall916@gmail.com
+ *
+ *  Copyright (C) Ht-waytofall. All rights reserved.
+ *	
+ *  This file is part of hmeshsimp.
+ *
+ *  hmeshsimp is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  hmeshsimp is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __H_ITERATIVE_PAIR_COLLAPSE__
@@ -18,7 +36,8 @@
 #include "pcol_other_structures.h"
 #include "util_common.h"
 #include "h_dynamarray.h"
-#include "MxHeap.h"
+#include "MixKit/MxHeap.h"
+#include "h_aug_time.h"
 
 using std::ofstream;
 using std::cout;
@@ -104,13 +123,16 @@ public:
 	////////////////////////////////////
 	// Collapsing & Linkage operation
 
+	// collect start vertices from adjacent faces
+	inline void collectStarVertices(uint vert_index, vert_arr *starVertices);
+	// collect the faces of the edge <vert1, vert2>
+	inline void collectEdgeFaces(uint vert1, uint vert2, face_arr &_faces);
+	
 	// evaluate the target placement and error incurred,
 	// and update the pair's content
 	// this function should be overrided
 	// in specific derivative class
 	virtual HVertex evaluatePair(CollapsablePair *pair) = 0;
-	// collect start vertices from adjacent faces
-	inline void collectStarVertices(uint vert_index, vert_arr *starVertices);
 	// !!an important function
 	virtual void collapsePair(pCollapsablePair &pair);
 
@@ -131,6 +153,8 @@ public:
 	// change one vertex index to another for all faces in the arr
 	inline void changeFacesOneVert(face_arr &face_indices, uint orig, uint dst);
 	inline void mergeFaces(uint vert1, uint vert2);
+	inline void markFaces(face_arr &_faces, unsigned char m);
+	inline void collectMarkFaces(face_arr &faces_in, face_arr &faces_out, unsigned char m);
 
 
 	///////////////////////////////////////
@@ -149,6 +173,7 @@ public:
 	void addInfo(const char *s);
 	char* getInfo() { return INFO_BUF; };
 	void clearInfo() { info_buf_len = 0; INFO_BUF[0] = '\0'; };
+	void totalTime();
 	uint vertexCount() const { return vertices.count(); }
 	uint faceCount() const { return faces.count(); }
 
@@ -168,6 +193,8 @@ protected:
 
 	char	INFO_BUF[INFO_BUF_CAPACITY];
 	uint	info_buf_len;
+
+	HAugTime read_time, run_time, write_time;
 
 	/////////////////////////////////////
 	// constants
@@ -417,6 +444,32 @@ void PairCollapse::mergeFaces(uint vert1, uint vert2) {
 	/* post process */
 	faces1.swap(new_faces);
 	faces2.freeSpace();
+}
+
+void PairCollapse::collectEdgeFaces(uint vert1, uint vert2, face_arr &_faces) {
+
+	face_arr &faces1 = vertices[vert1].adjacent_faces;
+	face_arr &faces2 = vertices[vert2].adjacent_faces;
+
+	markFaces(faces1, 0);
+	markFaces(faces2, 1);
+	collectMarkFaces(faces1, _faces, 1);
+}
+
+void PairCollapse::markFaces(face_arr &_faces, unsigned char m) {
+	
+	for (int i = 0; i < _faces.count(); i ++)
+		faces[_faces[i]].markFace(m);
+}
+
+void PairCollapse::collectMarkFaces(face_arr &faces_in, face_arr &faces_out, unsigned char m) {
+
+	faces_out.clear();
+	faces_out.resize(faces_in.count() / 2);
+
+	for (int i = 0; i < faces_in.count(); i ++) 
+		if (faces[faces_in[i]].markIs(m))
+			faces_out.push_back(faces_in[i]);
 }
 
 #endif //__H_ITERATIVE_PAIR_COLLAPSE__ 

@@ -4,7 +4,24 @@
  *	amortized analysis chapters in CLRS
  *
  *  Author: Ht
- *  Email:  waytofall916@gmail.com
+ *  Email : waytofall916@gmail.com
+ *
+ *  Copyright (C) Ht-waytofall. All rights reserved.
+ *	
+ *  This file is part of hmeshsimp.
+ *
+ *  hmeshsimp is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  hmeshsimp is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __H_DYNAM_ARRAY__
@@ -28,12 +45,12 @@ public:
 	inline ElemType& elem(unsigned int i) const { return data[i]; }
 	inline ElemType* pointer(unsigned int i) { return data + i; }
 	inline int count() const { return size; }
-	inline int getCapacity() { return capacity; }
+	inline int getCapacity() const { return capacity; }
 	// return the index of the element value 
 	// equals to e, return 'size' if it doesn't
 	// exist
-	inline unsigned int find(ElemType &e);
-	inline bool exist(ElemType &e);
+	inline unsigned int find(ElemType &e) const;
+	inline bool exist(ElemType &e) const;
 
 	/* modifiers */
 	inline void push_back(ElemType e);
@@ -149,7 +166,7 @@ void HDynamArray<ElemType>::freeSpace() {
 }
 
 template<class ElemType>
-unsigned int HDynamArray<ElemType>::find(ElemType &e) {
+unsigned int HDynamArray<ElemType>::find(ElemType &e) const {
 	
 	int i;
 
@@ -161,7 +178,7 @@ unsigned int HDynamArray<ElemType>::find(ElemType &e) {
 }
 
 template<class ElemType>
-bool HDynamArray<ElemType>::exist(ElemType &e) {
+bool HDynamArray<ElemType>::exist(ElemType &e) const {
 	
 	int i = find(e);
 

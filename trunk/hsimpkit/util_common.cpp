@@ -7,17 +7,12 @@ float HFaceFormula::b = 0;
 float HFaceFormula::c = 0;
 float HFaceFormula::d = 0;
 
-/* calculate face formula */
 void HFaceFormula::calcTriangleFaceFormula(HVertex _v1, HVertex _v2, HVertex _v3)
 {
-	ChapillVec3<float> v1(_v1.x, _v1.y, _v1.z), 
-		v2(_v2.x, _v2.y, _v2.z), 
-		v3(_v3.x, _v3.y, _v3.z);
+	HNormal edge1(_v1 - _v2), 
+		edge2(_v2 - _v3);
 
-	ChapillVec3<float> edge1(v1 - v2), 
-		edge2(v2 - v3);
-
-	ChapillVec3<float> normal = edge1 ^ edge2; // cross product
+	HNormal normal = edge1 ^ edge2; // cross product
 
 	normal.Normalize();
 
@@ -25,7 +20,15 @@ void HFaceFormula::calcTriangleFaceFormula(HVertex _v1, HVertex _v2, HVertex _v3
 	b = normal.y;
 	c = normal.z;
 
-	d = - (a * v1.x + b * v1.y + c * v1.z);
+	d = - (a * _v1.x + b * _v1.y + c * _v1.z);
+}
+
+void HFaceFormula::calcFaceNormal(HVertex v1, HVertex v2, HVertex v3, HNormal &n) {
+
+	HNormal edge1(v1 - v2), 
+		edge2(v2 - v3);
+
+	n = edge1 ^ edge2; // cross product
 }
 
 float HFaceFormula::calcTriangleFaceArea(HVertex &_v1, HVertex &_v2, HVertex &_v3)
