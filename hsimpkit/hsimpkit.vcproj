@@ -211,18 +211,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="out_of_core"
-			>
-			<File
-				RelativePath=".\divide_grid_mesh.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\divide_grid_mesh.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="vertex_clustering"
 			>
 			<File
@@ -256,6 +244,14 @@
 			<File
 				RelativePath=".\oocsimp.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\vertex_cluster.cpp"
@@ -513,6 +509,18 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="patching_simp"
+			>
+			<File
+				RelativePath=".\divide_grid_mesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\divide_grid_mesh.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\esorttest.cpp"
