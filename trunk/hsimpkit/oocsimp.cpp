@@ -1,30 +1,5 @@
 // !!!IMPORTANT this file is not updated, may not be valid due to the change from 'VertexBinary' to 'LRUCache'
 
-/*
- *	Main algorithms implementation for hoocs
- *
- *  Author: Ht
- *  Email : waytofall916@gmail.com
- *
- *  Copyright (C) Ht-waytofall. All rights reserved.
- *	
- *  This file is part of hmeshsimp.
- *
- *  hmeshsimp is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  hmeshsimp is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-
 //#include "global_var.h"
 #include "oocsimp.h"
 #include <iostream>
@@ -82,20 +57,20 @@ static void freePointersInFace(Face *face) {
 }
 
 /*
-	the thesis of [Lindstrom 2000] needs the input file
+	The thesis of [Lindstrom 2000] needs the input file
 	to be triangle soup, while the standard model input
 	is mostly indexed mesh, so I need some techniques
 	and investigation to try to first convert the indexed
-	mesh form to triangle soup. converting it needs to
+	mesh form to triangle soup. Converting it needs to
 	randomly access the vertex, which means constantly
 	irregular disk fetching, the way I solve this problem
 	is by using a hashing cache for constant time fetching
 	of cached unit while using LEAST RECENT USED strategy
 	to pop out the existing cached content when the cache
-	is full. please refer to the class VertexBinary for
+	is full. Please refer to the class VertexBinary for
 	further information. Another approach for the transformation 
 	is using external sorts [Lindstrom.Silva 2001].
-	-- ht
+	-- Ht
 */
 
 int HOOCSimp::toTriangleSoup()

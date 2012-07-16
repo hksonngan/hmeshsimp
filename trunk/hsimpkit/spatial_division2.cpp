@@ -95,9 +95,9 @@ HSpatialDivision2::~HSpatialDivision2()
 bool HSpatialDivision2::readPly(char *filename)
 {
 	PlyStream plyStream;
-	Integer i;
+	integer i;
 	HVertex v;
-	HTripleIndex<Integer> f;
+	HTripleIndex<uint> f;
 
 	htime.setCheckPoint();
 
@@ -107,7 +107,7 @@ bool HSpatialDivision2::readPly(char *filename)
 
 	// set the capacity for the gvl and gfl
 	vertices = new HSDVertex2[plyStream.getVertexCount()];
-	faces = new HTripleIndex<Integer>[plyStream.getFaceCount()];
+	faces = new HTripleIndex<uint>[plyStream.getFaceCount()];
 
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 
@@ -187,7 +187,7 @@ bool HSpatialDivision2::divide(int target_count)
 
 	// init the first cluster
 	for (i = 0; i < vertexCount; i ++) 
-		if (vertices[i].clusterIndex != -1) 
+		if (vertices[i].clusterIndex != INVALID_CLUSTER_INDEX) 
 			vc.addVertex(i, vertices[i]);
 
 	cout << "\t-----------------------------------------------" << endl 
@@ -383,8 +383,8 @@ void HSpatialDivision2::generateIndexedMesh()
 {
 	int i, vindex, i1, i2, i3;
 	HSDVertexCluster2 sdc;
-	HTripleIndex<Integer> tripleIndex;
-	list<Integer>::iterator iter;
+	HTripleIndex<uint> tripleIndex;
+	list<uint>::iterator iter;
 
 	for (i = 0; i < clusters.count(); i ++) {
 		sdc = clusters.get(i);
@@ -407,21 +407,21 @@ void HSpatialDivision2::generateIndexedMesh()
 	}
 }
 
-void HSpatialDivision2::searchConnectivity(Integer vIndex, Integer clusterIndex) {
+void HSpatialDivision2::searchConnectivity(uint vIndex, uint clusterIndex) {
 
-	list<Integer>::iterator iter;
-	HTripleIndex<Integer> f;
+	list<uint>::iterator iter;
+	HTripleIndex<uint> f;
 
 	vertices[vIndex].clusterIndex = clusterIndex;
 
 	for (iter = vertices[vIndex].adjacentFaces.begin(); iter != vertices[vIndex].adjacentFaces.end(); iter ++) {
 		f = faces[*iter];
 		// haven't been visited
-		if (vertices[f.i].clusterIndex == -1) 
+		if (vertices[f.i].clusterIndex == INVALID_CLUSTER_INDEX) 
 			searchConnectivity(f.i, clusterIndex);
-		if (vertices[f.j].clusterIndex == -1) 
+		if (vertices[f.j].clusterIndex == INVALID_CLUSTER_INDEX) 
 			searchConnectivity(f.j, clusterIndex);
-		if (vertices[f.k].clusterIndex == -1) 
+		if (vertices[f.k].clusterIndex == INVALID_CLUSTER_INDEX) 
 			searchConnectivity(f.k, clusterIndex);
 	}
 }

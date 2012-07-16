@@ -15,8 +15,8 @@ using std::vector;
 
 /* -- vertex -- */
 
-void HSDVertex::addConnectivity(Integer i) {
-	list<int>::iterator iter;
+void HSDVertex::addConnectivity(uint i) {
+	list<uint>::iterator iter;
 
 	// check if i has already existed
 	for (iter = connectedVerts.begin(); iter != connectedVerts.end(); iter ++) 
@@ -203,7 +203,7 @@ void HSpatialDivision::addVertex(HVertex v)
 	vertexCount ++;
 }
 
-void HSpatialDivision::addFace(HTripleIndex<Integer> i3)
+void HSpatialDivision::addFace(HTripleIndex<uint> i3)
 {
 	faces[faceCount] = i3;
 	faceCount ++;
@@ -254,9 +254,9 @@ void HSpatialDivision::addFace(HTripleIndex<Integer> i3)
 bool HSpatialDivision::readPly(char *filename)
 {
 	PlyStream plyStream;
-	Integer i;
+	uint i;
 	HVertex v;
-	HTripleIndex<Integer> f;
+	HTripleIndex<uint> f;
 
 	if (plyStream.openForRead(filename) == false) {
 		return false;
@@ -264,7 +264,7 @@ bool HSpatialDivision::readPly(char *filename)
 
 	// set the capacity for the gvl and gfl
 	vertices = new HSDVertex[plyStream.getVertexCount()];
-	faces = new HTripleIndex<Integer>[plyStream.getFaceCount()];
+	faces = new HTripleIndex<uint>[plyStream.getFaceCount()];
 	//vIndexMap.resize(plyStream.getVertexCount());
 	notifyVertSwap.vertices = vertices;
 	
@@ -598,7 +598,7 @@ void HSpatialDivision::generateIndexedMesh()
 {
 	int i, vindex, j, i1, i2, i3;
 	HSDVertexCluster sdc;
-	HTripleIndex<Integer> tripleIndex;
+	HTripleIndex<uint> tripleIndex;
 	int *indexMap = new int[vertexCount];
 
 	for (i = 0; i < clusters.count(); i ++) {
@@ -625,13 +625,13 @@ void HSpatialDivision::generateIndexedMesh()
 	delete[] indexMap;
 }
 
-void HSpatialDivision::splitConnectedRange(Integer start, Integer end)
+void HSpatialDivision::splitConnectedRange(uint start, uint end)
 {
 	if (start > end)
 		return;
 
 	int i;
-	list<Integer>::iterator iter;
+	list<uint>::iterator iter;
 	// local cluster index start from 1, 0 denotes that it hasn't been given a cluster id
 	unsigned short curCluster = 1;
 
@@ -689,9 +689,9 @@ void HSpatialDivision::splitConnectedRange(Integer start, Integer end)
 	delete[] partOf;
 }
 
-void HSpatialDivision::searchConnectivity(Integer vIndex, Integer rangeStart, Integer clusterIndex) {
+void HSpatialDivision::searchConnectivity(uint vIndex, uint rangeStart, uint clusterIndex) {
 
-	list<Integer>::iterator iter;
+	list<uint>::iterator iter;
 	vertices[vIndex].clusterIndex = clusterIndex;
 
 	for (iter = vertices[vIndex].connectedVerts.begin(); iter != vertices[vIndex].connectedVerts.end(); iter ++)

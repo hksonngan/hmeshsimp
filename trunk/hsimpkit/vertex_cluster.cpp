@@ -36,7 +36,7 @@ HVertex& HVertexCluster::
 
 /* --- HVertexClusterContainer --- */
 
-bool HVertexClusterContainer::create(Integer _x_partition, Integer _y_partition, Integer _z_partition)
+bool HVertexClusterContainer::create(uint _x_partition, uint _y_partition, uint _z_partition)
 {
 	x_partition = _x_partition; y_partition = _y_partition;
 	z_partition = _z_partition;
@@ -53,7 +53,7 @@ bool HVertexClusterContainer::create(Integer _x_partition, Integer _y_partition,
 
 bool HVertexClusterContainer::clear()
 {
-	Integer i, j, k;
+	uint i, j, k;
 
 	for (i = 0; i < x_partition; i ++)
 		for (j = 0; j < y_partition; j ++)
@@ -75,7 +75,7 @@ bool HVertexClusterContainer::clear()
 }
 
 // add a face qem to the cluster, create a cluster if the it doesn't exist
-bool HVertexClusterContainer::addFace(Integer i, Integer j, Integer k, HSoupTriangle tri)
+bool HVertexClusterContainer::addFace(uint i, uint j, uint k, HSoupTriangle tri)
 {
 	HVertexCluster* p_cluster = 
 		pp_cluster[i * y_partition * z_partition + j * z_partition + k];
@@ -94,7 +94,7 @@ bool HVertexClusterContainer::addFace(Integer i, Integer j, Integer k, HSoupTria
 	return true;
 }
 
-void HVertexClusterContainer::addVertex(Integer i, Integer j, Integer k, HVertex vertex)
+void HVertexClusterContainer::addVertex(uint i, uint j, uint k, HVertex vertex)
 {
 	HVertexCluster* p_cluster = 
 		pp_cluster[i * y_partition * z_partition + j * z_partition + k];
@@ -110,7 +110,7 @@ void HVertexClusterContainer::addVertex(Integer i, Integer j, Integer k, HVertex
 
 void HVertexClusterContainer::generateIndexForClusters()
 {
-	Integer i, j, k, c = 0;
+	uint i, j, k, c = 0;
 	HVertexCluster* p_cluster;
 
 	for (i = 0; i < x_partition; i ++)
@@ -128,7 +128,7 @@ void HVertexClusterContainer::generateIndexForClusters()
 
 void HVertexClusterContainer::calcAllRepresentativeVertices(RepCalcPolicy p)
 {
-	Integer i, j, k, c = 0;
+	uint i, j, k, c = 0;
 	HVertexCluster* p_cluster;
 
 	for (i = 0; i < x_partition; i ++)
@@ -165,7 +165,7 @@ HVertexClusterSimp::~HVertexClusterSimp()
 		<< "\tmaximum load factor: " << face_set.max_load_factor() << std::endl; 
 }
 
-bool HVertexClusterSimp::create(Integer _x_partition, Integer _y_partition, Integer _z_partition, RepCalcPolicy _p) {
+bool HVertexClusterSimp::create(uint _x_partition, uint _y_partition, uint _z_partition, RepCalcPolicy _p) {
 	x_partition = _x_partition; y_partition = _y_partition; 
 	z_partition = _z_partition;
 	vertex_clusters.create(x_partition, y_partition, z_partition);
@@ -201,9 +201,9 @@ void HVertexClusterSimp::clear()
 	z_slice = 0;
 }
 
-HTripleIndex<Integer> HVertexClusterSimp::retrieveIndex(HVertex v)
+HTripleIndex<uint> HVertexClusterSimp::retrieveIndex(HVertex v)
 {
-	HTripleIndex<Integer> i;
+	HTripleIndex<uint> i;
 
 	i.i = (int)((v.x - min_x) / x_slice);
 	if (i.i >= x_partition) {
@@ -224,7 +224,7 @@ HTripleIndex<Integer> HVertexClusterSimp::retrieveIndex(HVertex v)
 bool HVertexClusterSimp::addSoupTriangle(HSoupTriangle triangle)
 {
 	// index for three vertices in clusters
-	HTripleIndex<Integer> i1, i2, i3;
+	HTripleIndex<uint> i1, i2, i3;
 
 	if (x_slice == 0) {
 		x_slice = (max_x - min_x) / x_partition;
@@ -284,7 +284,7 @@ const char* getPolicyStr(RepCalcPolicy p)
 	return NULL;
 }
 
-void HVertexClusterSimp::getClusterRange(HTripleIndex<Integer> index, float &_max_x, float &_min_x, 
+void HVertexClusterSimp::getClusterRange(HTripleIndex<uint> index, float &_max_x, float &_min_x, 
 										 float &_max_y, float &_min_y, float &_max_z, float &_min_z)
 {
 	_min_x = min_x + index.i * x_slice;
@@ -319,7 +319,7 @@ bool HVertexClusterSimp::writeToPly(char* filename)
 	fout << "end_header" << std::endl;
 
 	/* write vertices */
-	Integer i, j, k, c = 0;
+	integer i, j, k, c = 0;
 	HVertexCluster* p_cluster;
 	float cmaxx, cminx, cmaxy, cminy, cmaxz, cminz;
 
@@ -333,7 +333,7 @@ bool HVertexClusterSimp::writeToPly(char* filename)
 					p_cluster->setVIndex(c);
 
 					// calculating representative vertex
-					getClusterRange(HTripleIndex<Integer>(i, j, k), cmaxx, cminx, cmaxy, cminy, cmaxz, cminz);
+					getClusterRange(HTripleIndex<uint>(i, j, k), cmaxx, cminx, cmaxy, cminy, cmaxz, cminz);
 					p_cluster->calcRepresentativeVertex(rep_calc_policy, cmaxx, cminx, cmaxy, cminy, cmaxz, cminz);
 
 					// write

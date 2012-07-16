@@ -7,36 +7,21 @@
  *  Email : waytofall916@gmail.com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
- *	
- *  This file is part of hmeshsimp.
- *
- *  hmeshsimp is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  hmeshsimp is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
 #ifndef __VERTEX_CLUSTER__
 #define __VERTEX_CLUSTER__
 
-//#include <hash_set>
-//#include <unordered_set>
 #include <cstddef>
 #include <iostream>
+#include <boost/unordered_map.hpp>
 #include "math/chapill_vec3.h"
 #include "math/chapill_vec4.h"
 #include "math/mat44.h"
 #include "util_common.h"
 #include "hash_face.h"
+
 
 
 /* =================== type & constants ================== */
@@ -78,7 +63,7 @@ public:
 	HVertex& getRepresentativeVertex() {
 		return representative_vertex; }
 
-	Integer getRepresentativeIndex() {
+	uint getRepresentativeIndex() {
 		return v_index; }
 
 	void addVertex(HVertex &vertex) {
@@ -87,10 +72,10 @@ public:
 		representative_vertex = representative_vertex * (((float)nverts - 1) / (float) nverts) + vertex * (1 / (float) nverts);
 	}
 
-	void setVIndex(Integer n) {
+	void setVIndex(uint n) {
 		v_index = n; }
 
-	Integer getVIndex() {
+	uint getVIndex() {
 		return v_index; }
 
 private:
@@ -98,52 +83,55 @@ private:
 	   metrics for the cluster */
 	HQEMatrix<float> qem;
 	/* vertex index in the simplified mesh */
-	Integer v_index;
+	uint v_index;
 	/* before inverting the qem to calculate the 
 	   minimum distance vertex, it stores the mean
-	   vertex iteratively
-	*/
+	   vertex iteratively */
 	HVertex representative_vertex;
 	/* vertices count */
-	Integer nverts;
+	uint nverts;
 };
+
+using boost::unordered::unordered_map;
+typedef unordered_map<HTripleIndex<uint>, HVertexCluster, HTripleIndexHash, HTripleIndexEqual> HClusterMap;
 
 /* vertex clusters container */
 class HVertexClusterContainer
 {
 public:
-	bool create(Integer _x_partition, Integer _y_partition, Integer _z_partition);
+	bool create(uint _x_partition, uint _y_partition, uint _z_partition);
 	bool clear();
 
-	HVertexCluster* get(const HTripleIndex<Integer> &index) {
+	HVertexCluster* get(const HTripleIndex<uint> &index) const {
 		return get(index.i, index.j, index.k); }
 
-	HVertexCluster* get(Integer i, Integer j, Integer k) {
+	HVertexCluster* get(const uint i, const uint j, const uint k) const {
 		return pp_cluster[i * y_partition * z_partition + j * z_partition + k]; }
 
-	bool exist(const HTripleIndex<Integer> &index) {
+	bool exist(const HTripleIndex<uint> &index) const {
 		return get(index) != NULL; }
 
-	bool exist(Integer i, Integer j, Integer k) {
+	bool exist(const uint i, const uint j, const uint k) const {
 		return get(i, j, k) != NULL; }
 
-	bool addFace(HTripleIndex<Integer> index, HSoupTriangle tri) {
+	bool addFace(HTripleIndex<uint> index, HSoupTriangle tri) {
 		addFace(index.i, index.j, index.k, tri);
 		return true;
 	}
 
 	// add a face qem to the cluster, create a cluster if the it doesn't exist
-	bool addFace(Integer i, Integer j, Integer k, HSoupTriangle tri);
+	// i, j, k is the cluster index
+	bool addFace(uint i, uint j, uint k, HSoupTriangle tri);
 
 	// add a vertex to a corresponding cluster for calculating of mean vertex
-	void addVertex(HTripleIndex<Integer> index, HVertex vertex){
+	void addVertex(HTripleIndex<uint> index, HVertex vertex){
 		addVertex(index.i, index.j, index.k, vertex); }
 
-	void addVertex(Integer i, Integer j, Integer k, HVertex vertex);
+	void addVertex(uint i, uint j, uint k, HVertex vertex);
 
 	void generateIndexForClusters();
 
-	Integer getValidClusterCount() {
+	uint getValidClusterCount() {
 		return valid_clusters; }
 
 	void calcAllRepresentativeVertices(RepCalcPolicy p);
@@ -151,11 +139,11 @@ public:
 private:
 	HVertexCluster **pp_cluster;
 	// partitions along different dimensions
-	Integer x_partition; Integer y_partition; Integer z_partition;
+	uint x_partition; uint y_partition; uint z_partition;
 	// maximum clusters
-	Integer cluster_count;
+	uint cluster_count;
 	// valid cluster count
-	Integer valid_clusters;
+	uint valid_clusters;
 };
 
 /* out-of-core vertex clustering algorithm */
@@ -164,14 +152,14 @@ class HVertexClusterSimp
 public:
 	HVertexClusterSimp();
 	~HVertexClusterSimp();
-	bool create(Integer _x_partition, Integer _y_partition, Integer _z_partition, RepCalcPolicy _p);
+	bool create(uint _x_partition, uint _y_partition, uint _z_partition, RepCalcPolicy _p);
 	void setBoundBox(float _max_x, float _min_x, float _max_y, float _min_y, float _max_z, float _min_z);
 	void clear();
 	bool addSoupTriangle(HSoupTriangle triangle);
 	bool generateIndexedMesh();
 	bool writeToPly(char* filename);
-	HTripleIndex<Integer> retrieveIndex(HVertex v);
-	void getClusterRange(HTripleIndex<Integer> index, float &_max_x, float &_min_x, float &_max_y, float &_min_y, float &_max_z, float &_min_z);
+	HTripleIndex<uint> retrieveIndex(HVertex v);
+	void getClusterRange(HTripleIndex<uint> index, float &_max_x, float &_min_x, float &_max_y, float &_min_y, float &_max_z, float &_min_z);
 
 private:
 	/* use hash map to store the degenerated face index */
@@ -179,7 +167,7 @@ private:
 	/* vertex clusters */
 	HVertexClusterContainer vertex_clusters;
 	/* partitions in x y z dimension */
-	Integer x_partition; Integer y_partition; Integer z_partition;
+	uint x_partition; uint y_partition; uint z_partition;
 	/* bound box */
 	float max_x, min_x; float max_y, min_y; float max_z, min_z;
 	float x_slice; float y_slice; float z_slice;

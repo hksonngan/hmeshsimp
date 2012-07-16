@@ -64,7 +64,7 @@ public:
 	}
 };
 
-/* type of degenerated face container */
+/* type of degenerated face container for vertex clustering */
 typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HFaceIndexSet; // HDegFaceContainer deprecated
 
 /* -- the HTripleIndex hash definitions -- */
@@ -75,9 +75,9 @@ typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEq
 class HTripleIndexHash
 {
 public:
-	size_t operator()(const HTripleIndex<Integer>& index) const {
+	size_t operator()(const HTripleIndex<uint>& index) const {
 		unsigned long h = 0;
-		Integer arr[3];
+		uint arr[3];
 
 		index.sortIndex(arr);
 
@@ -93,12 +93,12 @@ public:
 class HTripleIndexEqual
 {
 public:
-	bool operator()(const HTripleIndex<Integer>& h1, const HTripleIndex<Integer>& h2) const {
+	bool operator()(const HTripleIndex<uint>& h1, const HTripleIndex<uint>& h2) const {
 		return h1.unsequencedEqual(h2);
 	}
 };
 
-/* type of degenerated face container */
-typedef boost::unordered::unordered_set<HTripleIndex<Integer>, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
+/* type of degenerated face container for spatial division */
+typedef boost::unordered::unordered_set<HTripleIndex<uint>, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
 
 #endif //__HASH_FACE__
