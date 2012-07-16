@@ -521,6 +521,14 @@
 				RelativePath=".\divide_grid_mesh.h"
 				>
 			</File>
+			<File
+				RelativePath=".\mesh_patch.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mesh_patch.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\esorttest.cpp"
