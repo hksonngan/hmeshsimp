@@ -1,5 +1,6 @@
 /*
  *  The vertices and faces division algorithm algorithm is based on array self partition
+ *  This implementation is temporarily deprecated.
  *
  *  Codes about the algorithm of 'reverse spatial subdivision mesh simplification', 
  *  More detail please refer to 
@@ -12,22 +13,8 @@
  *  Email : waytofall916@gmail.com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
- *	
- *  This file is part of hmeshsimp.
- *
- *  hmeshsimp is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  hmeshsimp is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef __SPATIAL_DIVISION__
 #define __SPATIAL_DIVISION__
@@ -88,11 +75,11 @@ public:
 		awQ.setZero();
 		awN.Set(0.0, 0.0, 0.0);
 		area = 0.0;
-		clusterIndex = -1;
+		clusterIndex = INVALID_CLUSTER_INDEX;
 	}
 
-	void addConnectivity(Integer i);
-	inline void changeConnecIndices(Integer orig_i, Integer changed_i);
+	void addConnectivity(uint i);
+	inline void changeConnecIndices(uint orig_i, uint changed_i);
 
 public:
 	// area weighted quadric matrix
@@ -102,16 +89,16 @@ public:
 	// area, in fact the area computed is 3 times the de facto area
 	float area;
 	// cluster index, could be used as local cluster index when checking connectivity
-	Integer clusterIndex;
+	uint clusterIndex;
 	// connected vertices
-	list<Integer> connectedVerts;
+	list<uint> connectedVerts;
 	// index before moved
-	Integer oldIndex;
+	uint oldIndex;
 };
 
-void HSDVertex::changeConnecIndices(Integer orig_i, Integer changed_i) {
+void HSDVertex::changeConnecIndices(uint orig_i, uint changed_i) {
 
-	list<Integer>::iterator iter;
+	list<uint>::iterator iter;
 
 	for (iter = connectedVerts.begin(); iter != connectedVerts.end(); iter ++)
 		if (*iter == orig_i) {
@@ -174,9 +161,9 @@ private:
 	///
 
 	// vertex and face range in the gvl, gfl
-	Integer vRangeStart, vRangeEnd;
+	uint vRangeStart, vRangeEnd;
 	// vertex count
-	Integer vCount;
+	uint vCount;
 
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
@@ -305,7 +292,7 @@ public:
 	virtual bool operator() (HSDVertex v);
 
 private:
-	Integer cIndex;
+	uint cIndex;
 };
 
 /*  take such a connectivity as an example:
@@ -342,7 +329,7 @@ class NotifyVertSwap : public NotifySwap {
 	friend class HSpatialDivision;
 
 public:
-	virtual void operator() (Integer i, Integer j);
+	virtual void operator() (uint i, uint j);
 
 private:
 	/* change the connected indices after the swap
@@ -350,7 +337,7 @@ private:
 	 * changed_i:	changed index */
 	void ChangeConnecIndicesAfterSwap(int orig_i, int changed_i) {
 		
-		list<Integer>::iterator iter;
+		list<uint>::iterator iter;
 		HSDVertex vert = vertices[changed_i];
 		
 		for (iter = vert.connectedVerts.begin(); iter != vert.connectedVerts.end(); iter ++) {
@@ -386,7 +373,7 @@ public:
 	void addVertex(HVertex v);
 	// caution: better add the faces after 
 	// you've added all the vertices
-	void addFace(HTripleIndex<Integer> i3);
+	void addFace(HTripleIndex<uint> i3);
 	bool readPly(char *filename);
 	bool divide(int target_count);
 	bool toPly(char *filename);
@@ -424,16 +411,16 @@ private:
 	///
 
 	// split the range of vertices to connected vertex clusters
-	void splitConnectedRange(Integer start, Integer end);
+	void splitConnectedRange(uint start, uint end);
 	// recursively search the connectivity region
-	void searchConnectivity(Integer vIndex, Integer rangeStart, Integer clusterIndex);
+	void searchConnectivity(uint vIndex, uint rangeStart, uint clusterIndex);
 
 private:
 	// all the vertices, gvl
 	HSDVertex *vertices;
 	int vertexCount;
 	// all the faces, gfl
-	HTripleIndex<Integer> *faces;
+	HTripleIndex<uint> *faces;
 	int faceCount;
 	/// deprecated
 	// vertex index map

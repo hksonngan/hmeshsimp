@@ -34,9 +34,11 @@
 
 /* -- types & constants -- */
 
-/* integer index type */
-typedef int Integer;
+typedef int integer;
 typedef unsigned int uint;
+
+#define MAX_UINT	0xffffffff
+#define INVALID_CLUSTER_INDEX	MAX_UINT
 
 enum WhichSide
 { Side1, Side2 };
@@ -307,6 +309,7 @@ public:
 	ElemType i, j, k;
 
 private:
+	// assisting variable for sorting and comparing
 	static ElemType arr1[3], arr2[3], temp;
 	static int index1, index2, index3;
 };
@@ -319,6 +322,7 @@ template<class ElemType> int HTripleIndex<ElemType>::index2;
 template<class ElemType> int HTripleIndex<ElemType>::index3;
 
 typedef HTripleIndex<uint> HFace;
+typedef HTripleIndex<uint> HClusterIndex;
 
 /* face index: three HTripleIndex as cluster index */
 class HFaceIndex
@@ -326,11 +330,11 @@ class HFaceIndex
 public:
 	HFaceIndex() {}
 
-	HFaceIndex(HTripleIndex<Integer>& tr1, HTripleIndex<Integer>& tr2, HTripleIndex<Integer>& tr3) {
+	HFaceIndex(HTripleIndex<uint>& tr1, HTripleIndex<uint>& tr2, HTripleIndex<uint>& tr3) {
 		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
 	}
 
-	void set(HTripleIndex<Integer>& tr1, HTripleIndex<Integer>& tr2, HTripleIndex<Integer>& tr3) {
+	void set(HTripleIndex<uint>& tr1, HTripleIndex<uint>& tr2, HTripleIndex<uint>& tr3) {
 		this->v1CIndex = tr1; this->v2CIndex = tr2; this->v3CIndex = tr3;
 	}
 
@@ -356,6 +360,6 @@ public:
 	}
 
 public:
-	HTripleIndex<Integer> v1CIndex, v2CIndex, v3CIndex;
+	HTripleIndex<uint> v1CIndex, v2CIndex, v3CIndex;
 };
 #endif //__UTIL_COMMON__

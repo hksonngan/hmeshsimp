@@ -37,25 +37,10 @@
     Email : waytofall916@gmail.com
   
     Copyright (C) Ht-waytofall. All rights reserved.
-  	
-    This file is part of hmeshsimp.
-  
-    hmeshsimp is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-  
-    hmeshsimp is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-  
-    You should have received a copy of the GNU General Public License
-    along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __VERT_BIN__
-#define __VERT_BIN__
+#ifndef __LRU_CACHE__
+#define __LRU_CACHE__
 
 #include <fstream>
 #include <iostream>
@@ -63,13 +48,16 @@ using std::ifstream;
 using std::ofstream;
 
 
+#define LRU_SUCCESS	1
+#define LRU_FAIL	0
+
 /* ============================= & DEFINITION & ============================== */
 
 // if dump the cache to the file
 //#define _WRITE_CACHE_DEBUG
 
 /* you should inherit this class if you want to
-   use the lru cache, and make this class as the
+   use the LRU cache, and make this class as the
    template argument for the class template 'LRUCache' */
 class LRUVal {
 public:
@@ -128,20 +116,22 @@ public:
 	/* write */
 	int openForWrite(const char* filename);
 	int closeWriteFile();
-	int writeVertexFloat(float x, float y, float z);
 	int writeVal(ValType val);
 
 	/* read */
 	int initCache(unsigned int size);
 	int openForRead(const char* filename);
 	// read the value of the given index
-	ValType indexedRead(unsigned int index/*given index*/, ValType &val/*returned value*/);
+	ValType indexedRead(
+		unsigned int index,	/*given index*/ 
+		ValType &val);		/*returned value*/
 	int closeReadFile();
 
 	/* for debug */
 	void writeCacheDebug();
 	
 	/// deprecated
+	//int writeVertexFloat(float x, float y, float z);
 	//int indexedRead(unsigned int index);
 	//float getXFloat();
 	//float getYFloat();
@@ -203,9 +193,9 @@ int LRUCache<ValType, Equal>::openForWrite(const char *filename)
 	fout.open(filename, ios::out | ios::binary);
 
 	if(fout.good())
-		return 1;
+		return LRU_SUCCESS;
 	else
-		return 0;
+		return LRU_FAIL;
 }
 
 /// deprecated
@@ -227,10 +217,9 @@ int LRUCache<ValType, Equal>::openForWrite(const char *filename)
 
 template <class ValType, class Equal>
 int LRUCache<ValType, Equal>::writeVal(ValType val) {
-	if (val.write(fout)) {
-		return 1;
-	}
-	return 0;
+	if (val.write(fout)) 
+		return LRU_SUCCESS;
+	return LRU_FAIL;
 }
 
 template <class ValType, class Equal>
@@ -238,9 +227,9 @@ int LRUCache<ValType, Equal>::openForRead(const char* filename)
 {
 	fin.open(filename, ios::binary | ios::in);
 	if (fin.good())
-		return 1;
+		return LRU_SUCCESS;
 	else
-		return 0;
+		return LRU_FAIL;
 }
 
 template <class ValType, class Equal>
@@ -249,7 +238,7 @@ int LRUCache<ValType, Equal>::indexedRead(unsigned int index, ValType &val)
 	if (cache_size <= 0)
 	{
 		cerr << "#error : no cache while indexed reading" << endl;
-		return 0;
+		return LRU_FAIL;
 	}
 
 	read_count ++;
@@ -279,7 +268,7 @@ int LRUCache<ValType, Equal>::indexedRead(unsigned int index, ValType &val)
 		// current_unit = hit_unit;
 		val = hit_unit->val;
 		hit_count ++;
-		return 1;
+		return LRU_SUCCESS;
 	}
 
 	// the cache doesn't store the queried unit
@@ -311,7 +300,7 @@ int LRUCache<ValType, Equal>::indexedRead(unsigned int index, ValType &val)
 	writeCacheDebug();
 #endif
 
-	return 1;
+	return LRU_SUCCESS;
 }
 
 template <class ValType, class Equal>
@@ -323,10 +312,8 @@ int LRUCache<ValType, Equal>::initCache(unsigned int size)
 	cache_size = size;
 	cache_bucket = new __CacheUnit<ValType>*[cache_size];
 
-	for(unsigned int i = 0; i < cache_size; i ++)
-	{
+	for(int i = 0; i < cache_size; i ++)
 		cache_bucket[i] = NULL;
-	}
 
 	cache_count = 0;
 	lru_head = NULL;
@@ -335,7 +322,7 @@ int LRUCache<ValType, Equal>::initCache(unsigned int size)
 	read_count = 0; 
 	hit_count = 0;
 
-	return 1;
+	return LRU_SUCCESS;
 }
 
 // insert from head
@@ -436,9 +423,9 @@ int LRUCache<ValType, Equal>::indexedReadFromFile(unsigned int index, ValType &v
 	val.read(fin);
 
 	if (fin.good())
-		return 1;
+		return LRU_SUCCESS;
 	else
-		return 0;
+		return LRU_FAIL;
 }
 
 template <class ValType, class Equal>
@@ -446,7 +433,7 @@ int LRUCache<ValType, Equal>::closeWriteFile()
 {
 	fout.close();
 
-	return 1;
+	return LRU_SUCCESS;
 }
 
 template <class ValType, class Equal>
@@ -454,7 +441,7 @@ int LRUCache<ValType, Equal>::closeReadFile()
 {
 	fin.close();
 
-	return 1;
+	return LRU_SUCCESS;
 }
 
 //float LRUCache::getXFloat()
@@ -505,4 +492,4 @@ void LRUCache::writeCacheDebug()
 	fout.close();
 }
 
-#endif
+#endif //__LRU_CACHE__

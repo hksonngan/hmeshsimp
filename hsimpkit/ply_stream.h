@@ -64,17 +64,17 @@ public:
 	bool close();
 	inline bool nextVertex(HVertex &v);
 	inline bool nextFace(HFace &f);
-	inline bool nextFace(HTripleIndex<Integer> &f);
+	//inline bool nextFace(HTripleIndex<uint> &f);
 
-	Integer getVertexCount() { return vCount; };
-	Integer getFaceCount() { return fCount; };
+	uint getVertexCount() { return vCount; };
+	uint getFaceCount() { return fCount; };
 
 private:
 	PlyFile *ply;
-	Integer vCount;
-	Integer fCount;
-	Integer readVCount;
-	Integer readFCount;
+	uint vCount;
+	uint fCount;
+	uint readVCount;
+	uint readFCount;
 	Vertex vertex;
 	Face face;
 	PlyElement *vertexElem;
@@ -117,13 +117,13 @@ bool PlyStream::nextFace(HFace &f)
 	return true;
 }
 
-bool PlyStream::nextFace(HTripleIndex<Integer> &f) {
-	if (!nextFace(_face))
-		return false;
-	f.set(_face.i, _face.j, _face.k);
-
-	return true;
-}
+//bool PlyStream::nextFace(HTripleIndex<uint> &f) {
+//	if (!nextFace(_face))
+//		return false;
+//	f.set(_face.i, _face.j, _face.k);
+//
+//	return true;
+//}
 
 bool PlyStream::nextVertex(HVertex &v)
 {

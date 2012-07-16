@@ -16,22 +16,8 @@
  *  Email : waytofall916@gmail.com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
- *	
- *  This file is part of hmeshsimp.
- *
- *  hmeshsimp is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  hmeshsimp is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef __SPATIAL_DIVISION_2__
 #define __SPATIAL_DIVISION_2__
@@ -61,10 +47,8 @@ using std::list;
 using std::ofstream;
 using std::fstream;
 
-/* class defined */
-class HSDVertex2;
-class HSDVertexCluster2;
-class HSpatialDivision2;
+
+/*========================= & DEFINITION & ============================*/
 
 /* -- spatial division vertex -- */
 
@@ -76,7 +60,7 @@ public:
 		awQ.setZero();
 		awN.Set(0.0, 0.0, 0.0);
 		area = 0.0;
-		clusterIndex = -1;
+		clusterIndex = INVALID_CLUSTER_INDEX;
 	}
 
 public:
@@ -84,13 +68,15 @@ public:
 	HQEMatrix<float> awQ;
 	// area weighted normal
 	HNormal awN;
-	// area, in fact the area computed is 3 times the de facto area
+	// area, in fact the area computed is 3 times the de-facto area
 	float area;
 	// cluster index, could be used as local cluster index when checking connectivity
-	Integer clusterIndex;
+	uint clusterIndex;
 	// adjacent faces, used for checking connectivity
-	list<Integer> adjacentFaces;
+	list<uint> adjacentFaces;
 };
+
+ostream& operator <<(ostream &out, const HSDVertexCluster2& c);
 
 /* the cluster class, mostly a data maintaining class */
 class HSDVertexCluster2
@@ -104,8 +90,8 @@ public:
 public:
 	HSDVertexCluster2::HSDVertexCluster2() { weakClear(); }
 	~HSDVertexCluster2() { /*delete[] vIndices;*/ }
-	inline void addVertex(Integer i, HSDVertex2 v);
-	inline void addFace(Integer i);
+	inline void addVertex(uint i, HSDVertex2 v);
+	inline void addFace(uint i);
 	
 	bool operator <(const HSDVertexCluster2 &vc) const 
 		{ return getImportance() < vc.getImportance(); }
@@ -142,14 +128,105 @@ private:
 	// addVertex() and addFace() is called in case of 
 	// a waste of memory when value copied, remember 
 	// to delete the occupied memory space when discarding it
-	list<Integer> *vIndices;
-	list<Integer> *fIndices;
+	list<uint> *vIndices;
+	list<uint> *fIndices;
 
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
 };
 
-inline void HSDVertexCluster2::addVertex(Integer i, HSDVertex2 v)
+/* -- spatial division class, mostly a algorithm class -- */
+class HSpatialDivision2
+{
+	// constants
+private:
+	static const int INIT_HEAP_VOL = 10000; // initial heap capacity
+	static const float SPHERE_MEAN_NORMAL_THRESH; // threshold of the mean normal treated as a sphere
+	static const float MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE; // threshold of the ratio of maximum / minimum curvature treated as a hemisphere
+	static const int INIT_V_CAPACITY = 20000; // initial capacity for the vertex container
+	static const int INIT_F_CAPACITY = 35000; // initial capacity for the face container
+	static const float RANGE_MAX;
+
+public:
+	HSpatialDivision2();
+	~HSpatialDivision2();
+	inline void addVertex(HVertex v);
+	// caution: better add the faces after 
+	// you've added all the vertices
+	inline void addFace(HTripleIndex<uint> i3);
+	bool readPly(char *filename);
+	bool divide(int target_count);
+	bool toPly(char *filename);
+	// clear the vertex indices allocated in the heap of HSDVertexCluster
+	void clear();
+	void generateIndexedMesh();
+	void startTotalTime();
+	void totalTime();
+
+	int getVertexCount() { return vertexCount; }
+	int getFaceCount() { return faceCount; }
+
+private:
+	// partition the vertex cluster to 8 4 2 sub clusters 
+	// based on the 3 2 1 partition plane
+	inline void partition8(
+		HSDVertexCluster2 vc,
+		HNormal n1, float d1, HNormal n2, float d2,
+		HNormal n3, float d3);
+	inline void partition4(
+		HSDVertexCluster2 vc,
+		HNormal n1, float d1, HNormal n2, float d2);
+	inline void partition2(
+		HSDVertexCluster2 vc, 
+		HNormal n1, float d1);
+
+	// split the range of vertices to connected vertex clusters
+	inline void splitConnectedRange(HSDVertexCluster2 &vc);
+	/// deprecated: may cause stack overflow
+	// recursively depth-first search the connectivity region
+	void searchConnectivity(uint vIndex, uint clusterIndex);
+	///
+	// breadth-first search the connectivity
+	inline void searchConnectivityBF(uint vSrcIndex, uint clusterIndex);
+
+private:
+	// all the vertices, gvl
+	HSDVertex2 *vertices; int vertexCount;
+	// all the faces, gfl
+	HTripleIndex<uint> *faces; int faceCount;
+	// all the clusters in a heap
+	DoubleHeap<HSDVertexCluster2> clusters;
+	// degenerated face hash set
+	HTripleIndexSet degFaces;
+
+	// bounding box
+	float max_x, min_x, max_y, min_y, max_z, min_z;
+	float max_range;
+
+	/* some constantly used aiding variables */
+	WhichSide sideOfPlane1, sideOfPlane2, sideOfPlane3;
+	HSDVertexCluster2 vcArr[8];
+	HSDVertexCluster2 *vcArr2; int vcArr2Count;
+	list<uint> bfQueue; // queue used for breadth-first search
+
+#ifdef PRINT_DEBUG_INFO
+	// debug info
+	ofstream fdebug;
+#endif
+
+	// log file
+	ofstream flog;
+	HTime htime;
+	HTime total_time;
+};
+
+
+/*========================= & IMPLEMENTATION & ============================*/
+
+
+/* ---- HSDVertexCluster2 ---- */
+
+inline void HSDVertexCluster2::addVertex(uint i, HSDVertex2 v)
 {
 	if (vIndices == NULL || vIndices->size() == 0) {
 		max_x = v.x;
@@ -177,7 +254,7 @@ inline void HSDVertexCluster2::addVertex(Integer i, HSDVertex2 v)
 	}
 
 	if (vIndices == NULL) {
-		vIndices = new list<Integer>;
+		vIndices = new list<uint>;
 	}
 
 	vIndices->push_back(i);
@@ -190,10 +267,10 @@ inline void HSDVertexCluster2::addVertex(Integer i, HSDVertex2 v)
 	this->area += v.area;
 }
 
-inline void HSDVertexCluster2::addFace(Integer i)
+inline void HSDVertexCluster2::addFace(uint i)
 {
 	if (fIndices == NULL) {
-		fIndices = new list<Integer>;
+		fIndices = new list<uint>;
 	}
 
 	fIndices->push_back(i);
@@ -236,92 +313,7 @@ inline void HSDVertexCluster2::strongClear()
 	weakClear();
 }
 
-ostream& operator <<(ostream &out, const HSDVertexCluster2& c);
-
-/* -- spatial division class, mostly a algorithm class -- */
-class HSpatialDivision2
-{
-	// constants
-private:
-	static const int INIT_HEAP_VOL = 10000; // initial heap capacity
-	static const float SPHERE_MEAN_NORMAL_THRESH; // threshold of the mean normal treated as a sphere
-	static const float MAX_MIN_CURVATURE_RATIO_TREATED_AS_HEMISPHERE; // threshold of the ratio of maximum / minimum curvature treated as a hemisphere
-	static const int INIT_V_CAPACITY = 20000; // initial capacity for the vertex container
-	static const int INIT_F_CAPACITY = 35000; // initial capacity for the face container
-	static const float RANGE_MAX;
-
-public:
-	HSpatialDivision2();
-	~HSpatialDivision2();
-	inline void addVertex(HVertex v);
-	// caution: better add the faces after 
-	// you've added all the vertices
-	inline void addFace(HTripleIndex<Integer> i3);
-	bool readPly(char *filename);
-	bool divide(int target_count);
-	bool toPly(char *filename);
-	// clear the vertex indices allocated in the heap of HSDVertexCluster
-	void clear();
-	void generateIndexedMesh();
-	void startTotalTime();
-	void totalTime();
-
-	int getVertexCount() { return vertexCount; }
-	int getFaceCount() { return faceCount; }
-
-private:
-	// partition the vertex cluster to 8 4 2 sub clusters 
-	// based on the 3 2 1 partition plane
-	inline void partition8(
-		HSDVertexCluster2 vc,
-		HNormal n1, float d1, HNormal n2, float d2,
-		HNormal n3, float d3);
-	inline void partition4(
-		HSDVertexCluster2 vc,
-		HNormal n1, float d1, HNormal n2, float d2);
-	inline void partition2(
-		HSDVertexCluster2 vc, 
-		HNormal n1, float d1);
-
-	// split the range of vertices to connected vertex clusters
-	inline void splitConnectedRange(HSDVertexCluster2 &vc);
-	/// deprecated: may cause stack overflow
-	// recursively depth-first search the connectivity region
-	void searchConnectivity(Integer vIndex, Integer clusterIndex);
-	///
-	// breadth-first search the connectivity
-	inline void searchConnectivityBF(Integer vSrcIndex, Integer clusterIndex);
-
-private:
-	// all the vertices, gvl
-	HSDVertex2 *vertices; int vertexCount;
-	// all the faces, gfl
-	HTripleIndex<Integer> *faces; int faceCount;
-	// all the clusters in a heap
-	DoubleHeap<HSDVertexCluster2> clusters;
-	// degenerated face hash set
-	HTripleIndexSet degFaces;
-
-	// bounding box
-	float max_x, min_x, max_y, min_y, max_z, min_z;
-	float max_range;
-
-	/* some constantly used aiding variables */
- 	WhichSide sideOfPlane1, sideOfPlane2, sideOfPlane3;
-	HSDVertexCluster2 vcArr[8];
-	HSDVertexCluster2 *vcArr2; int vcArr2Count;
-	list<Integer> bfQueue; // queue used for breadth-first search
-
-#ifdef PRINT_DEBUG_INFO
-	// debug info
-	ofstream fdebug;
-#endif
-
-	// log file
-	ofstream flog;
-	HTime htime;
-	HTime total_time;
-};
+/* ---- HSpatialDivision2 ---- */
 
 inline void HSpatialDivision2::addVertex(HVertex v)
 {
@@ -354,7 +346,7 @@ inline void HSpatialDivision2::addVertex(HVertex v)
 	vertexCount ++;
 }
 
-inline void HSpatialDivision2::addFace(HTripleIndex<Integer> i3)
+inline void HSpatialDivision2::addFace(HTripleIndex<uint> i3)
 {
 	faces[faceCount] = i3;
 	faceCount ++;
@@ -404,8 +396,8 @@ inline void HSpatialDivision2::partition8(
 	HNormal n3, float d3) {
 
 	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex<Integer> f;
+	list<uint>::iterator iter;
+	HTripleIndex<uint> f;
 
 	for (i = 0; i < 8; i ++) {
 		vcArr[i].weakClear();
@@ -480,8 +472,8 @@ inline void HSpatialDivision2::partition4(
 	HNormal n1, float d1, HNormal n2, float d2) {
 
 	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex<Integer> f;
+	list<uint>::iterator iter;
+	HTripleIndex<uint> f;
 
 	for (i = 0; i < 4; i ++) {
 		vcArr[i].weakClear();
@@ -539,8 +531,8 @@ inline void HSpatialDivision2::partition2(
 	HNormal n1, float d1) {
 
 	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex<Integer> f;
+	list<uint>::iterator iter;
+	HTripleIndex<uint> f;
 
 	for (i = 0; i < 2; i ++) {
 		vcArr[i].weakClear();
@@ -590,8 +582,8 @@ inline void HSpatialDivision2::splitConnectedRange(HSDVertexCluster2 &vc)
 		return;
 
 	int i;
-	list<Integer>::iterator iter;
-	HTripleIndex<Integer> f;
+	list<uint>::iterator iter;
+	HTripleIndex<uint> f;
 	// local cluster index start from 0, -1 denotes that it hasn't been given a cluster id
 	int curCluster = 0;
 
@@ -607,13 +599,14 @@ inline void HSpatialDivision2::splitConnectedRange(HSDVertexCluster2 &vc)
 
 	// initialize cluster index for all the vertices as -1 (not assigned)
 	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++) {
-		vertices[*iter].clusterIndex = -1;
+		///!!! it was -1 before
+		vertices[*iter].clusterIndex = INVALID_CLUSTER_INDEX;
 	}
 
 	// search and assign the connected clusters the local cluster index
 	for (iter = vc.vIndices->begin(); iter != vc.vIndices->end(); iter ++)	{
 		// if the vertex hasn't been visited
-		if (vertices[*iter].clusterIndex == -1) {
+		if (vertices[*iter].clusterIndex == INVALID_CLUSTER_INDEX) {
 			searchConnectivityBF(*iter, curCluster);
 			curCluster ++;
 		}
@@ -664,11 +657,11 @@ inline void HSpatialDivision2::splitConnectedRange(HSDVertexCluster2 &vc)
 	}
 }
 
-inline void HSpatialDivision2::searchConnectivityBF(Integer vSrcIndex, Integer clusterIndex) {
+inline void HSpatialDivision2::searchConnectivityBF(uint vSrcIndex, uint clusterIndex) {
 	
-	Integer vIndex;
-	list<Integer>::iterator iter;
-	HTripleIndex<Integer> f;
+	uint vIndex;
+	list<uint>::iterator iter;
+	HTripleIndex<uint> f;
 
 	// push from front, pop from back
 	vertices[vSrcIndex].clusterIndex = clusterIndex;
@@ -681,15 +674,15 @@ inline void HSpatialDivision2::searchConnectivityBF(Integer vSrcIndex, Integer c
 		for (iter = vertices[vIndex].adjacentFaces.begin(); iter != vertices[vIndex].adjacentFaces.end(); iter ++) {
 			f = faces[*iter];
 			// haven't been visited
-			if (vertices[f.i].clusterIndex == -1) {
+			if (vertices[f.i].clusterIndex == INVALID_CLUSTER_INDEX) {
 				vertices[f.i].clusterIndex = clusterIndex;
 				bfQueue.push_front(f.i);
 			}
-			if (vertices[f.j].clusterIndex == -1) {
+			if (vertices[f.j].clusterIndex == INVALID_CLUSTER_INDEX) {
 				vertices[f.j].clusterIndex = clusterIndex;
 				bfQueue.push_front(f.j);
 			}
-			if (vertices[f.k].clusterIndex == -1) {
+			if (vertices[f.k].clusterIndex == INVALID_CLUSTER_INDEX) {
 				vertices[f.k].clusterIndex = clusterIndex;
 				bfQueue.push_front(f.k);
 			}
