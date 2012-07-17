@@ -11,7 +11,7 @@ PlyStream::PlyStream()
 	faceElem = NULL;
 }
 
-bool PlyStream::openForRead(char *filename)
+bool PlyStream::openForRead(const char *filename)
 {
 	int file_type;
 	int nelems;
