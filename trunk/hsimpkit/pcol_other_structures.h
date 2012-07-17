@@ -35,7 +35,7 @@
 
 
 /* The pairs stored in the priority queue should always point to the valid vertices, such that the
-deprecated pairs should be freed. Note that the pair_heap only stores a pointer to the real struct, 
+abandoned pairs should be freed. Note that the pair_heap only stores a pointer to the real struct, 
 and the 'adjacent_col_pairs' field also stores a pointer to the real 'CollapsablePair' structure
 located in operating system HEAP, so 'adjacent_col_pairs' field of different vertices in fact point 
 to the same struct if they are the same. This is similar to 'adjacent_faces' field which storing
@@ -84,7 +84,7 @@ public:
 	// indices of the two collapsable vertices
 	uint	vert1, vert2;
 	// don't know whether really need this. may
-	// be a waste of memory space. may be deprecated
+	// be a waste of memory space. may be abandoned
 	HVertex	new_vertex;
 };
 

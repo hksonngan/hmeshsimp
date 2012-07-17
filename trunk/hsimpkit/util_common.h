@@ -1,25 +1,10 @@
 /*
- *  Utility & common classes for algorithms
+ *  Utility & common definitions for algorithms
  *
  *  Author: Ht
  *  Email : waytofall916@gmail.com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
- *	
- *  This file is part of hmeshsimp.
- *
- *  hmeshsimp is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  hmeshsimp is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
@@ -31,6 +16,17 @@
 #include "math/mat44.h"
 #include "gfx/vec3.h"
 
+
+/* -- macros -- */
+
+#define WRITE_BLOCK(out, n, size)			out.write((char *)&n, size)
+#define WRITE_UINT(out, n)					out.write((char *)&n, sizeof(uint))
+
+#define READ_BLOCK(in, n, size)				in.read((char *)&n, size)
+#define READ_UINT(in, n)					in.read((char *)&n, sizeof(uint))
+
+#define C_READ_BLOCK(fp, n, size, count)	fread((void *)&n, size, count, fp)
+#define C_WRITE_BLOCK(fp, n, size, count)	fwrite((void *)&n, size, count, fp)
 
 /* -- types & constants -- */
 
@@ -361,5 +357,56 @@ public:
 
 public:
 	HTripleIndex<uint> v1CIndex, v2CIndex, v3CIndex;
+};
+
+class LRUVertex {
+public:
+	// binary(!) read
+	bool read(ifstream& fin) {
+
+		READ_BLOCK(fin, v.x, VERT_ITEM_SIZE);
+		READ_BLOCK(fin, v.y, VERT_ITEM_SIZE);
+		READ_BLOCK(fin, v.z, VERT_ITEM_SIZE);
+
+		if (fin.good())
+			return true;
+		return false; 
+	}
+
+	bool read(FILE *fp) { 
+
+		if (C_READ_BLOCK(fp, v.x, VERT_ITEM_SIZE, 1) != 1)
+			return false;
+		if (C_READ_BLOCK(fp, v.x, VERT_ITEM_SIZE, 1) != 1)
+			return false;
+		if (C_READ_BLOCK(fp, v.x, VERT_ITEM_SIZE, 1) != 1)
+			return false;
+
+		return true; 
+	}
+
+	// binary(!) write
+	bool write(ofstream& fout) { 
+
+		WRITE_BLOCK(fout, v.x, VERT_ITEM_SIZE);
+		WRITE_BLOCK(fout, v.y, VERT_ITEM_SIZE);
+		WRITE_BLOCK(fout, v.z, VERT_ITEM_SIZE);
+
+		if (fout.good())
+			return true;
+		return false; 
+	}
+
+	// hash the index
+	static unsigned int hash(unsigned int index) { return index; }
+	
+	// the size of the 
+	static size_t size() { return sizeof(HVertex); }
+
+public:
+	HVertex v;
+
+private:
+	static const uint VERT_ITEM_SIZE = sizeof(float);
 };
 #endif //__UTIL_COMMON__

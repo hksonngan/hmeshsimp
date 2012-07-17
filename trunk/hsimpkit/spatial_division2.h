@@ -182,7 +182,7 @@ private:
 
 	// split the range of vertices to connected vertex clusters
 	inline void splitConnectedRange(HSDVertexCluster2 &vc);
-	/// deprecated: may cause stack overflow
+	/// abandoned: may cause stack overflow
 	// recursively depth-first search the connectivity region
 	void searchConnectivity(uint vIndex, uint clusterIndex);
 	///

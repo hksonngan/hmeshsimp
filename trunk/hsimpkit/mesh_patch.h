@@ -28,12 +28,6 @@ using std::list;
 
 #define VERT_ITEM_SIZE sizeof(float)
 
-#define WRITE_BLOCK(out, n, size) out.write((char *)&n, size)
-#define WRITE_UINT(out, n) out.write((char *)&n, sizeof(uint))
-
-#define READ_BLOCK(in, n, size) in.read((char *)&n, size)
-#define READ_UINT(in, n) in.read((char *)&n, sizeof(uint))
-
 /* ================================ & DEFINITION & ============================= */
 
 class HIdVertex {

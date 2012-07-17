@@ -1,6 +1,6 @@
 /*
  *  The vertices and faces division algorithm algorithm is based on array self partition
- *  This implementation is temporarily deprecated.
+ *  This implementation is temporarily abandoned.
  *
  *  Codes about the algorithm of 'reverse spatial subdivision mesh simplification', 
  *  More detail please refer to 
@@ -115,21 +115,21 @@ class HSDVertexCluster
 public:
 	HSDVertexCluster();
 	~HSDVertexCluster() { /*delete[] vIndices;*/ }
-	/// deprecated
+	/// abandoned
 	//void addVertex(Integer i, HSDVertex v);
 	///
 	void addVertex(HSDVertex v);
 	bool operator< (const HSDVertexCluster &vc) const;
 	bool operator> (const HSDVertexCluster &vc) const;
 
-	/// deprecated
+	/// abandoned
 	//HSDVertexCluster& operator =(const HSDVertexCluster &vc);
 	///
 	
 	// clear the object
 	void weakClear();
 	
-	/// deprecated
+	/// abandoned
 	// clear the object and free the vIndices
 	void strongClear();
 	///
@@ -149,7 +149,7 @@ private:
 
 	float importance;
 
-	/// deprecated
+	/// abandoned
 	// vertices indices in the cluster.
 	// this pointer will be null unless
 	// the function addVertex() is called
@@ -394,7 +394,7 @@ private:
 	void partition2(
 		HSDVertexCluster vc, 
 		HNormal n1, float d1);
-	/// deprecated
+	/// abandoned
 	//void partition8(HSDVertexCluster vc, HSDVertexCluster &vc1,
 	//	HSDVertexCluster &vc2, HSDVertexCluster &vc3,
 	//	HSDVertexCluster &vc4, HSDVertexCluster &vc5,
@@ -422,7 +422,7 @@ private:
 	// all the faces, gfl
 	HTripleIndex<uint> *faces;
 	int faceCount;
-	/// deprecated
+	/// abandoned
 	// vertex index map
 	//HDynamArray<Integer> vIndexMap; 
 	///
