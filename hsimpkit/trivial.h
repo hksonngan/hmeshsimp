@@ -36,7 +36,7 @@ enum EndianOrder { H_BIG_ENDIAN, H_LITTLE_ENDIAN };
 // trim the extention of the file name and append some str
 extern void trimExtAndAppend(char *src, char *dst, char *app);
 
-// get file name without extensions
+// get file name without extensions and directory path
 extern string getFilename(const char *filepath);
 
 extern string getFileExtension(const char *filepath);

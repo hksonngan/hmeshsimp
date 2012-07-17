@@ -28,8 +28,6 @@ using std::ofstream;
 using std::cout;
 using std::endl;
 
-#define INFO_BUF_CAPACITY 4000
-
 typedef CollapsablePair* pCollapsablePair;
 
 static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePair &pair2) {
@@ -185,6 +183,7 @@ protected:
 	// constants
 	static const uint	DFLT_STAR_FACES = 6;
 	static const uint	DFLT_STAR_PAIRS = 6;
+	static const uint	INFO_BUF_CAPACITY = 1000;
 
 	/////////////////////////////////////
 	// assisting temporal variables

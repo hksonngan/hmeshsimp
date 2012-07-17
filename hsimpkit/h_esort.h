@@ -287,7 +287,7 @@ bool hESortCommon<ERadixRecordType>::set (
 
 	// create a directory for holding the patches
 	dir_name = getFilename(infilename);
-	dir_name += "_patches";
+	dir_name += "_esort_patches";
 	stringToCstr(dir_name, name_buf);
 	if (hCreateDir(name_buf) == false) {
 		cerr << "#hESortCommon::set(): can't create directory" << endl;

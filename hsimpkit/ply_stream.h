@@ -60,14 +60,16 @@ class PlyStream
 {
 public:
 	PlyStream();
-	bool openForRead(char *filename);
+	bool openForRead(const char *filename);
 	bool close();
 	inline bool nextVertex(HVertex &v);
 	inline bool nextFace(HFace &f);
 	//inline bool nextFace(HTripleIndex<uint> &f);
 
-	uint getVertexCount() { return vCount; };
-	uint getFaceCount() { return fCount; };
+	uint getVertexCount() const { return vCount; }
+	uint getFaceCount() const { return fCount; }
+
+	PlyFile* plyFile() const { return ply; }
 
 private:
 	PlyFile *ply;
