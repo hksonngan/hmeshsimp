@@ -65,7 +65,7 @@ public:
 };
 
 /* type of degenerated face container for vertex clustering */
-typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HFaceIndexSet; // HDegFaceContainer deprecated
+typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HFaceIndexSet;
 
 /* -- the HTripleIndex hash definitions -- */
 

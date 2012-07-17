@@ -1,59 +1,64 @@
 /*
-	Manipulations for the LRU cache file.
-
-	There is a least recent used hash cache
-	for reading, the hashed value is the index 
-	of the value. So the using scenario is that
-	there are some values that is too big to 
-	fit in the main memory while residing one
-	by one in the binary file, and there are
-	some reading mechanics that read the value
-	based on the location that they are residing 
-	in the disk (the index)
-
-	For writing, this is simple binary(!) stream 
-	writing.
-
-	The hash bucket with LRU list is like this
-
-	_____________        _____          _____
-	|bucket_head| ---->  |   | -> .. -> |   | -> Null
-	_____________        _____          _____
-	|bucket_head| ---->  |   | -> .. -> |   | -> Null
-	_____________        
-	|bucket_head| ---->  Null
-	
-	...
-	_____________        _____          _____
-	|bucket_head| ---->  |   | -> .. -> |   | -> Null
-
-	While all the nodes in the buckets are linked
-	based on the time they are accessed, thus the
-	newly accessed node are inserted into the head
-	of the LRU list, if it has already existed in
-	the list, it will be deleted from the list first
-
-    Author: Ht
-    Email : waytofall916@gmail.com
-  
-    Copyright (C) Ht-waytofall. All rights reserved.
-*/
+ *	Manipulations for the LRU cache file.
+ *
+ *	There is a least recent used hash cache
+ *	for reading, the hashed value is the index 
+ *	of the value. So the using scenario is that
+ *	there are some values that is too big to 
+ *	fit in the main memory while residing one
+ *	by one in the binary file, and there are
+ *	some reading mechanics that read the value
+ *	based on the location that they are residing 
+ *	in the disk (the index)
+ *
+ *	For writing, this is simple binary(!) stream 
+ *	writing.
+ *
+ *	The hash bucket with LRU list is like this
+ *
+ *	_____________        _____          _____
+ *	|bucket_head| ---->  |   | -> .. -> |   | -> Null
+ *	_____________        _____          _____
+ *	|bucket_head| ---->  |   | -> .. -> |   | -> Null
+ *	_____________        
+ *	|bucket_head| ---->  Null
+ *	
+ *	...
+ *	_____________        _____          _____
+ *	|bucket_head| ---->  |   | -> .. -> |   | -> Null
+ *
+ *	While all the nodes in the buckets are linked
+ *	based on the time they are accessed, thus the
+ *	newly accessed node are inserted into the head
+ *	of the LRU list, if it has already existed in
+ *	the list, it will be deleted from the list first
+ *
+ *  Author: Ht
+ *  Email : waytofall916@gmail.com
+ * 
+ *  Copyright (C) Ht-waytofall. All rights reserved.
+ */
 
 #ifndef __LRU_CACHE__
 #define __LRU_CACHE__
 
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
+
 using std::ifstream;
 using std::ofstream;
-
+using std::streampos;
+using std::cerr;
+using std::endl;
 
 #define LRU_SUCCESS	1
 #define LRU_FAIL	0
 
+
 /* ============================= & DEFINITION & ============================== */
 
-// if dump the cache to the file
+/* if dump the cache to the file */
 //#define _WRITE_CACHE_DEBUG
 
 /* you should inherit this class if you want to
@@ -62,23 +67,15 @@ using std::ofstream;
 class LRUVal {
 public:
 	// binary(!) read
-	virtual bool read(ifstream& fin) const = 0;
+	bool read(ifstream& fin) { return true; }
+	bool read(FILE *fp) { return true; }
 	// binary(!) write
-	virtual bool write(ofstream& fout) const = 0;
+	bool write(ofstream& fout) { return true; }
 	// hash the index
-	virtual static unsigned int hash(unsigned int index) const = 0;
-	// the size of the 
-	virtual static size_t size() = 0;
+	static unsigned int hash(unsigned int index) { return index; }
+	// the size of the data stored in file
+	static size_t size() { return 0; }
 };
-
-// the equal functor should look like this
-/*
-class Equal {
-public:
-	bool operator() (const ValType& val1, const ValType& val2) const {
-		return true;
-	}
-};*/
 
 /* the cache unit type */
 template <class ValType>
@@ -94,12 +91,10 @@ public:
 };
 
 /* least recent used cache */
-template <
-class ValType,	// type of the value contained in the cache, this type must be a derivative of LRUVal
-class Equal>	// the equal functor
+template <class ValType> /* type of the value contained in the cache, this type must be a derivative of LRUVal */
 class LRUCache
 {
-	/// deprecated
+	/// abandoned
 	//typedef struct __Vertex
 	//{
 	//	float x, y, z;
@@ -110,27 +105,30 @@ public:
 	LRUCache();
 	~LRUCache();
 
-	/* all the int returned value denotes success
-	   unless explicitly stated: 1-success 0-fail */ 
+	/* all the int returned value denotes success */ 
 
-	/* write */
+	/* ~ write ~ */
 	int openForWrite(const char* filename);
 	int closeWriteFile();
-	int writeVal(ValType val);
+	inline int writeVal(ValType &val);
 
-	/* read */
-	int initCache(unsigned int size);
-	int openForRead(const char* filename);
-	// read the value of the given index
-	ValType indexedRead(
+	/* ~ read ~ */
+	/// abandoned
+	//int openForRead(const char* filename);
+	void setReadFile(ifstream *_fin, streampos _start_pos);
+	void setReadFile(FILE *_fp, fpos_t _start_pos);
+	int initCache(unsigned int _buckets, unsigned int _size);
+	/* read the value of the given index */
+	int indexedRead(
 		unsigned int index,	/*given index*/ 
 		ValType &val);		/*returned value*/
-	int closeReadFile();
+	/// abandoned
+	//int closeReadFile();
 
 	/* for debug */
 	void writeCacheDebug();
 	
-	/// deprecated
+	/// abandoned
 	//int writeVertexFloat(float x, float y, float z);
 	//int indexedRead(unsigned int index);
 	//float getXFloat();
@@ -143,43 +141,53 @@ private:
 	void deleteBucketList(__CacheUnit<ValType> **head, __CacheUnit<ValType> *unit);
 	void insertLruList(__CacheUnit<ValType> *new_unit);
 	void deleteLruList(__CacheUnit<ValType> *unit);
-	int indexedReadFromFile(unsigned int index, ValType &val);
+	inline int indexedReadFromFile(unsigned int index, ValType &val);
 	
-	/// deprecated
+	/// abandoned
 	//int indexedReadFromFile(unsigned int index, float &x, float &y, float &z);
 	///
 
 private:
-	ifstream fin;
-	ofstream fout;
-	unsigned int cache_size;
-	unsigned int cache_count;
-	__CacheUnit<ValType> **cache_bucket;
-	__CacheUnit<ValType> *lru_head;
-	__CacheUnit<ValType> *lru_tail;
+	unsigned int			cache_size;
+	unsigned int			cache_count;
+	unsigned int			bucket_count;
+	__CacheUnit<ValType>	**cache_bucket;
+	__CacheUnit<ValType>	*lru_head;
+	__CacheUnit<ValType>	*lru_tail;
+
+	bool		cfile;
+	ifstream	*fin;
+	streampos	start_pos;
+	FILE		*fp;
+	fpos_t		start_pos_c;
+
+	ofstream	fout;
 	
-	/// deprecated
+	/// abandoned
 	//__CacheUnit *current_unit;
 	///
 
 public:
-	unsigned int read_count;
-	unsigned int hit_count;
+	unsigned int	read_count;
+	unsigned int	hit_count;
 };
 
 
 /* ============================= & IMPLEMENTATION & ============================== */
 
-template <class ValType, class Equal>
-LRUCache<ValType, Equal>::LRUCache()
+template <class ValType>
+LRUCache<ValType>::LRUCache()
 {
 	cache_bucket = NULL;
+	lru_head = NULL;
+	lru_tail = NULL;
 	cache_size = 0;
+	bucket_count = 0;
 	cache_count = 0;
 }
 
-template <class ValType, class Equal>
-LRUCache<ValType, Equal>::~LRUCache()
+template <class ValType>
+LRUCache<ValType>::~LRUCache()
 {
 	if (cache_bucket)
 	{
@@ -187,8 +195,8 @@ LRUCache<ValType, Equal>::~LRUCache()
 	}
 }
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::openForWrite(const char *filename)
+template <class ValType>
+int LRUCache<ValType>::openForWrite(const char *filename)
 {
 	fout.open(filename, ios::out | ios::binary);
 
@@ -198,7 +206,7 @@ int LRUCache<ValType, Equal>::openForWrite(const char *filename)
 		return LRU_FAIL;
 }
 
-/// deprecated
+/// abandoned
 //template <class ValType, class Equal>
 //int LRUCache<ValType, Equal>::writeVertexFloat(float x, float y, float z)
 //{
@@ -215,104 +223,53 @@ int LRUCache<ValType, Equal>::openForWrite(const char *filename)
 //}
 ///
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::writeVal(ValType val) {
+template <class ValType>
+int LRUCache<ValType>::writeVal(ValType &val) {
+
 	if (val.write(fout)) 
 		return LRU_SUCCESS;
 	return LRU_FAIL;
 }
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::openForRead(const char* filename)
-{
-	fin.open(filename, ios::binary | ios::in);
-	if (fin.good())
-		return LRU_SUCCESS;
-	else
-		return LRU_FAIL;
+//template <class ValType, class Equal>
+//int LRUCache<ValType, Equal>::openForRead(const char* filename)
+//{
+//	fin.open(filename, ios::binary | ios::in);
+//	if (fin.good())
+//		return LRU_SUCCESS;
+//	else
+//		return LRU_FAIL;
+//}
+
+template <class ValType>
+void LRUCache<ValType>::setReadFile(ifstream *_fin, streampos _start_pos) {
+
+	cfile = false;
+	fin = _fin;
+	start_pos = _start_pos;
 }
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::indexedRead(unsigned int index, ValType &val)
+template <class ValType>
+void LRUCache<ValType>::setReadFile(FILE *_fp, fpos_t _start_pos) {
+
+	cfile = true;
+	fp = _fp;
+	start_pos_c = _start_pos;
+}
+
+template <class ValType>
+int LRUCache<ValType>::initCache(unsigned int _buckets, unsigned int _size)
 {
-	if (cache_size <= 0)
-	{
-		cerr << "#error : no cache while indexed reading" << endl;
+	if (_buckets == 0 || _size == 0) {
+		cerr << "\t#ERROR in LRUCache::initCache: buckets count or cache size should not be zero" << endl;
 		return LRU_FAIL;
 	}
 
-	read_count ++;
+	bucket_count = _buckets;
+	cache_size = _size;
+	cache_bucket = new __CacheUnit<ValType>*[bucket_count];
 
-	// the bucket index of the value of the given index
-	int bucket_index = ValType::hash(index) % cache_size;
-	__CacheUnit<ValType> *hit_unit = NULL;
-
-	// check if the cache hit
-	if(cache_bucket[bucket_index])
-	{
-		__CacheUnit<ValType> *bucket_head;
-		for(bucket_head = cache_bucket[bucket_index]; bucket_head; bucket_head = bucket_head->bucket_next) 
-		{
-			if (bucket_head->index == index) {
-				hit_unit = bucket_head;
-				break;
-			}
-		}
-	}
-
-	// the the cache has the queried unit
-	if (hit_unit)
-	{
-		deleteLruList(hit_unit);
-		insertLruList(hit_unit);
-		// current_unit = hit_unit;
-		val = hit_unit->val;
-		hit_count ++;
-		return LRU_SUCCESS;
-	}
-
-	// the cache doesn't store the queried unit
-
-	// check if needed to delete the least recent used unit
-	if (cache_count == cache_size)
-	{
-		// delete the tail unit from the two lists
-		hit_unit = lru_tail;
-		//deleteBucketList(&cache_bucket[hit_unit->index % cache_size], hit_unit);
-		deleteBucketList(&cache_bucket[ValType::hash(hit_unit->index) % cache_size], hit_unit);
-		deleteLruList(hit_unit);
-	}
-	else
-	{
-		hit_unit =  new __CacheUnit<ValType>();
-		cache_count ++;
-	}
-
-	// hear hit_unit is the new unit need to inserted 
-	hit_unit->index = index;
-	//indexedReadFromFile(index, hit_unit->vert.x, hit_unit->vert.y, hit_unit->vert.z);
-	indexedReadFromFile(index, hit_unit->val);
-	insertBucketList(&cache_bucket[bucket_index], hit_unit);
-	insertLruList(hit_unit);
-	//current_unit = hit_unit;
-
-#ifdef _WRITE_CACHE_DEBUG
-	writeCacheDebug();
-#endif
-
-	return LRU_SUCCESS;
-}
-
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::initCache(unsigned int size)
-{
-	if(size <= 0)
-		return 0;
-
-	cache_size = size;
-	cache_bucket = new __CacheUnit<ValType>*[cache_size];
-
-	for(int i = 0; i < cache_size; i ++)
+	for(int i = 0; i < bucket_count; i ++)
 		cache_bucket[i] = NULL;
 
 	cache_count = 0;
@@ -325,9 +282,82 @@ int LRUCache<ValType, Equal>::initCache(unsigned int size)
 	return LRU_SUCCESS;
 }
 
+template <class ValType>
+int LRUCache<ValType>::indexedRead(unsigned int index, ValType &val)
+{
+	if (cache_size == 0 || bucket_count == 0)
+	{
+		cerr << "\t#ERROR in LRUCache::indexedRead : no cache while indexed reading" << endl;
+		return LRU_FAIL;
+	}
+
+	read_count ++;
+
+	/* the bucket index of the value of the given index */
+	int bucket_index = ValType::hash(index) % bucket_count;
+	__CacheUnit<ValType> *hit_unit = NULL;
+
+	/* check if the cache hit */
+	if(cache_bucket[bucket_index])
+	{
+		__CacheUnit<ValType> *bucket_node;
+		for(bucket_node = cache_bucket[bucket_index]; bucket_node; bucket_node = bucket_node->bucket_next) 
+		{
+			if (bucket_node->index == index) {
+				hit_unit = bucket_node;
+				break;
+			}
+		}
+	}
+
+	/* the the cache has the queried unit */
+	if (hit_unit)
+	{
+		deleteLruList(hit_unit);
+		insertLruList(hit_unit);
+		// current_unit = hit_unit;
+		val = hit_unit->val;
+		hit_count ++;
+		return LRU_SUCCESS;
+	}
+
+	/* the cache doesn't store the queried unit */
+
+	/* check if needed to delete the least recent used unit */
+	if (cache_count == cache_size)
+	{
+		// delete the tail unit from the two lists
+		hit_unit = lru_tail;
+		//deleteBucketList(&cache_bucket[hit_unit->index % cache_size], hit_unit);
+		deleteBucketList(&cache_bucket[ValType::hash(hit_unit->index) % bucket_count], hit_unit);
+		deleteLruList(hit_unit);
+	}
+	else
+	{
+		hit_unit =  new __CacheUnit<ValType>();
+		cache_count ++;
+	}
+
+	// here hit_unit is the new unit need to inserted 
+	hit_unit->index = index;
+	//indexedReadFromFile(index, hit_unit->vert.x, hit_unit->vert.y, hit_unit->vert.z);
+	indexedReadFromFile(index, hit_unit->val);
+	/* write the return value */
+	val = hit_unit->val;
+	insertBucketList(&cache_bucket[bucket_index], hit_unit);
+	insertLruList(hit_unit);
+	//current_unit = hit_unit;
+
+#ifdef _WRITE_CACHE_DEBUG
+	writeCacheDebug();
+#endif
+
+	return LRU_SUCCESS;
+}
+
 // insert from head
-template <class ValType, class Equal>
-void LRUCache<ValType, Equal>::insertBucketList(__CacheUnit<ValType> **head, __CacheUnit<ValType> *new_unit)
+template <class ValType>
+void LRUCache<ValType>::insertBucketList(__CacheUnit<ValType> **head, __CacheUnit<ValType> *new_unit)
 {
 	new_unit->bucket_prev = NULL;
 	new_unit->bucket_next = *head;
@@ -338,8 +368,8 @@ void LRUCache<ValType, Equal>::insertBucketList(__CacheUnit<ValType> **head, __C
 }
 
 // delete from any place
-template <class ValType, class Equal>
-void LRUCache<ValType, Equal>::deleteBucketList(__CacheUnit<ValType> **head, __CacheUnit<ValType> *unit)
+template <class ValType>
+void LRUCache<ValType>::deleteBucketList(__CacheUnit<ValType> **head, __CacheUnit<ValType> *unit)
 {
 	if(*head == NULL)
 		return;
@@ -356,8 +386,8 @@ void LRUCache<ValType, Equal>::deleteBucketList(__CacheUnit<ValType> **head, __C
 }
 
 // insert from the LRU list head
-template <class ValType, class Equal>
-void LRUCache<ValType, Equal>::insertLruList(__CacheUnit<ValType> *new_unit)
+template <class ValType>
+void LRUCache<ValType>::insertLruList(__CacheUnit<ValType> *new_unit)
 {
 	new_unit->use_prev = NULL;
 	new_unit->use_next = lru_head;
@@ -373,8 +403,8 @@ void LRUCache<ValType, Equal>::insertLruList(__CacheUnit<ValType> *new_unit)
 }
 
 // delete the '_CacheUnit *unit' from the LRU list in any place
-template <class ValType, class Equal>
-void LRUCache<ValType, Equal>::deleteLruList(__CacheUnit<ValType> *unit)
+template <class ValType>
+void LRUCache<ValType>::deleteLruList(__CacheUnit<ValType> *unit)
 {
 	if (lru_head == NULL)
 		return;
@@ -398,7 +428,7 @@ void LRUCache<ValType, Equal>::deleteLruList(__CacheUnit<ValType> *unit)
 	}
 }
 
-/// deprecated
+/// abandoned
 //template <class ValType, class Equal>
 //int LRUCache<ValType, Equal>::indexedReadFromFile(unsigned int index, float &x, float &y, float &z)
 //{
@@ -416,33 +446,45 @@ void LRUCache<ValType, Equal>::deleteLruList(__CacheUnit<ValType> *unit)
 //}
 ///
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::indexedReadFromFile(unsigned int index, ValType &val) {
+template <class ValType>
+int LRUCache<ValType>::indexedReadFromFile(unsigned int index, ValType &val) {
 
-	fin.seekg(index * ValType::size());
-	val.read(fin);
+	if (cfile) {
+		fsetpos(fp, start_pos_c);
+		// !! the range of fseek is less than 4G !!
+		fseek(fp, index * ValType::size(), SEEK_CUR);
 
-	if (fin.good())
-		return LRU_SUCCESS;
-	else
-		return LRU_FAIL;
+		if (val.read(fp))
+			return LRU_SUCCESS;
+		else
+			return LRU_FAIL;
+	}
+	else {
+		fin->seekg(start_pos + index * ValType::size());
+		fin->seekg(index * ValType::size(), fstream::cur);
+
+		if (val.read(*fin))
+			return LRU_SUCCESS;
+		else
+			return LRU_FAIL;
+	}
 }
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::closeWriteFile()
+template <class ValType>
+int LRUCache<ValType>::closeWriteFile()
 {
 	fout.close();
 
 	return LRU_SUCCESS;
 }
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::closeReadFile()
-{
-	fin.close();
-
-	return LRU_SUCCESS;
-}
+//template <class ValType>
+//int LRUCache<ValType>::closeReadFile()
+//{
+//	fin.close();
+//
+//	return LRU_SUCCESS;
+//}
 
 //float LRUCache::getXFloat()
 //{
@@ -459,15 +501,15 @@ int LRUCache<ValType, Equal>::closeReadFile()
 //	return current_unit->vert.z;
 //}
 
-template <class ValType, class Equal>
-void LRUCache::writeCacheDebug()
+template <class ValType>
+void LRUCache<ValType>::writeCacheDebug()
 {
 	int i, c1, c2;
 	using namespace std;
 	ofstream fout ("cache_dump.txt", ios::out | ios::app);
 	__CacheUnit<ValType> *pUnit;
 
-	for(i = 0, c1 = 0; i < cache_size; i ++)
+	for(i = 0, c1 = 0; i < bucket_count; i ++)
 	{
 		if (cache_bucket[i] == NULL)
 			continue;

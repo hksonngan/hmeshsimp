@@ -6,7 +6,7 @@
  copyleft : basically GPL
 *************************************/
 
-/* caution!! this file as well as 'ply_additional.h' may be deprecated due to the 'PlyStream' class defined */
+/* caution!! this file as well as 'ply_additional.h' may be abandoned due to the 'PlyStream' class defined */
 
 #ifndef __PLY_INC_H__
 #define __PLY_INC_H__
