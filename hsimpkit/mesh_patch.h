@@ -28,6 +28,14 @@ using std::list;
 
 #define VERT_ITEM_SIZE sizeof(float)
 
+/*
+ *  interior boundary vertex: the vertex belonging to the patch while adjacent to 
+ *    some triangles which has some vertices belonging to other patches
+ *
+ *  exterior boundary vertex: the vertex not belonging to the patch while adjacent
+ *    to some triangles which has some vertices belonging to the patch
+ */
+
 /* ================================ & DEFINITION & ============================= */
 
 class HIdVertex {

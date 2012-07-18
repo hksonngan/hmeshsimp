@@ -5,21 +5,6 @@
  *  Email : waytofall916@gmail.com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
- *	
- *  This file is part of hmeshsimp.
- *
- *  hmeshsimp is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  hmeshsimp is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
@@ -28,6 +13,8 @@
 
 #include "util_common.h"
 #include <boost/unordered_set.hpp>
+
+using boost::unordered::unordered_set;
 
 
 /* -- the face index (three uniform cluster index, 
@@ -65,13 +52,14 @@ public:
 };
 
 /* type of degenerated face container for vertex clustering */
-typedef boost::unordered::unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HFaceIndexSet;
+typedef unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HFaceIndexSet;
 
-/* -- the HTripleIndex hash definitions -- */
+/* -- the HTripleIndex<uint> hash definitions -- */
 
 /* -- hash -- */
 
 /* the hash functor */
+/* !!this name is a little improper, will change it or not */ 
 class HTripleIndexHash
 {
 public:
@@ -99,6 +87,6 @@ public:
 };
 
 /* type of degenerated face container for spatial division */
-typedef boost::unordered::unordered_set<HTripleIndex<uint>, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
+typedef unordered_set<HTripleIndex<uint>, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
 
 #endif //__HASH_FACE__

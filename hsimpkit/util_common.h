@@ -1,5 +1,8 @@
 /*
  *  Utility & common definitions for algorithms
+ *  They file may be separated for a better configuration strategy
+ *  Like separated to: 
+ *      -"common_def.h" -"common_geometric_type.h" -"h_math.h"
  *
  *  Author: Ht
  *  Email : waytofall916@gmail.com
@@ -15,6 +18,7 @@
 #include "math/chapill_vec4.h"
 #include "math/mat44.h"
 #include "gfx/vec3.h"
+#include "lru_cache.h"
 
 
 /* -- macros -- */
@@ -50,7 +54,6 @@ inline void assign(TVec3<T1> &v1, const ChapillVec3<T2> &v2) {
 	v1[1] = v2.y;
 	v1[2] = v2.z;
 }
-
 
 template<class T1, class T2>
 inline void assign(ChapillVec3<T1> &v1, const TVec3<T2> &v2) {
@@ -409,4 +412,7 @@ public:
 private:
 	static const uint VERT_ITEM_SIZE = sizeof(float);
 };
+
+typedef LRUCache<LRUVertex> VertexBinary;
+
 #endif //__UTIL_COMMON__

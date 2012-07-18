@@ -1,6 +1,12 @@
 #include "divide_grid_mesh.h"
 #include "trivial.h"
 
+/*
+ *  The occupancy rate in fact never surpasses 1%
+ *    -- [Shaffer. A Multi-resolution Representation for Massive Meshes]
+ */
+float HMeshGridDivide::MAX_OCCUPANCY = 0.1;
+
 bool HMeshGridDivide::readPlyFirst(const char* _ply_name) {
 
 	PlyStream ply_stream;
@@ -21,29 +27,19 @@ bool HMeshGridDivide::readPlyFirst(const char* _ply_name) {
 	face_count = ply_stream.getFaceCount();
 
 	PlyFile *ply = ply_stream.plyFile();
-	binary_file = false;
 
-	if (ply->file_type == PLY_BINARY_BE || ply->file_type == PLY_BINARY_LE) {
-		binary_file = true;
-		if(fgetpos(ply->fp, &vert_start) != 0) {
-			oss.clear();
-			oss << "\t#ERROR: get " << _ply_name << " pos failed" << endl;
-			info(oss);
-			return false;
-		}
-	}
-	else {
-		string file_name = tmp_base;
-		file_name += hPathSeperator();
-		file_name += getFilename(_ply_name) + ".vertbin";
-		
-		vertbin_name = new char[file_name.length() + 1];
-		stringToCstr(file_name, vertbin_name);
-		vert_bin.openForWrite(vertbin_name);
-	}
+	/* open vertex binary file for write */
+	string file_name = tmp_base;
+	file_name += hPathSeperator();
+	file_name += getFilename(_ply_name) + ".vertbin";
+	
+	vertbin_name = new char[file_name.length() + 1];
+	stringToCstr(file_name, vertbin_name);
+	vert_bin.openForWrite(vertbin_name);
 
-	/* the first pass */
+	/* read the vertices */
 	for (i = 0; i < ply_stream.getVertexCount(); i ++) {
+
 		ply_stream.nextVertex(v);
 		if (!addVertexFirst(i, v)) {
 			oss.clear();
@@ -51,10 +47,11 @@ bool HMeshGridDivide::readPlyFirst(const char* _ply_name) {
 			info(oss);
 			return false;
 		}
+
+
 	}
 
-	if (!binary_file)
-		vert_bin.closeWriteFile();
+	vert_bin.closeWriteFile();
 
 	oss << "\t_______________________________________________" << endl
 		<< "\tfirst pass complete reading" << endl
@@ -86,4 +83,12 @@ bool HMeshGridDivide::readPlySecond(uint _X, uint _Y, uint _Z) {
 		info(oss);
 		return false;
 	}
+
+	partitionInit();
+
+	vert_bin.openForRead(vertbin_name);
+
+	/* read the faces */
+
+	return true;
 }

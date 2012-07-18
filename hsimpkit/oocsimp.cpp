@@ -57,21 +57,21 @@ static void freePointersInFace(Face *face) {
 }
 
 /*
-	The thesis of [Lindstrom 2000] needs the input file
-	to be triangle soup, while the standard model input
-	is mostly indexed mesh, so I need some techniques
-	and investigation to try to first convert the indexed
-	mesh form to triangle soup. Converting it needs to
-	randomly access the vertex, which means constantly
-	irregular disk fetching, the way I solve this problem
-	is by using a hashing cache for constant time fetching
-	of cached unit while using LEAST RECENT USED strategy
-	to pop out the existing cached content when the cache
-	is full. Please refer to the class VertexBinary for
-	further information. Another approach for the transformation 
-	is using external sorts [Lindstrom.Silva 2001].
-	-- Ht
-*/
+ *	The thesis of [Lindstrom 2000] needs the input file
+ *	to be triangle soup, while the standard model input
+ *	is mostly indexed mesh, so I need some techniques
+ *	and investigation to try to first convert the indexed
+ *	mesh form to triangle soup. Converting it needs to
+ *	randomly access the vertex, which means constantly
+ *	irregular disk fetching, the way I solve this problem
+ *	is by using a hashing cache for constant time fetching
+ *	of cached unit while using LEAST RECENT USED strategy
+ *	to pop out the existing cached content when the cache
+ *	is full. Please refer to the class VertexBinary for
+ *	further information. Another approach for the transformation 
+ *	is using external sorts [Lindstrom.Silva 2001].
+ *	-- Ht
+ */
 
 int HOOCSimp::toTriangleSoup()
 {
