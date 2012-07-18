@@ -23,12 +23,15 @@
 #include "lru_cache.h"
 #include "ply_stream.h"
 #include "util_common.h"
+#include "mesh_patch.h"
 
 using std::ofstream;
 using std::ostringstream;
 using std::streampos;
 using std::string;
 using std::endl;
+
+using boost::unordered::unordered_map;
 
 /*
  *  The dividing algorithm takes two phase:
@@ -42,10 +45,29 @@ using std::endl;
 /* ========================== & DEFINITION & ======================= */
 
 /* map between grid index and the id of the patches */
-typedef boost::unordered::unordered_map<HTripleIndex<uint>, unsigned int, HTripleIndexHash, HTripleIndexEqual> HTripleIndexNumMap;
+
+//typedef 
+//unordered_map<
+//	HTripleIndex<uint>, unsigned int, 
+//	HTripleIndexHash, HTripleIndexEqual> 
+//HTripleIndexNumMap;
+
+typedef HTripleIndex<uint> HPatchIndex;
+typedef 
+unordered_map<
+	HPatchIndex, HMeshPatch, 
+	HTripleIndexHash, HTripleIndexEqual> 
+HIndexPatchMap;
 
 /* out-of-core mesh divide base on the uniform grid */
 class HMeshGridDivide {
+
+	/* $ constants $ */
+private:
+	static const uint INFO_BUF_SIZE = 1000;
+	static const float MAX_OCCUPANCY;
+	static const uint MAX_BUCKET_COUNT = 1000000;
+
 public:
 	HMeshGridDivide() {
 		vertbin_name = NULL;
@@ -81,12 +103,20 @@ private:
 	inline bool addVertexFirst(const int &i, const HVertex &v);
 
 	/* ~ partitioning ~ */
+	inline void partitionInit();
 	inline void getSlice();
-	inline void getGrid(HVertex &v, HTripleIndex<uint> &grid_index);
+	inline void getGridIndex(const HVertex &v, HTripleIndex<uint> &i);
 
 private:
-	/* a hash map, key is the grid coordinate, value is the index */
-	HTripleIndexNumMap gridIndexMap;
+	/* 
+	 * a hash map, key is the grid coordinate, 
+	 * value is the patch object 
+	 */
+	HIndexPatchMap indexPatchMap;
+
+	/* num of vertices & faces */
+	uint		vert_count;
+	uint		face_count;
 
 	/* bound box */
 	float		max_x, min_x; 
@@ -96,24 +126,21 @@ private:
 	uint		x_div, y_div, z_div;
 	float		x_slice, y_slice, z_slice;
 
-	uint		vert_count;
-	uint		face_count;
-
+	/* file name opened */
 	char		*file_name;
 
-	bool		binary_file;
-	fpos_t		vert_start;
+	/* vertex cache file */
 	char*		vertbin_name;
 	LRUCache<LRUVertex>	
 				vert_bin;
+
 	/* the temporary file base directory */
 	char*		tmp_base;
 	LRUVertex	tmpv;
 
+	/* return information */
 	char		INFO_BUF[INFO_BUF_SIZE];
 	uint		info_buf_len;
-
-	static const uint INFO_BUF_SIZE = 1000;
 };
 
 
@@ -168,10 +195,9 @@ bool HMeshGridDivide::addVertexFirst(const int &i, const HVertex &v) {
 			min_z = v.z;
 	}
 
-	if (!binary_file) {
-		tmpv.v = v;
-		vert_bin.writeVal(tmpv);
-	}
+	/* write to vertex binary file */
+	tmpv.v = v;
+	vert_bin.writeVal(tmpv);
 
 	return true;
 }
@@ -199,6 +225,40 @@ void HMeshGridDivide::getSlice() {
 	x_slice = (max_x - min_x) / x_div;
 	y_slice = (max_y - min_y) / y_div;
 	z_slice = (max_z - min_z) / z_div;
+}
+
+void HMeshGridDivide::partitionInit() {
+
+	getSlice();
+
+	uint hash_size = x_div * y_div * z_div * MAX_OCCUPANCY;
+
+	if (hash_size == 0)
+		hash_size = 1;
+	else if (hash_size > MAX_BUCKET_COUNT)
+		hash_size = MAX_BUCKET_COUNT;
+
+	/* alloc some buckets for the hash map */
+	indexPatchMap.rehash(hash_size);
+
+}
+
+void HMeshGridDivide::getGridIndex(const HVertex &v, HTripleIndex<uint> &i) {
+
+	i.i = (int)((v.x - min_x) / x_slice);
+	if (i.i >= x_div) {
+		i.i = x_div - 1;
+	}
+
+	i.j = (int)((v.y - min_y) / y_slice);
+	if (i.j >= y_div) {
+		i.j = y_div - 1;
+	}
+
+	i.k = (int)((v.z - min_z) / z_slice);
+	if (i.k >= z_div) {
+		i.k = z_div - 1;
+	}
 }
 
 #endif //__H_DIVIDE_GRID_MESH__
