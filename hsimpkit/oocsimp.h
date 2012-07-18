@@ -2,7 +2,7 @@
  *	Out-of-core algorithms implementation for hoocs
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */

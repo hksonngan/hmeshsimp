@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "patchingsimp", "patchingsimp.vcproj", "{437FA071-1E60-43B1-A481-93EE9CD8B238}"
+	ProjectSection(ProjectDependencies) = postProject
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6} = {448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}
+		{A03330D3-129A-4EB5-828C-0112EFE97B77} = {A03330D3-129A-4EB5-828C-0112EFE97B77}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsimpkit", "..\hsimpkit\hsimpkit.vcproj", "{A03330D3-129A-4EB5-828C-0112EFE97B77}"
 EndProject

@@ -329,7 +329,7 @@ class NotifyVertSwap : public NotifySwap {
 	friend class HSpatialDivision;
 
 public:
-	virtual void operator() (uint i, uint j);
+	virtual void operator() (int i, int j);
 
 private:
 	/* change the connected indices after the swap

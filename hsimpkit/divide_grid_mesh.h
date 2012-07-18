@@ -18,12 +18,13 @@
 #include <stdlib.h>
 #include <string>
 
-#include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "lru_cache.h"
 #include "ply_stream.h"
 #include "util_common.h"
 #include "mesh_patch.h"
+#include "hash_def.h"
 
 using std::ofstream;
 using std::ostringstream;
@@ -80,7 +81,7 @@ public:
 	 * the first pass
 	 * retrieve the bounding box and create the vertex binary file
 	 */
-	bool readPlyFirst(const char* _ply_name);
+	bool readPlyFirst(char* _ply_name);
 	/* 
 	 * the second pass
 	 * partition the mesh
@@ -88,9 +89,9 @@ public:
 	 */
 	bool readPlySecond(uint _X, uint _Y, uint _Z);
 	
-	char* info() const { return INFO_BUF; }
+	char* info() { return INFO_BUF; }
 	/* set the temporary file directory */
-	void tmpBase(const char *s) { tmp_base = s; }
+	void tmpBase(char *s) { tmp_base = s; }
 
 private:
 	/* ~ info ~ */
@@ -263,7 +264,7 @@ void HMeshGridDivide::partitionEnd() {
 
 		iter->second->closeForWrite();
 
-		oss << "\t  patch " << i << " - index: " << iter->first->i << "_" iter->first->j << "_" iter->first->k 
+		oss << "\t  patch " << i << " - index: " << iter->first.i << "_" << iter->first.j << "_" << iter->first.k 
 			<< " verts: " << iter->second->verts() << " ibverts: " << iter->second->interiors()
 			<< " ebverts: " << iter->second->exteriors() << " faces: " << iter->second->faces() << endl;
 	}
@@ -297,7 +298,7 @@ HGridPatch* HMeshGridDivide::getPatch(const HPatchIndex &pi) {
 	iter = indexPatchMap.find(pi);
 
 	if (iter != indexPatchMap.end()) 
-		return *iter;
+		return iter->second;
 
 	HGridPatch* pPatch = new HGridPatch();
 	indexPatchMap.insert(HIndexPatchMap::value_type(pi, pPatch));
@@ -309,7 +310,7 @@ HGridPatch* HMeshGridDivide::getPatch(const HPatchIndex &pi) {
 void HMeshGridDivide::addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3) {
 
 	HTripleIndex<uint> v1pindex, v2pindex, v3pindex;
-	HGridPatch* pPatch1, pPatch2, pPatch3;
+	HGridPatch *pPatch1, *pPatch2, *pPatch3;
 
 	getGridIndex(v1, v1pindex);
 	getGridIndex(v2, v2pindex);

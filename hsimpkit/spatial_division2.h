@@ -76,8 +76,6 @@ public:
 	list<uint> adjacentFaces;
 };
 
-ostream& operator <<(ostream &out, const HSDVertexCluster2& c);
-
 /* the cluster class, mostly a data maintaining class */
 class HSDVertexCluster2
 {
@@ -134,6 +132,8 @@ private:
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
 };
+
+ostream& operator <<(ostream &out, const HSDVertexCluster2& c);
 
 /* -- spatial division class, mostly a algorithm class -- */
 class HSpatialDivision2

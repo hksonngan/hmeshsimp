@@ -40,6 +40,7 @@
 #include <iostream>
 #include <stdio.h>
 
+using std::fstream;
 using std::ifstream;
 using std::ofstream;
 using std::streampos;
@@ -88,13 +89,6 @@ public:
 template <class ValType> /* type of the value contained in the cache, this type must be a derivative of LRUVal */
 class LRUCache
 {
-	/// abandoned
-	//typedef struct __Vertex
-	//{
-	//	float x, y, z;
-	//} __Vertex;
-	///
-
 public:
 	LRUCache();
 	~LRUCache();
@@ -120,14 +114,6 @@ public:
 	/* for debug */
 	void writeCacheDebug();
 	
-	/// abandoned
-	//int writeVertexFloat(float x, float y, float z);
-	//int indexedRead(unsigned int index);
-	//float getXFloat();
-	//float getYFloat();
-	//float getZFloat();
-	///
-
 private:
 	void insertBucketList(__CacheUnit<ValType> **head, __CacheUnit<ValType> *new_unit);
 	void deleteBucketList(__CacheUnit<ValType> **head, __CacheUnit<ValType> *unit);
@@ -135,10 +121,6 @@ private:
 	void deleteLruList(__CacheUnit<ValType> *unit);
 
 	inline int indexedReadFromFile(unsigned int index, ValType &val);
-	
-	/// abandoned
-	//int indexedReadFromFile(unsigned int index, float &x, float &y, float &z);
-	///
 
 private:
 	unsigned int			cache_size;
@@ -150,16 +132,12 @@ private:
 
 	bool		cfile;
 	ifstream	*fin;
-	ifstream	&fin_obj;
+	ifstream	fin_obj;
 	streampos	start_pos;
 	FILE		*fp;
 	fpos_t		start_pos_c;
 
 	ofstream	fout;
-	
-	/// abandoned
-	//__CacheUnit *current_unit;
-	///
 
 public:
 	unsigned int	read_count;
@@ -192,30 +170,13 @@ LRUCache<ValType>::~LRUCache()
 template <class ValType>
 int LRUCache<ValType>::openForWrite(const char *filename)
 {
-	fout.open(filename, ios::out | ios::binary);
+	fout.open(filename, fstream::out | fstream::binary);
 
 	if(fout.good())
 		return LRU_SUCCESS;
 	else
 		return LRU_FAIL;
 }
-
-/// abandoned
-//template <class ValType, class Equal>
-//int LRUCache<ValType, Equal>::writeVertexFloat(float x, float y, float z)
-//{
-//	if (!fout.good())
-//	{
-//		return 0;
-//	}
-//
-//	fout.write((char*)&x, sizeof(float));
-//	fout.write((char*)&y, sizeof(float));
-//	fout.write((char*)&z, sizeof(float));
-//
-//	return 1;
-//}
-///
 
 template <class ValType>
 int LRUCache<ValType>::writeVal(ValType &val) {
@@ -225,12 +186,15 @@ int LRUCache<ValType>::writeVal(ValType &val) {
 	return LRU_FAIL;
 }
 
-template <class ValType, class Equal>
-int LRUCache<ValType, Equal>::openForRead(const char* filename)
+template <class ValType>
+int LRUCache<ValType>::openForRead(const char* filename)
 {
-	fin_obj.open(filename, ios::binary | ios::in);
+	fin_obj.open(filename, fstream::binary | fstream::in);
+	
 	fin = &fin_obj;
 	start_pos = 0 /*fstream::beg*/;
+	cfile = false;
+
 	if (fin_obj.good())
 		return LRU_SUCCESS;
 	else
@@ -373,7 +337,7 @@ void LRUCache<ValType>::deleteBucketList(__CacheUnit<ValType> **head, __CacheUni
 	if(*head == unit) {
 		*head = unit->bucket_next;
 	}
-	if (unit->bucket_prev) 
+	if (unit->bucket_prev) {
 		unit->bucket_prev->bucket_next = unit->bucket_next;
 	}
 	if (unit->bucket_next) {
@@ -428,7 +392,7 @@ template <class ValType>
 int LRUCache<ValType>::indexedReadFromFile(unsigned int index, ValType &val) {
 
 	if (cfile) {
-		fsetpos(fp, start_pos_c);
+		fsetpos(fp, &start_pos_c);
 		// !! the range of fseek is less than 4G !!
 		fseek(fp, index * ValType::size(), SEEK_CUR);
 
@@ -438,7 +402,7 @@ int LRUCache<ValType>::indexedReadFromFile(unsigned int index, ValType &val) {
 			return LRU_FAIL;
 	}
 	else {
-		fin->seekg(start_pos + index * ValType::size());
+		fin->seekg( start_pos + (long) (index * ValType::size()) );
 		fin->seekg(index * ValType::size(), fstream::cur);
 
 		if (val.read(*fin))
