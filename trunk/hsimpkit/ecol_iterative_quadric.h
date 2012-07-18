@@ -3,7 +3,7 @@
  *  You can refer to THE PAPER (you must have known it)
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */

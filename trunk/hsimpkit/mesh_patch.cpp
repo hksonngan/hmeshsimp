@@ -64,7 +64,7 @@ bool HMeshPatch::closeForWrite() {
 	for (interior_iter = interior_bound.begin(); interior_iter != interior_bound.end(); interior_iter ++) 
 		interior.push_back(*interior_iter);
 	interior_bound.clear();
-	sort(interior.pointer(0), interior.pointer(0) + interior.count());
+	std::sort(interior.pointer(0), interior.pointer(0) + interior.count());
 
 	for (i = 0, interior_count = 0; i < interior.count(); interior_count ++) {
 
@@ -87,7 +87,7 @@ bool HMeshPatch::closeForWrite() {
 	exterior.resize(exterior_bound.size());
 	for (exterior_iter = exterior_bound.begin(); exterior_iter != exterior_bound.end(); exterior_iter ++) 
 		exterior.push_back(*exterior_iter);
-	sort(exterior.pointer(0), exterior.pointer(0) + exterior.count());
+	std::sort(exterior.pointer(0), exterior.pointer(0) + exterior.count());
 	exterior_bound.clear();
 
 	for (i = 0, exterior_count = 0; i < exterior.count(); exterior_count ++) {
@@ -133,7 +133,7 @@ bool HMeshPatch::closeForWrite() {
 	return true;
 }
 
-bool HMeshPatch::openForWrite(const char* vert_name, const char* face_name) {
+bool HMeshPatch::openForRead(const char* vert_name, const char* face_name) {
 
 	vert_in.open(vert_name, fstream::binary | fstream::in);
 	if (!vert_in.good()) {
@@ -174,8 +174,11 @@ bool HIBTriangles::openIBTFileForWrite(const char* dir_path) {
 	char buf[__FILE_NAME_BUF_SIZE];
 	uint n = 0;
 
-	string str = dir_path;
-	str += hPathSeperator();
+	string str;
+	if (dir_path) {
+		str = dir_path;
+		str += hPathSeperator();
+	}
 	str += "interior_boundary_triangles";
 	stringToCstr(str, buf);
 
@@ -205,8 +208,11 @@ bool HIBTriangles::openIBTFileForRead(const char* dir_path) {
 
 	char buf[__FILE_NAME_BUF_SIZE];
 
-	string str = dir_path;
-	str += hPathSeperator();
+	string str;
+	if (dir_path) {
+		str = dir_path;
+		str += hPathSeperator();
+	}
 	str += "interior_boundary_triangles";
 	stringToCstr(str, buf);
 
@@ -237,17 +243,22 @@ bool HGridPatch::openForWrite(const char* dir_path, const HTripleIndex<uint> gri
 	getVertPatchName(grid_index, vert_name);
 	getFacePatchName(grid_index, face_name);
 
-	str = dir_path;
-	str += hPathSeperator();
+	if (dir_path) {
+		str = dir_path;
+		str += hPathSeperator();
+	}
 	str += vert_name;
 	stringToCstr(str, vert_name);
 
-	str = dir_path;
-	str += hPathSeperator();
+	str.clear();
+	if (dir_path) {
+		str = dir_path;
+		str += hPathSeperator();
+	}
 	str += face_name;
 	stringToCstr(str, face_name);
 
-	if(!openForWrite(vert_name, face_name))
+	if(!HMeshPatch::openForWrite(vert_name, face_name))
 		return false;
 	return true;
 }
@@ -260,17 +271,22 @@ bool HGridPatch::openForRead(const char* dir_path, const HTripleIndex<uint> grid
 	getVertPatchName(grid_index, vert_name);
 	getFacePatchName(grid_index, face_name);
 
-	str = dir_path;
-	str += hPathSeperator();
+	if (dir_path) {
+		str = dir_path;
+		str += hPathSeperator();
+	}
 	str += vert_name;
 	stringToCstr(str, vert_name);
 
-	str = dir_path;
-	str += hPathSeperator();
+	str.clear();
+	if (dir_path) {
+		str = dir_path;
+		str += hPathSeperator();
+	}
 	str += face_name;
 	stringToCstr(str, face_name);
 
-	if(!openForRead(vert_name, face_name))
+	if(!HMeshPatch::openForRead(vert_name, face_name))
 		return false;
 	return true;
 }

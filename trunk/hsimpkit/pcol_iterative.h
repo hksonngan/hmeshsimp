@@ -2,7 +2,7 @@
  *  Iteratively perform the vertex pair collapse
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
@@ -164,6 +164,12 @@ public:
 	void clear();
 
 protected:
+	/////////////////////////////////////
+	// constants
+	static const uint	DFLT_STAR_FACES = 6;
+	static const uint	DFLT_STAR_PAIRS = 6;
+	static const uint	INFO_BUF_CAPACITY = 1000;
+
 	HDynamArray<CollapsableVertex>	vertices;
 	uint	valid_verts;
 	HDynamArray<CollapsableFace>	faces;
@@ -178,12 +184,6 @@ protected:
 	uint	info_buf_len;
 
 	HAugTime read_time, run_time, write_time;
-
-	/////////////////////////////////////
-	// constants
-	static const uint	DFLT_STAR_FACES = 6;
-	static const uint	DFLT_STAR_PAIRS = 6;
-	static const uint	INFO_BUF_CAPACITY = 1000;
 
 	/////////////////////////////////////
 	// assisting temporal variables

@@ -1,13 +1,15 @@
 #include "divide_grid_mesh.h"
 #include "trivial.h"
+#include "os_dependent.h"
+
 
 /*
  *  The occupancy rate in fact never surpasses 1%
  *    -- [Shaffer. A Multi-resolution Representation for Massive Meshes]
  */
-float HMeshGridDivide::MAX_OCCUPANCY = 0.01;
+const float HMeshGridDivide::MAX_OCCUPANCY = 0.01;
 
-bool HMeshGridDivide::readPlyFirst(const char* _ply_name) {
+bool HMeshGridDivide::readPlyFirst(char* _ply_name) {
 
 	PlyStream ply_stream;
 	int i;
@@ -31,8 +33,11 @@ bool HMeshGridDivide::readPlyFirst(const char* _ply_name) {
 	PlyFile *ply = ply_stream.plyFile();
 
 	/* open vertex binary file for write */
-	string file_name = tmp_base;
-	file_name += hPathSeperator();
+	string file_name;
+	if (tmp_base) {
+		file_name = tmp_base;
+		file_name += hPathSeperator();
+	}
 	file_name += getFilename(_ply_name) + ".vertbin";
 	
 	vertbin_name = new char[file_name.length() + 1];
@@ -49,10 +54,6 @@ bool HMeshGridDivide::readPlyFirst(const char* _ply_name) {
 			info(oss);
 			return false;
 		}
-
-		getGridIndex(v, pi);
-		pPatch = getPatch(pi);
-		pPatch->addInteriorVertex(v);
 	}
 
 	vert_bin.closeWriteFile();
@@ -79,7 +80,7 @@ bool HMeshGridDivide::readPlySecond(uint _X, uint _Y, uint _Z) {
 	HVertex v;
 	HTripleIndex<uint> face, pi;
 	ostringstream oss;
-	HGridPatch pPatch;
+	HGridPatch *pPatch;
 
 	x_div = _X;
 	y_div = _Y;
@@ -101,7 +102,7 @@ bool HMeshGridDivide::readPlySecond(uint _X, uint _Y, uint _Z) {
 
 		getGridIndex(v, pi);
 		pPatch = getPatch(pi);
-		pPatch->addInteriorVertex(v);
+		pPatch->addInteriorVertex(i, v);
 	}
 
 	vert_bin.openForRead(vertbin_name);
