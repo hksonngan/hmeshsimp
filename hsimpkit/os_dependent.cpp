@@ -9,9 +9,13 @@
 
 bool hCreateDir(char *dir_path)
 {
-	CreateDirectory(dir_path, NULL);
+	if (CreateDirectory(dir_path, NULL))
+		return true;
 
-	return true;
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+		return true;
+
+	return false;
 }
 
 inline extern char* hPathSeperator()
