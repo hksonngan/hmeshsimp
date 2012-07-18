@@ -4,7 +4,7 @@
  *    [Lindstrom] Out-of-Core Simplification of Large Polygonal Models
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
@@ -20,8 +20,7 @@
 #include "math/chapill_vec4.h"
 #include "math/mat44.h"
 #include "util_common.h"
-#include "hash_face.h"
-
+#include "hash_def.h"
 
 
 /* =================== type & constants ================== */

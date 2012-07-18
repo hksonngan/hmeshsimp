@@ -2,7 +2,7 @@
  *  Divide the mesh based on the uniform grid
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
@@ -33,6 +33,7 @@ using std::endl;
 
 using boost::unordered::unordered_map;
 
+
 /*
  *  The dividing algorithm takes two phase:
  *  1. retrieve the bounding box and create the
@@ -44,19 +45,13 @@ using boost::unordered::unordered_map;
 
 /* ========================== & DEFINITION & ======================= */
 
-/* map between grid index and the id of the patches */
-
-//typedef 
-//unordered_map<
-//	HTripleIndex<uint>, unsigned int, 
-//	HTripleIndexHash, HTripleIndexEqual> 
-//HTripleIndexNumMap;
+/* map between grid index and the patch object */
 
 typedef HTripleIndex<uint> HPatchIndex;
 typedef 
 unordered_map<
-	HPatchIndex, HMeshPatch, 
-	HTripleIndexHash, HTripleIndexEqual> 
+	HPatchIndex, HGridPatch*, 
+	HTripleIndexHash, HTripleIndexSequencedEqual> 
 HIndexPatchMap;
 
 /* out-of-core mesh divide base on the uniform grid */
@@ -81,10 +76,14 @@ public:
 	}
 
 	/* ~ ply file read ~ */
-	/* the first pass */
+	/* 
+	 * the first pass
+	 * retrieve the bounding box and create the vertex binary file
+	 */
 	bool readPlyFirst(const char* _ply_name);
 	/* 
 	 * the second pass
+	 * partition the mesh
 	 * X Y Z: x y z axis division count 
 	 */
 	bool readPlySecond(uint _X, uint _Y, uint _Z);
@@ -104,8 +103,11 @@ private:
 
 	/* ~ partitioning ~ */
 	inline void partitionInit();
+	inline void partitionEnd();
 	inline void getSlice();
 	inline void getGridIndex(const HVertex &v, HTripleIndex<uint> &i);
+	inline HGridPatch* getPatch(const HPatchIndex &pi);
+	inline void addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3);
 
 private:
 	/* 
@@ -113,6 +115,7 @@ private:
 	 * value is the patch object 
 	 */
 	HIndexPatchMap indexPatchMap;
+	HIBTriangles ibt;
 
 	/* num of vertices & faces */
 	uint		vert_count;
@@ -241,6 +244,33 @@ void HMeshGridDivide::partitionInit() {
 	/* alloc some buckets for the hash map */
 	indexPatchMap.rehash(hash_size);
 
+	ibt.openIBTFileForWrite(tmp_base);
+}
+
+void HMeshGridDivide::partitionEnd() {
+
+	HIndexPatchMap::iterator iter;
+	ostringstream oss;
+	int i;
+
+	ibt.closeIBTFileForWrite();
+
+	oss << "\t_______________________________________________" << endl
+		<< "\tsecond pass complete" << endl
+		<< "\tpatch count:\t" << indexPatchMap.size() << endl;
+
+	for (iter = indexPatchMap.begin(), i = 0; iter != indexPatchMap.end(); iter ++, i ++) {
+
+		iter->second->closeForWrite();
+
+		oss << "\t  patch " << i << " - index: " << iter->first->i << "_" iter->first->j << "_" iter->first->k 
+			<< " verts: " << iter->second->verts() << " ibverts: " << iter->second->interiors()
+			<< " ebverts: " << iter->second->exteriors() << " faces: " << iter->second->faces() << endl;
+	}
+
+	oss << endl;
+
+	info(oss);
 }
 
 void HMeshGridDivide::getGridIndex(const HVertex &v, HTripleIndex<uint> &i) {
@@ -258,6 +288,115 @@ void HMeshGridDivide::getGridIndex(const HVertex &v, HTripleIndex<uint> &i) {
 	i.k = (int)((v.z - min_z) / z_slice);
 	if (i.k >= z_div) {
 		i.k = z_div - 1;
+	}
+}
+
+HGridPatch* HMeshGridDivide::getPatch(const HPatchIndex &pi) {
+
+	HIndexPatchMap::iterator iter;
+	iter = indexPatchMap.find(pi);
+
+	if (iter != indexPatchMap.end()) 
+		return *iter;
+
+	HGridPatch* pPatch = new HGridPatch();
+	indexPatchMap.insert(HIndexPatchMap::value_type(pi, pPatch));
+
+	pPatch->openForWrite(tmp_base, pi);
+	return pPatch;
+}
+
+void HMeshGridDivide::addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3) {
+
+	HTripleIndex<uint> v1pindex, v2pindex, v3pindex;
+	HGridPatch* pPatch1, pPatch2, pPatch3;
+
+	getGridIndex(v1, v1pindex);
+	getGridIndex(v2, v2pindex);
+	getGridIndex(v3, v3pindex);
+
+	if (v1pindex == v2pindex && v1pindex == v3pindex ) {
+
+		pPatch1 = getPatch(v1pindex);
+		pPatch1->addFace(face);
+	}
+	else if (v1pindex == v2pindex && v1pindex != v3pindex) {
+
+		ibt.addIBTriangle(face);
+
+		pPatch1 = getPatch(v1pindex);
+		pPatch2 = getPatch(v3pindex);
+
+		pPatch1->addFace(face);
+		pPatch2->addFace(face);
+
+		pPatch1->addInteriorBound(face.i);
+		pPatch1->addInteriorBound(face.j);
+		pPatch1->addExteriorBound(face.k, v3);
+
+		pPatch2->addInteriorBound(face.k);
+		pPatch2->addExteriorBound(face.i, v1);
+		pPatch2->addExteriorBound(face.j, v2);
+	}
+	else if (v1pindex == v3pindex && v1pindex != v2pindex) {
+
+		ibt.addIBTriangle(face);
+
+		pPatch1 = getPatch(v1pindex);
+		pPatch2 = getPatch(v2pindex);
+
+		pPatch1->addFace(face);
+		pPatch2->addFace(face);
+
+		pPatch1->addInteriorBound(face.i);
+		pPatch1->addInteriorBound(face.k);
+		pPatch1->addExteriorBound(face.j, v2);
+
+		pPatch2->addInteriorBound(face.j);
+		pPatch2->addExteriorBound(face.i, v1);
+		pPatch2->addExteriorBound(face.k, v3);
+	}
+	else if (v2pindex == v3pindex && v1pindex != v2pindex) {
+
+		ibt.addIBTriangle(face);
+
+		pPatch1 = getPatch(v2pindex);
+		pPatch2 = getPatch(v1pindex);
+
+		pPatch1->addFace(face);
+		pPatch2->addFace(face);
+
+		pPatch1->addInteriorBound(face.j);
+		pPatch1->addInteriorBound(face.k);
+		pPatch1->addExteriorBound(face.i, v1);
+
+		pPatch2->addInteriorBound(face.i);
+		pPatch2->addExteriorBound(face.j, v2);
+		pPatch2->addExteriorBound(face.k, v3);
+	}
+	else /*(v1pindex != v2pindex && v1pindex != v3pindex)*/ {
+
+		ibt.addIBTriangle(face);
+
+		pPatch1 = getPatch(v1pindex);
+		pPatch2 = getPatch(v2pindex);
+		pPatch3 = getPatch(v3pindex);
+
+		pPatch1->addFace(face);
+		pPatch2->addFace(face);
+		pPatch3->addFace(face);
+
+		pPatch1->addInteriorBound(face.i);
+		pPatch1->addExteriorBound(face.j, v2);
+		pPatch1->addExteriorBound(face.k, v3);
+
+		pPatch2->addInteriorBound(face.j);
+		pPatch2->addExteriorBound(face.i, v1);
+		pPatch2->addExteriorBound(face.k, v3);
+
+		pPatch3->addInteriorBound(face.k);
+		pPatch3->addExteriorBound(face.i, v1);
+		pPatch3->addExteriorBound(face.j, v2);
 	}
 }
 

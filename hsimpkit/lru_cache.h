@@ -27,7 +27,7 @@
  *	the list, it will be deleted from the list first.
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  * 
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
