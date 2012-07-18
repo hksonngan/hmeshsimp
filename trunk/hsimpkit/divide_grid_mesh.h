@@ -91,7 +91,7 @@ public:
 	
 	char* info() { return INFO_BUF; }
 	/* set the temporary file directory */
-	void tmpBase(char *s) { tmp_base = s; }
+	bool tmpBase(char *s);
 
 private:
 	/* ~ info ~ */
@@ -108,7 +108,7 @@ private:
 	inline void getSlice();
 	inline void getGridIndex(const HVertex &v, HTripleIndex<uint> &i);
 	inline HGridPatch* getPatch(const HPatchIndex &pi);
-	inline void addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3);
+	inline bool addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3);
 
 private:
 	/* 
@@ -307,7 +307,7 @@ HGridPatch* HMeshGridDivide::getPatch(const HPatchIndex &pi) {
 	return pPatch;
 }
 
-void HMeshGridDivide::addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3) {
+bool HMeshGridDivide::addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3) {
 
 	HTripleIndex<uint> v1pindex, v2pindex, v3pindex;
 	HGridPatch *pPatch1, *pPatch2, *pPatch3;
@@ -399,6 +399,8 @@ void HMeshGridDivide::addFaceToPatch(const HTripleIndex<uint> &face, const HVert
 		pPatch3->addExteriorBound(face.i, v1);
 		pPatch3->addExteriorBound(face.j, v2);
 	}
+
+	return true;
 }
 
 #endif //__H_DIVIDE_GRID_MESH__

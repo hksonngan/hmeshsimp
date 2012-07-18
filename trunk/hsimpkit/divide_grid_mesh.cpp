@@ -9,6 +9,12 @@
  */
 const float HMeshGridDivide::MAX_OCCUPANCY = 0.01;
 
+bool HMeshGridDivide::tmpBase(char *s) { 
+
+	tmp_base = s; 
+	return hCreateDir(s);
+}
+
 bool HMeshGridDivide::readPlyFirst(char* _ply_name) {
 
 	PlyStream ply_stream;
@@ -102,7 +108,9 @@ bool HMeshGridDivide::readPlySecond(uint _X, uint _Y, uint _Z) {
 
 		getGridIndex(v, pi);
 		pPatch = getPatch(pi);
-		pPatch->addInteriorVertex(i, v);
+
+		if (!pPatch->addInteriorVertex(i, v))
+			return false;
 	}
 
 	vert_bin.openForRead(vertbin_name);
