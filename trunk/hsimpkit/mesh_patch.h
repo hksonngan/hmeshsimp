@@ -2,7 +2,7 @@
  *  The patch class in a patching simplification
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
@@ -86,12 +86,12 @@ public:
 
 public:
 	uint vert_count;
+	uint interior_count;
+	uint exterior_count;
 	uint face_count;
 
 	list<uint> interior_bound;
-	uint interior_count;
 	list<HIdVertex> exterior_bound;
-	uint exterior_count;
 
 private:
 	ofstream vert_out;

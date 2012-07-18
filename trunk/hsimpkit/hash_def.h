@@ -2,14 +2,14 @@
  *  All about hash sets containing degenerated faces
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
 
 
-#ifndef __HASH_FACE__
-#define __HASH_FACE__
+#ifndef __HASH_DEF__
+#define __HASH_DEF__
 
 #include "util_common.h"
 #include <boost/unordered_set.hpp>
@@ -43,6 +43,7 @@ public:
 };
 
 /* the equal functor */
+/* !! this should be the unsequenced equal !! */
 class HFaceIndexEqual
 {
 public:
@@ -77,7 +78,7 @@ public:
 	}
 };
 
-/* the equal functor */
+/* the unsequenced equal functor (which means <1,2,3> = <2,1,3>) */
 class HTripleIndexEqual
 {
 public:
@@ -89,4 +90,13 @@ public:
 /* type of degenerated face container for spatial division */
 typedef unordered_set<HTripleIndex<uint>, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
 
-#endif //__HASH_FACE__
+/* the sequenced equal functor (which means <1,2,3> != <2,1,3>) */
+class HTripleIndexSequencedEqual
+{
+public:
+	bool operator()(const HTripleIndex<uint>& h1, const HTripleIndex<uint>& h2) const {
+		return h1 == h2;
+	}
+};
+
+#endif //__HASH_DEF__

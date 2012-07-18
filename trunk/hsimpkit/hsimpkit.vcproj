@@ -302,7 +302,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\hash_face.h"
+				RelativePath=".\hash_def.h"
 				>
 			</File>
 			<File

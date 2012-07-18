@@ -10,7 +10,7 @@
  *    [Shaffer & Garland]	Efficient Adaptive Simplification of Massive Meshes
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
@@ -29,7 +29,7 @@
 
 #include "util_common.h"
 #include "vertex_cluster.h"
-#include "hash_face.h"
+#include "hash_def.h"
 #define PRINT_HEAP
 #include "double_heap.h"
 #include "h_algorithm.h"

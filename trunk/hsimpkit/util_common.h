@@ -5,7 +5,7 @@
  *      -"common_def.h" -"common_geometric_type.h" -"h_math.h"
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
+ *  Email : waytofall916 at gmail dot com
  *
  *  Copyright (C) Ht-waytofall. All rights reserved.
  */
