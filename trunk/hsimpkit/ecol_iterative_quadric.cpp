@@ -99,6 +99,7 @@ void QuadricEdgeCollapse::collectPairs() {
 				evaluatePair(new_pair);
 				addCollapsablePair(new_pair);
 
+				// add boundary constraint
 				if (boundary_weight > 0) {
 					collectEdgeFaces(i, starVertices[j], _faces);
 					// is the boundary edge
