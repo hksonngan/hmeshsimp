@@ -25,20 +25,20 @@ bool HMeshPatch::openForWrite(const char* vert_name, const char* face_name) {
 
 	vert_out.open(vert_name, fstream::binary | fstream::out);
 	if (!vert_out.good()) {
-		cerr << "#ERROR: " << vert_name << " vertex file open failed" << endl;
+		cerr << "#ERROR: " << vert_name << " vertex file open for write failed" << endl;
 		return false;
 	}
 	// count of vertices
-	vert_out.write((char *)&n, sizeof(uint));
+	WRITE_UINT(vert_out, n);
 	// count of interior boundary vertices
-	vert_out.write((char *)&n, sizeof(uint));
+	WRITE_UINT(vert_out, n);
 	// count of exterior boundary vertices
-	vert_out.write((char *)&n, sizeof(uint));
+	WRITE_UINT(vert_out, n);
 
 
 	face_out.open(face_name, fstream::binary | fstream::out);
 	if (!face_out.good()) {
-		cerr << "#ERROR: " << face_name << " face file open failed" << endl;
+		cerr << "#ERROR: " << face_name << " face file open for write failed" << endl;
 		return false;
 	}
 	// count of faces
@@ -124,7 +124,6 @@ bool HMeshPatch::closeForWrite() {
 	WRITE_UINT(face_out, face_count);
 
 	face_out.close();
-	face_out.close();
 	if (!face_out.good()) {
 		cerr << "#ERROR: close face file failed" << endl;
 		return false;
@@ -137,7 +136,7 @@ bool HMeshPatch::openForRead(const char* vert_name, const char* face_name) {
 
 	vert_in.open(vert_name, fstream::binary | fstream::in);
 	if (!vert_in.good()) {
-		cerr << "#ERROR: " << vert_name << " vertex file open failed" << endl;
+		cerr << "#ERROR: " << vert_name << " vertex file open for read failed" << endl;
 		return false;
 	}
 	// count of vertices
@@ -149,7 +148,7 @@ bool HMeshPatch::openForRead(const char* vert_name, const char* face_name) {
 
 	face_in.open(face_name, fstream::binary | fstream::in);
 	if (!face_in.good()) {
-		cerr << "#ERROR: " << face_name << " face file open failed" << endl;
+		cerr << "#ERROR: " << face_name << " face file open for read failed" << endl;
 		return false;
 	}
 	// count of faces
@@ -184,7 +183,7 @@ bool HIBTriangles::openIBTFileForWrite(const char* dir_path) {
 
 	ibt_out.open(buf, fstream::binary | fstream::out);
 	// count of triangles
-	ibt_out.write((char *)&n, sizeof(uint));
+	WRITE_UINT(ibt_out, n);
 	if (ibt_out.good())
 		return true;
 	cerr << "#ERROR: open interior boundary triangles file for write failed" << endl;
@@ -195,7 +194,7 @@ bool HIBTriangles::closeIBTFileForWrite() {
 
 	// write the count of triangles to the beginning of the file
 	ibt_out.seekp(0);
-	ibt_out.write((char *)&face_count, sizeof(uint));
+	WRITE_UINT(ibt_out, face_count);
 
 	ibt_out.close();
 	if (ibt_out.good())
