@@ -4,24 +4,7 @@
  *		-the face in vertex collapse
  *
  *  Author: Ht
- *  Email : waytofall916@gmail.com
- *
- *  Copyright (C) Ht-waytofall. All rights reserved.
- *	
- *  This file is part of hmeshsimp.
- *
- *  hmeshsimp is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  hmeshsimp is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with hmeshsimp.  If not, see <http://www.gnu.org/licenses/>.
+ *  Email : waytofall916 at gmail dot com
  */
 
 #ifndef __PCOL_OTHER__
@@ -88,13 +71,6 @@ public:
 	HVertex	new_vertex;
 };
 
-//class QuadricPair: public CollapsablePair {
-//public:
-//	
-//public:
-//	
-//};
-
 /* Like the pairs, the vertex indices always point
    to the valid vertices, so the indices may be
    changed along the collapse. But if it is invalidated,
@@ -102,8 +78,8 @@ public:
 class CollapsableFace: public HTripleIndex<uint> {
 public:
 	CollapsableFace() { mark = 0; }
-	void markFace(unsigned char m) { mark = m; }
-	bool markIs(unsigned char m) { return mark == m; }
+	void markFace(uchar m) { mark = m; }
+	bool markIs(uchar m) { return mark == m; }
 	void invalidate() { markFace(FACE_INVALID); }
 	bool valid() { return mark != FACE_INVALID && indexValid(); }
 
@@ -132,7 +108,7 @@ public:
 
 private:
 	// face marking
-	unsigned char	mark;
+	uchar	mark;
 };
 
 #endif //__PCOL_OTHER__

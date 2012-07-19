@@ -92,7 +92,8 @@ void QuadricEdgeCollapse::collectPairs() {
 		collectStarVertices(i, &starVertices);
 		for (j = 0; j < starVertices.count(); j ++)
 			// add specific edge only once
-			if (i < starVertices[j]) {
+			// never collapse the exterior vertices
+			if (i < starVertices[j] && !vertices[i].exterior() && !vertices[starVertices[j]].exterior()) {
 
 				CollapsablePair *new_pair = new CollapsablePair(i, starVertices[j]);
 				evaluatePair(new_pair);

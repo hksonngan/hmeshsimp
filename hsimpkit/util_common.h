@@ -36,9 +36,9 @@
 
 typedef int integer;
 typedef unsigned int uint;
+typedef unsigned char uchar;
 
-#define MAX_UINT	0xffffffff
-#define INVALID_CLUSTER_INDEX	MAX_UINT
+#define INVALID_CLUSTER_INDEX	UINT_MAX
 
 enum WhichSide
 { Side1, Side2 };

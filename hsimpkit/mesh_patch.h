@@ -26,19 +26,24 @@ using std::fstream;
 using std::ostringstream;
 using std::list;
 
-#define VERT_ITEM_SIZE sizeof(float)
-
 
 /*
+ *  interior boundary triangle: the triangle which has some vertices belonging to 
+ *	  different patches
+ *
  *  interior boundary vertex: the vertex belonging to the patch while adjacent to 
- *    some triangles which has some vertices belonging to other patches
+ *    interior boundary triangle
  *
  *  exterior boundary vertex: the vertex not belonging to the patch while adjacent
- *    to some triangles which has some vertices belonging to the patch
+ *    to some interior boundary triangles which has some vertices belonging to the 
+ *    patch
  */
 
 /* ================================ & DEFINITION & ============================= */
 
+#define VERT_ITEM_SIZE sizeof(float)
+
+/* helper data object */
 class HIdVertex {
 public:
 	bool operator < (const HIdVertex &v) const {
