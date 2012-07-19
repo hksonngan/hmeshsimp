@@ -60,16 +60,16 @@ class HMeshGridDivide {
 
 	/* $ constants $ */
 private:
-	static const uint INFO_BUF_SIZE = 1000;
+	static const uint INIT_INFO_BUF_SIZE = 4000;
 	static const float MAX_OCCUPANCY;
-	static const uint MAX_BUCKET_COUNT = 1000000;
+	static const uint MAX_BUCKET_COUNT = 1000;
+	static const uint MAX_CACHE_BUCKETS = 30000;
+	static const uint MAX_CACHE_SIZE = 100000;
 
 public:
 	HMeshGridDivide() {
 		vertbin_name = NULL;
 		tmp_base = NULL;
-		INFO_BUF[0] = '\0';
-		info_buf_len = 0;
 	}
 	~HMeshGridDivide() {
 		if (vertbin_name)
@@ -89,7 +89,9 @@ public:
 	 */
 	bool readPlySecond(uint _X, uint _Y, uint _Z);
 	
-	char* info() { return INFO_BUF; }
+	const char* info() { return INFO.c_str(); }
+	string& infoString() { return INFO; }
+	inline void clearInfo();
 	/* set the temporary file directory */
 	bool tmpBase(char *s);
 
@@ -98,13 +100,12 @@ private:
 	inline void info(ostringstream &oss);
 	inline void addInfo(const char *s);
 	inline void addInfo(ostringstream &oss);
-	inline void clearInfo();
 
 	inline bool addVertexFirst(const int &i, const HVertex &v);
 
 	/* ~ partitioning ~ */
 	inline void partitionInit();
-	inline void partitionEnd();
+	inline bool partitionEnd();
 	inline void getSlice();
 	inline void getGridIndex(const HVertex &v, HTripleIndex<uint> &i);
 	inline HGridPatch* getPatch(const HPatchIndex &pi);
@@ -134,17 +135,16 @@ private:
 	char		*file_name;
 
 	/* vertex cache file */
-	char*		vertbin_name;
+	char		*vertbin_name;
 	LRUCache<LRUVertex>	
 				vert_bin;
 
 	/* the temporary file base directory */
-	char*		tmp_base;
+	char		*tmp_base;
 	LRUVertex	tmpv;
 
 	/* return information */
-	char		INFO_BUF[INFO_BUF_SIZE];
-	uint		info_buf_len;
+	string		INFO;
 };
 
 
@@ -158,21 +158,17 @@ void HMeshGridDivide::info(ostringstream &oss) {
 
 void HMeshGridDivide::addInfo(const char *s) {
 
-	int len = strlen(s);
-	memcpy(INFO_BUF + info_buf_len, s, len);
-	info_buf_len += len;
-	INFO_BUF[info_buf_len] = '\0';
+	INFO += s;
 }
 
 void HMeshGridDivide::addInfo(ostringstream &oss) {
 
-	addInfo(oss.str().c_str());
+	INFO += oss.str();
 }
 
 void HMeshGridDivide::clearInfo() {
 
-	INFO_BUF[0] = '\0';
-	info_buf_len += 0;
+	INFO.clear();
 }
 
 bool HMeshGridDivide::addVertexFirst(const int &i, const HVertex &v) {
@@ -235,43 +231,61 @@ void HMeshGridDivide::partitionInit() {
 
 	getSlice();
 
+	/* index patch hash */
 	uint hash_size = x_div * y_div * z_div * MAX_OCCUPANCY;
-
 	if (hash_size == 0)
 		hash_size = 1;
 	else if (hash_size > MAX_BUCKET_COUNT)
 		hash_size = MAX_BUCKET_COUNT;
-
-	/* alloc some buckets for the hash map */
 	indexPatchMap.rehash(hash_size);
+
+	/* vertex binary file */
+	uint cache_buckets = vert_count * 0.3 * 0.3;
+	uint cache_size = vert_count * 0.3;
+	vert_bin.initCache(cache_buckets, cache_size);
 
 	ibt.openIBTFileForWrite(tmp_base);
 }
 
-void HMeshGridDivide::partitionEnd() {
+bool HMeshGridDivide::partitionEnd() {
 
 	HIndexPatchMap::iterator iter;
 	ostringstream oss;
 	int i;
 
-	ibt.closeIBTFileForWrite();
+	if (ibt.closeIBTFileForWrite() == false) {
+		oss.clear();
+		oss << "#ERROR: close ibt file for write failed" << endl;
+		info(oss);
+		return false;
+	}
 
 	oss << "\t_______________________________________________" << endl
 		<< "\tsecond pass complete" << endl
-		<< "\tpatch count:\t" << indexPatchMap.size() << endl;
+		<< "\tgrid size: " << x_div << "x" << y_div << "x" << z_div << endl
+		<< vert_bin.info("\t")
+		<< "\tibtriangles count: " << ibt.faceCount() << endl
+		<< "\tpatch count: " << indexPatchMap.size() << endl
+		<< "\tpatches info: " << endl
+		<< "\t\tid\tindex\tverts\tibverts\tebverts\tfaces" << endl;
 
 	for (iter = indexPatchMap.begin(), i = 0; iter != indexPatchMap.end(); iter ++, i ++) {
 
-		iter->second->closeForWrite();
+		if (iter->second->closeForWrite() == false) {
+			oss.clear();
+			oss << "#ERROR: close patch " << iter->first.i << "_" << iter->first.j << "_" << iter->first.k << " files for write failed" << endl;
+			info(oss);
+			return false;
+		}
 
-		oss << "\t  patch " << i << " - index: " << iter->first.i << "_" << iter->first.j << "_" << iter->first.k 
-			<< " verts: " << iter->second->verts() << " ibverts: " << iter->second->interiors()
-			<< " ebverts: " << iter->second->exteriors() << " faces: " << iter->second->faces() << endl;
+		oss << "\t\t" << i << "\t" << iter->first.i << "_" << iter->first.j << "_" << iter->first.k 
+			<< "\t" << iter->second->verts() << "\t" << iter->second->interiors()
+			<< "\t" << iter->second->exteriors() << "\t" << iter->second->faces() << endl;
 	}
 
-	oss << endl;
-
 	info(oss);
+
+	return true;
 }
 
 void HMeshGridDivide::getGridIndex(const HVertex &v, HTripleIndex<uint> &i) {

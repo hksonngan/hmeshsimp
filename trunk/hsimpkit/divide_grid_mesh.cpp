@@ -3,11 +3,7 @@
 #include "os_dependent.h"
 
 
-/*
- *  The occupancy rate in fact never surpasses 1%
- *    -- [Shaffer. A Multi-resolution Representation for Massive Meshes]
- */
-const float HMeshGridDivide::MAX_OCCUPANCY = 0.01;
+const float HMeshGridDivide::MAX_OCCUPANCY = 0.8;
 
 bool HMeshGridDivide::tmpBase(char *s) { 
 
@@ -71,7 +67,7 @@ bool HMeshGridDivide::readPlyFirst(char* _ply_name) {
 		<< "\tbounding box:" << endl
 		<< "\t\tx\t" << min_x << "\t" << max_x << endl
 		<< "\t\ty\t" << min_y << "\t" << max_y << endl
-		<< "\t\tz\t" << min_z << "\t" << max_z << endl << endl;
+		<< "\t\tz\t" << min_z << "\t" << max_z << endl;
 
 	info(oss);
 
@@ -96,7 +92,7 @@ bool HMeshGridDivide::readPlySecond(uint _X, uint _Y, uint _Z) {
 
 	if (!ply_stream.openForRead(file_name)) {
 		oss.clear();
-		oss << "\t#ERROR: open " << file_name << " failed" << endl;
+		oss << "#ERROR: open " << file_name << " failed" << endl;
 		info(oss);
 		return false;
 	}
@@ -113,7 +109,12 @@ bool HMeshGridDivide::readPlySecond(uint _X, uint _Y, uint _Z) {
 			return false;
 	}
 
-	vert_bin.openForRead(vertbin_name);
+	if (vert_bin.openForRead(vertbin_name) == LRU_FAIL) {
+		oss.clear();
+		oss << "#ERROR: open " << vertbin_name << " failed" << endl;
+		info(oss);
+		return false;
+	}
 
 	/* read the faces */
 	for (i = 0; i < ply_stream.getFaceCount(); i ++) {
@@ -121,25 +122,28 @@ bool HMeshGridDivide::readPlySecond(uint _X, uint _Y, uint _Z) {
 		ply_stream.nextFace(face);
 
 		if (vert_bin.indexedRead(face.i, cache_v1) == LRU_FAIL) {
-			oss << "\t#ERROR: read vertex binary file failed" << endl;
+			oss.clear();
+			oss << "#ERROR: read vertex binary file failed" << endl;
 			info(oss);
 			return false;
 		}
 
 		if (vert_bin.indexedRead(face.j, cache_v2) == LRU_FAIL) {
-			oss << "\t#ERROR: read vertex binary file failed" << endl;
+			oss.clear();
+			oss << "#ERROR: read vertex binary file failed" << endl;
 			info(oss);
 			return false;
 		}
 
 		if (vert_bin.indexedRead(face.k, cache_v3) == LRU_FAIL) {
-			oss << "\t#ERROR: read vertex binary file failed" << endl;
+			oss.clear();
+			oss << "#ERROR: read vertex binary file failed" << endl;
 			info(oss);
 			return false;
 		}
 
-		
+		addFaceToPatch(face, cache_v1.v, cache_v2.v, cache_v3.v);		
 	}
 
-	return true;
+	return partitionEnd();
 }

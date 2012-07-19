@@ -39,6 +39,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
+#include <string>
+#include <sstream>
 
 using std::fstream;
 using std::ifstream;
@@ -46,12 +48,14 @@ using std::ofstream;
 using std::streampos;
 using std::cerr;
 using std::endl;
-
-#define LRU_SUCCESS	1
-#define LRU_FAIL	0
+using std::string;
+using std::ostringstream;
 
 
 /* ============================= & DEFINITION & ============================== */
+
+#define LRU_SUCCESS	1
+#define LRU_FAIL	0
 
 /* if dump the cache to the file */
 //#define _WRITE_CACHE_DEBUG
@@ -105,11 +109,18 @@ public:
 	void setReadFile(ifstream *_fin, streampos _start_pos);
 	void setReadFile(FILE *_fp, fpos_t _start_pos);
 	int initCache(unsigned int _buckets, unsigned int _cache_size);
+	void clearCache();
 	/* read the value of the given index */
 	int indexedRead(
 		unsigned int index,	/*given index*/ 
 		ValType &val);		/*returned value*/
 	int closeReadFile();
+
+	/* ~ info ~ */
+	string info(const char* prefix);
+	void info(int &max_buckets, int &min_buckets);
+	unsigned int reads() { return read_count; }
+	unsigned int hits() { return hit_count; }
 
 	/* for debug */
 	void writeCacheDebug();
@@ -139,7 +150,6 @@ private:
 
 	ofstream	fout;
 
-public:
 	unsigned int	read_count;
 	unsigned int	hit_count;
 };
@@ -161,69 +171,18 @@ LRUCache<ValType>::LRUCache()
 template <class ValType>
 LRUCache<ValType>::~LRUCache()
 {
-	if (cache_bucket)
-	{
-		delete[] cache_bucket;
-	}
-}
-
-template <class ValType>
-int LRUCache<ValType>::openForWrite(const char *filename)
-{
-	fout.open(filename, fstream::out | fstream::binary);
-
-	if(fout.good())
-		return LRU_SUCCESS;
-	else
-		return LRU_FAIL;
-}
-
-template <class ValType>
-int LRUCache<ValType>::writeVal(ValType &val) {
-
-	if (val.write(fout)) 
-		return LRU_SUCCESS;
-	return LRU_FAIL;
-}
-
-template <class ValType>
-int LRUCache<ValType>::openForRead(const char* filename)
-{
-	fin_obj.open(filename, fstream::binary | fstream::in);
-	
-	fin = &fin_obj;
-	start_pos = 0 /*fstream::beg*/;
-	cfile = false;
-
-	if (fin_obj.good())
-		return LRU_SUCCESS;
-	else
-		return LRU_FAIL;
-}
-
-template <class ValType>
-void LRUCache<ValType>::setReadFile(ifstream *_fin, streampos _start_pos) {
-
-	cfile = false;
-	fin = _fin;
-	start_pos = _start_pos;
-}
-
-template <class ValType>
-void LRUCache<ValType>::setReadFile(FILE *_fp, fpos_t _start_pos) {
-
-	cfile = true;
-	fp = _fp;
-	start_pos_c = _start_pos;
+	clearCache();
 }
 
 template <class ValType>
 int LRUCache<ValType>::initCache(unsigned int _buckets, unsigned int _cache_size)
 {
 	if (_buckets == 0 || _cache_size == 0) {
-		cerr << "\t#ERROR in LRUCache::initCache: buckets count or cache size should not be zero" << endl;
+		cerr << "#ERROR in LRUCache::initCache: buckets count or cache size should not be zero" << endl;
 		return LRU_FAIL;
 	}
+
+	clearCache();
 
 	bucket_count = _buckets;
 	cache_size = _cache_size;
@@ -232,14 +191,37 @@ int LRUCache<ValType>::initCache(unsigned int _buckets, unsigned int _cache_size
 	for(int i = 0; i < bucket_count; i ++)
 		cache_bucket[i] = NULL;
 
-	cache_count = 0;
+	return LRU_SUCCESS;
+}
+
+template <class ValType>
+void LRUCache<ValType>::clearCache() {
+
+	if (bucket_count != 0) {
+		__CacheUnit<ValType> *node, *next;
+
+		for (int i = 0; i < bucket_count; i ++) {
+
+			node = cache_bucket[i];
+			while(node) {
+				next = node->bucket_next;
+				delete[] node;
+				node = next;
+			}
+		}
+
+		delete[] cache_bucket;
+	}
+
+	cache_bucket = NULL;
 	lru_head = NULL;
 	lru_tail = NULL;
 
-	read_count = 0; 
+	bucket_count = 0;
+	cache_size = 0;
+	cache_count = 0;
+	read_count = 0;
 	hit_count = 0;
-
-	return LRU_SUCCESS;
 }
 
 template <class ValType>
@@ -247,7 +229,7 @@ int LRUCache<ValType>::indexedRead(unsigned int index, ValType &val)
 {
 	if (cache_size == 0 || bucket_count == 0)
 	{
-		cerr << "\t#ERROR in LRUCache::indexedRead : no cache while indexed reading" << endl;
+		cerr << "#ERROR in LRUCache::indexedRead : no cache while indexed reading" << endl;
 		return LRU_FAIL;
 	}
 
@@ -300,8 +282,10 @@ int LRUCache<ValType>::indexedRead(unsigned int index, ValType &val)
 
 	// here hit_unit is the new unit need to inserted 
 	hit_unit->index = index;
-	//indexedReadFromFile(index, hit_unit->vert.x, hit_unit->vert.y, hit_unit->vert.z);
-	indexedReadFromFile(index, hit_unit->val);
+
+	if (indexedReadFromFile(index, hit_unit->val) == LRU_FAIL)
+		return LRU_FAIL;
+	
 	/* write the return value */
 	val = hit_unit->val;
 	insertBucketList(&cache_bucket[bucket_index], hit_unit);
@@ -389,6 +373,105 @@ void LRUCache<ValType>::deleteLruList(__CacheUnit<ValType> *unit)
 }
 
 template <class ValType>
+string LRUCache<ValType>::info(const char* prefix) {
+
+	ostringstream oss;
+	int max_buckets, min_buckets;
+
+	info(max_buckets, min_buckets);
+
+	oss << prefix << "buckets: " << bucket_count << " cache size: " << cache_size << endl
+		<< prefix << "max buckets: " << max_buckets << " min buckets: " << min_buckets << " avg: " << cache_count / bucket_count << endl
+		<< prefix << "total read: " << read_count << " hits: " << hit_count << " hit rate: " << ((float) hit_count) / read_count * 100.0f << "%" << endl;
+
+	return oss.str();
+}
+
+template <class ValType>
+void LRUCache<ValType>::info(int &max_buckets, int &min_buckets) {
+	
+	if (bucket_count == 0)
+		return;
+
+	int count;
+	__CacheUnit<ValType> *node;
+
+	count = 0;
+	node = cache_bucket[0];
+	while(node) {
+		node = node->bucket_next;
+		count ++;
+	}
+	max_buckets = count;
+	min_buckets = count;
+
+	for (int i = 1; i < bucket_count; i ++) {
+
+		count = 0;
+		node = cache_bucket[i];
+		while(node) {
+			node = node->bucket_next;
+			count ++;
+		}
+
+		if (count > max_buckets)
+			max_buckets = count;
+		else if (count < min_buckets)
+			min_buckets = count;
+	}
+}
+
+template <class ValType>
+int LRUCache<ValType>::openForWrite(const char *filename)
+{
+	fout.open(filename, fstream::out | fstream::binary);
+
+	if(fout.good())
+		return LRU_SUCCESS;
+	else
+		return LRU_FAIL;
+}
+
+template <class ValType>
+int LRUCache<ValType>::openForRead(const char* filename)
+{
+	fin_obj.open(filename, fstream::binary | fstream::in);
+
+	fin = &fin_obj;
+	start_pos = 0 /*fstream::beg*/;
+	cfile = false;
+
+	if (fin_obj.good())
+		return LRU_SUCCESS;
+	else
+		return LRU_FAIL;
+}
+
+template <class ValType>
+void LRUCache<ValType>::setReadFile(ifstream *_fin, streampos _start_pos) {
+
+	cfile = false;
+	fin = _fin;
+	start_pos = _start_pos;
+}
+
+template <class ValType>
+void LRUCache<ValType>::setReadFile(FILE *_fp, fpos_t _start_pos) {
+
+	cfile = true;
+	fp = _fp;
+	start_pos_c = _start_pos;
+}
+
+template <class ValType>
+int LRUCache<ValType>::writeVal(ValType &val) {
+
+	if (val.write(fout)) 
+		return LRU_SUCCESS;
+	return LRU_FAIL;
+}
+
+template <class ValType>
 int LRUCache<ValType>::indexedReadFromFile(unsigned int index, ValType &val) {
 
 	if (cfile) {
@@ -403,7 +486,9 @@ int LRUCache<ValType>::indexedReadFromFile(unsigned int index, ValType &val) {
 	}
 	else {
 		fin->seekg( start_pos + (long) (index * ValType::size()) );
-		fin->seekg(index * ValType::size(), fstream::cur);
+
+		if (!fin->good()) 
+			return LRU_FAIL;
 
 		if (val.read(*fin))
 			return LRU_SUCCESS;

@@ -28,6 +28,7 @@ using std::list;
 
 #define VERT_ITEM_SIZE sizeof(float)
 
+
 /*
  *  interior boundary vertex: the vertex belonging to the patch while adjacent to 
  *    some triangles which has some vertices belonging to other patches
@@ -49,10 +50,11 @@ public:
 	}
 
 	void write(ostream &out) {
-		out.write((char *)&id, sizeof(uint));
-		out.write((char *)&v.x, VERT_ITEM_SIZE);
-		out.write((char *)&v.y, VERT_ITEM_SIZE);
-		out.write((char *)&v.z, VERT_ITEM_SIZE);
+
+		WRITE_UINT(out, id);
+		WRITE_BLOCK(out, v.x, VERT_ITEM_SIZE);
+		WRITE_BLOCK(out, v.y, VERT_ITEM_SIZE);
+		WRITE_BLOCK(out, v.z, VERT_ITEM_SIZE);
 	}
 
 public:
@@ -145,10 +147,10 @@ private:
 
 bool HMeshPatch::addInteriorVertex(const uint &orig_id, const HVertex &v) {
 
-	vert_out.write((char *)&orig_id, sizeof(uint));
-	vert_out.write((char *)&v.x, VERT_ITEM_SIZE);
-	vert_out.write((char *)&v.y, VERT_ITEM_SIZE);
-	vert_out.write((char *)&v.z, VERT_ITEM_SIZE);
+	WRITE_UINT(vert_out, orig_id);
+	WRITE_BLOCK(vert_out, v.x, VERT_ITEM_SIZE);
+	WRITE_BLOCK(vert_out, v.y, VERT_ITEM_SIZE);
+	WRITE_BLOCK(vert_out, v.z, VERT_ITEM_SIZE);
 	vert_count ++;
 
 	if (vert_out.good())
@@ -173,9 +175,9 @@ void HMeshPatch::addExteriorBound(const uint &orig_id, const HVertex &v) {
 
 bool HMeshPatch::addFace(const HTripleIndex<uint> &f) {
 
-	face_out.write((char *)&f.i, sizeof(uint));
-	face_out.write((char *)&f.j, sizeof(uint));
-	face_out.write((char *)&f.k, sizeof(uint));
+	WRITE_UINT(face_out, f.i);
+	WRITE_UINT(face_out, f.j);
+	WRITE_UINT(face_out, f.k);
 	face_count ++;
 
 	if (face_out.good())
@@ -240,9 +242,9 @@ bool HMeshPatch::nextFace(HTripleIndex<uint> &f) {
 
 bool HIBTriangles::addIBTriangle(const HTripleIndex<uint> &f) {
 	
-	ibt_out.write((char *)&f.i, sizeof(uint));
-	ibt_out.write((char *)&f.j, sizeof(uint));
-	ibt_out.write((char *)&f.k, sizeof(uint));
+	WRITE_UINT(ibt_out, f.i);
+	WRITE_UINT(ibt_out, f.j);
+	WRITE_UINT(ibt_out, f.k);
 	face_count ++;
 
 	if (ibt_out.good())

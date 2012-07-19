@@ -1,6 +1,6 @@
 /*
  *  The vertices and faces division algorithm algorithm is based on array self partition
- *  This implementation is temporarily abandoned.
+ *  This implementation is deprecated.
  *
  *  Codes about the algorithm of 'reverse spatial subdivision mesh simplification', 
  *  More detail please refer to 

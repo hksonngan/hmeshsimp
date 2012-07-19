@@ -12,6 +12,7 @@
 #define __TRIVIAL__
 
 #include <string>
+#include <time.h>
 
 using std::string;
 
@@ -28,6 +29,16 @@ extern string getFileExtension(const char *filepath);
 
 // get the system endian mode
 extern EndianOrder getSystemEndianMode();
+
+inline char* getTime() {
+
+	time_t rawtime;
+	struct tm * timeinfo;
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+
+	return asctime(timeinfo);
+}
 
 inline void stringToCstr(string &str, char* cstr)
 {
