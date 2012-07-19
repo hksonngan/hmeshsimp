@@ -7,8 +7,8 @@ using std::cerr;
 using std::endl;
 using std::streampos;
 
-#define __FILE_NAME_BUF_SIZE 400
 
+#define __FILE_NAME_BUF_SIZE 400
 
 /* -- HMeshPatch -- */
 

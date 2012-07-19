@@ -28,9 +28,10 @@ void PairCollapse::allocFaces(uint _face_count) {
 }
 
 void PairCollapse::addVertex(HVertex vert) {
+
 	cvert.Set(vert.x, vert.y, vert.z);
-	// set the new id, this is important!!
-	cvert.setNewId(INVALID_VERT);
+	cvert.markv(UNREFER);
+	cvert.setNewId(vertices.count());
 	vertices.push_back(cvert);
 	vertices[vertices.count() - 1].allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
 }
@@ -56,9 +57,9 @@ bool PairCollapse::addFace(HFace face) {
 	vertices[face.k].adjacent_faces.push_back(faces.count() - 1);
 
 	// set the new_id field
-	vertices[face.i].setNewId(face.i);
-	vertices[face.j].setNewId(face.j);
-	vertices[face.k].setNewId(face.k);
+	vertices[face.i].markv(REFERRED);
+	vertices[face.j].markv(REFERRED);
+	vertices[face.k].markv(REFERRED);
 
 	return true;
 }
@@ -192,7 +193,7 @@ bool PairCollapse::writePly(char* filename) {
 	int i;
 	valid_vert_count = 0;
 	for (i = 0; i < vertices.count(); i ++)
-		if (vertices[i].valid(i)) {
+		if (vertices[i].valid(i) && !vertices[i].unreferred()) {
 			fout << vertices[i].x << " " << vertices[i].y << " " << vertices[i].z << endl;
 			vertices[i].output_id = valid_vert_count;
 			valid_vert_count ++;

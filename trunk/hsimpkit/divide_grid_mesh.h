@@ -269,6 +269,8 @@ bool HMeshGridDivide::partitionEnd() {
 		<< "\tpatches info: " << endl
 		<< "\t\tid\tindex\tverts\tibverts\tebverts\tfaces" << endl;
 
+	vert_bin.clearCache();
+
 	for (iter = indexPatchMap.begin(), i = 0; iter != indexPatchMap.end(); iter ++, i ++) {
 
 		if (iter->second->closeForWrite() == false) {

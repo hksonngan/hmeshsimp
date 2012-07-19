@@ -28,6 +28,7 @@ using std::ofstream;
 using std::cout;
 using std::endl;
 
+
 typedef CollapsablePair* pCollapsablePair;
 
 static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePair &pair2) {
@@ -197,7 +198,7 @@ void PairCollapse::unreferVertsCheck() {
 	valid_verts = 0;
 
 	for (int i = 0; i < vertices.count(); i ++) 
-		if (vertices[i].valid(i)) 
+		if (!vertices[i].unreferred()) 
 			valid_verts ++;
 }
 

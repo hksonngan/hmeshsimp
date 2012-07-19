@@ -60,9 +60,11 @@ using std::ostringstream;
 /* if dump the cache to the file */
 //#define _WRITE_CACHE_DEBUG
 
-/* you should inherit this class if you want to
-   use the LRU cache, and make this class as the
-   template argument for the class template 'LRUCache' */
+/* 
+ *  you should implement or inherit this class if you want to
+ *  use the LRU cache, and make this class as the template 
+ *  argument for the class template 'LRUCache' 
+ */
 class LRUVal {
 public:
 	// binary(!) read

@@ -20,7 +20,12 @@
 #include "pcol_other_structures.h"
 #include "MixKit/MxQMetric3.h"
 
-#define INVALID_VERT UINT_MAX
+
+#define INVALID_VERT	UINT_MAX
+#define UNREFER			UCHAR_MAX		// interior unreferred vertex mark
+#define REFERRED		UCHAR_MAX - 1	// interior referred vertex mark
+#define INTERIOR_BOUND	UCHAR_MAX - 2	// interior boundary (must be referred) vertex mark
+#define EXTERIOR		UCHAR_MAX - 3	// exterior boundary (must be referred) vertex mark
 
 using std::list;
 
@@ -36,13 +41,20 @@ class CollapsedVertex: public HVertex {
 public:
 	uint	new_id;		// the id after the collapse
 	uint	output_id;	// the id of the output model
+	uchar	mark;
 	/// I think it's useless!!!
-	HVertex	new_vertex;	// the new vertex after the collapse
+	//HVertex	new_vertex;	// the new vertex after the collapse
 						// used for collapsing sequence file
 
 public:
+	CollapsedVertex() { markv(UNREFER); };
 	void setNewId(uint _id) { new_id = _id; }
+	void markv(uchar m) { mark = m; }
 	bool valid(uint v_index) { return v_index == new_id; }
+	bool unreferred() { return mark == UNREFER; }
+	bool interior() { return mark == UNREFER || mark == REFERRED; }
+	bool interior_bound() { return mark == INTERIOR_BOUND; }
+	bool exterior() { return mark == EXTERIOR; }
 };
 
 /* in-core version */
