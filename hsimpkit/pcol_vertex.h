@@ -21,9 +21,9 @@
 #include "MixKit/MxQMetric3.h"
 
 
-#define INVALID_VERT	UINT_MAX
 #define UNREFER			UCHAR_MAX		// interior unreferred vertex mark
 #define REFERRED		UCHAR_MAX - 1	// interior referred vertex mark
+/* below used when simplifying a patch of a mesh */
 #define INTERIOR_BOUND	UCHAR_MAX - 2	// interior boundary (must be referred) vertex mark
 #define EXTERIOR		UCHAR_MAX - 3	// exterior boundary (must be referred) vertex mark
 
