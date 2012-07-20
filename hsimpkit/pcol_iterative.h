@@ -303,7 +303,6 @@ void PairCollapse::mergePairs(uint vert1, uint vert2) {
 		if (i < pairs1.count() && j < pairs2.count() && pairs1[i] == pairs2[j]) {
 			
 			///updateValidPairOrRemove(pairs1[i], new_pairs);
-
 			// this is the collapsed pair
 			pair_heap.remove(pairs1[i]);
 			delete[] pairs1[i];
@@ -313,7 +312,6 @@ void PairCollapse::mergePairs(uint vert1, uint vert2) {
 		else if (i < pairs1.count() && j < pairs2.count() && *pairs1[i] == *pairs2[j]) {
 			
 			///updateValidPairOrRemove(pairs1[i], new_pairs);
-
 			// these are the duplicated pairs
 			// update arbitrary one and remove another 
 			new_pairs.push_back(pairs1[i]);
@@ -331,20 +329,18 @@ void PairCollapse::mergePairs(uint vert1, uint vert2) {
 		else if (j >= pairs2.count() || i < pairs1.count() && *pairs1[i] < *pairs2[j]) {
 
 			///updateValidPairOrRemove(pairs1[i], new_pairs);
-
 			new_pairs.push_back(pairs1[i]);
 			i ++;
 		}
 		else {
 			///updateValidPairOrRemove(pairs2[j], new_pairs);
-
 			new_pairs.push_back(pairs2[j]);
 			j ++;
 		}
 	}
 
 	/* post process */
-	// the variable 'pair' is invalid now!!
+	/* the variable 'pair' is invalid now!! */
 	reevaluatePairs(new_pairs);
 	pairs1.swap(new_pairs);
 	pairs2.freeSpace();

@@ -18,6 +18,7 @@
 //#include "MxStdSlim.h"
 #include "gfx/geom3d.h"
 
+
 /// definitions from _QSLIM_
 
 #define MX_PLACE_ENDPOINTS 0
@@ -32,7 +33,7 @@
 #define MX_WEIGHT_AREA_AVG      4
 #define MX_WEIGHT_RAWNORMALS    5
 
-#define INIT_BOUND_WEIGHT 10000.0f
+#define INIT_BOUND_WEIGHT	10000.0f
 
 typedef MxQuadric3 Quadric;
 

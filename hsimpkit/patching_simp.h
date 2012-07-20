@@ -8,12 +8,12 @@
  */
 
 
-#ifndef __H_PATCH_SIMP__
-#define __H_PATCH_SIMP__
+#ifndef __H_PATCHING_SIMP__
+#define __H_PATCHING_SIMP__
 
-class HPatchSimp {
+class HPatchingSimp {
 public:
 	bool run();
 };
 
-#endif //__H_PATCH_SIMP__
+#endif //__H_PATCHING_SIMP__
