@@ -60,7 +60,7 @@ public:
 
 	void randGen(unsigned int count, unsigned int range);
 
-private:
+protected:
 	ElemType *data;
 	// initial capacity
 	int init_cap;

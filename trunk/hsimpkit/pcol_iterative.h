@@ -88,6 +88,7 @@ public:
 	inline void addCollapsablePair(CollapsablePair *new_pair);
 	// init after the vertices and faces are ready
 	virtual void intialize();
+	void initValids() { valid_verts = vertices.count(); valid_faces = faces.count(); }
 	inline void unreferVertsCheck();
 	
 	

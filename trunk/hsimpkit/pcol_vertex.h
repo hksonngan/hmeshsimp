@@ -49,6 +49,7 @@ public:
 public:
 	CollapsedVertex() { markv(UNREFER); };
 	void setNewId(uint _id) { new_id = _id; }
+	void setOutId(uint _id) { output_id = _id; }
 	void markv(uchar m) { 
 		if (m == REFERRED) {
 			if (mark == UNREFER)
