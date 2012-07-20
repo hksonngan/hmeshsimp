@@ -530,14 +530,6 @@
 			Name="patching_simp"
 			>
 			<File
-				RelativePath=".\divide_grid_mesh.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\divide_grid_mesh.h"
-				>
-			</File>
-			<File
 				RelativePath=".\mesh_patch.cpp"
 				>
 			</File>
@@ -546,11 +538,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\patch_simp.cpp"
+				RelativePath=".\patching_simp.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\patch_simp.h"
+				RelativePath=".\patching_simp.h"
 				>
 			</File>
 		</Filter>

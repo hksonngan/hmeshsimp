@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "divide_grid_mesh.h"
+#include "patching_simp.h"
 #include "trivial.h"
 
 using std::ofstream;
@@ -9,12 +9,13 @@ using std::fstream;
 using std::cout;
 using std::endl;
 
-char* filename;
-int x_div, y_div, z_div;
+static char* filename;
+static uint x_div = 2, y_div = 2, z_div = 2;
+static uint target = 4000;
 
 int main(int argc, char** argv)
 {
-	HMeshGridDivide mesh_divide;
+	PatchingSimp psimp;
 	ofstream flog("patchingsimp.log", fstream::app);
 	bool ret;
 	char tmp_dir[200];
@@ -23,24 +24,27 @@ int main(int argc, char** argv)
 	// d:/bunny/bun_zipper.ply
 	// F:/plys/happy_recon/happy_vrip.ply
 
-	filename = "F:/plys/bunny/bun_zipper.ply";
-	stringToCstr(getFilename(filename).c_str() + "_patches", tmp_dir);
+	filename = "d:/bunny/bun_zipper.ply";
+	stringToCstr(getFilename(filename) + "_patches", tmp_dir);
 
 	flog << "\t#" << getTime();
 
-	mesh_divide.tmpBase(tmp_dir);
-	ret = mesh_divide.readPlyFirst();
-	cout << mesh_divide.info();
-	flog << mesh_divide.info();
+	psimp.tmpBase(tmp_dir);
+	ret = psimp.readPlyFirst(filename);
+	cout << psimp.info();
+	flog << psimp.info();
 	if (!ret)
 		return EXIT_FAILURE;
 
-	mesh_divide.clearInfo();
-	ret = mesh_divide.readPlySecond(3, 3, 3);
-	cout << mesh_divide.info();
-	flog << mesh_divide.info();
+	psimp.clearInfo();
+	ret = psimp.readPlySecond(x_div, y_div, z_div);
+	cout << psimp.info();
+	flog << psimp.info();
 	if (!ret)
 		return EXIT_FAILURE;
+
+	psimp.patchesToPly();
+	psimp.simplfiyPatchesToPly(target);
 
 	return EXIT_SUCCESS;
 }

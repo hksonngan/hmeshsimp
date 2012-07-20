@@ -88,7 +88,29 @@ void PairCollapse::collapsePair(pCollapsablePair &pair) {
 	mergeFaces(vert1, vert2);
 }
 
-bool PairCollapse::targetVert(uint targe_count) {
+bool PairCollapse::targetVert(uint target_count) {
+
+	CollapsablePair* top_pair;
+
+	run_time.setStartPoint();
+
+	while(valid_verts > target_count) {
+
+		top_pair = (CollapsablePair *)pair_heap.extract();
+		if (!top_pair)
+			break;
+
+		collapsePair(top_pair);
+	}
+
+	run_time.setEndPoint();
+	ostringstream ostr;
+
+	ostr << "\tmodel simplified" << endl
+		<< "\tverts:\t" << valid_verts << "\tfaces:\t" << valid_faces << endl
+		<< "\ttime consuming:\t" << run_time.getElapseStr() << endl << endl;
+
+	addInfo(ostr.str().c_str());
 
 	return true;
 }
@@ -102,6 +124,9 @@ bool PairCollapse::targetFace(uint target_count) {
 	while(valid_faces > target_count) {
 
 		top_pair = (CollapsablePair *)pair_heap.extract();
+		if (!top_pair)
+			break;
+
 		collapsePair(top_pair);
 	}
 
@@ -191,7 +216,7 @@ bool PairCollapse::writePly(char* filename) {
 	fout << "end_header" << endl;
 
 	int i;
-	valid_vert_count = 0;
+	uint valid_vert_count = 0;
 	for (i = 0; i < vertices.count(); i ++)
 		if (vertices[i].valid(i) && !vertices[i].unreferred()) {
 			fout << vertices[i].x << " " << vertices[i].y << " " << vertices[i].z << endl;
@@ -199,7 +224,7 @@ bool PairCollapse::writePly(char* filename) {
 			valid_vert_count ++;
 		}
 
-	int valid_face_count = 0;
+	uint valid_face_count = 0;
 	for (i = 0; i < faces.count(); i ++) 
 		if (faces[i].valid()) {
 			fout << "3 " << vertices[faces[i].i].output_id << " "
@@ -235,7 +260,7 @@ void PairCollapse::outputIds(char* filename) {
 
 void PairCollapse::generateOutputId() {
 
-	valid_vert_count = 0;
+	uint valid_vert_count = 0;
 
 	for (int i = 0; i < vertices.count(); i ++)
 		if (vertices[i].valid(i)) {

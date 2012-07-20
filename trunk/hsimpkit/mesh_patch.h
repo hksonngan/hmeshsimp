@@ -16,8 +16,12 @@
 #include <sstream>
 #include <list>
 
+#include <boost/unordered_map.hpp>
+
 #include "util_common.h"
 #include "trivial.h"
+#include "pcol_iterative.h"
+#include "os_dependent.h"
 
 using std::ostream;
 using std::ofstream;
@@ -25,6 +29,8 @@ using std::ifstream;
 using std::fstream;
 using std::ostringstream;
 using std::list;
+
+using boost::unordered::unordered_map;
 
 
 /*
@@ -42,6 +48,8 @@ using std::list;
 /* ================================ & DEFINITION & ============================= */
 
 #define VERT_ITEM_SIZE sizeof(float)
+
+enum TargetOption { target_face, target_vert };
 
 /* helper data object */
 class HIdVertex {
@@ -69,8 +77,13 @@ public:
 
 /* a generic patch class */
 class HMeshPatch {
+
 public:
+
 	HMeshPatch() { vert_count = 0; face_count = 0; interior_count = 0; exterior_count = 0; }
+
+	/////////////////////////////////
+	// WRITE
 
 	bool openForWrite(const char* vert_name, const char* face_name);
 	bool closeForWrite();
@@ -79,12 +92,24 @@ public:
 	inline void addExteriorBound(const uint &orig_id, const HVertex &v);
 	inline bool addFace(const HTripleIndex<uint> &f);
 
+	/////////////////////////////////
+	// READ
+
 	bool openForRead(const char* vert_name, const char* face_name);
 	bool closeForRead();
 	inline bool nextInteriorVertex(uint &orig_id, HVertex &v);
 	inline bool nextInteriorBound(uint &orig_id);
 	inline bool nextExteriorBound(uint &orig_id, HVertex &v);
 	inline bool nextFace(HTripleIndex<uint> &f);
+	
+	/////////////////////////////////
+	// SIMPLIFY
+
+	bool readPatch(char *vert_patch, char *face_patch, PairCollapse *pcol);
+	bool toPly(PairCollapse *pcol, const char* ply_name);
+
+	/////////////////////////////////
+	// ACCESSORS
 
 	uint interiors() const { return interior_count; }
 	uint exteriors() const { return exterior_count; }
@@ -92,13 +117,19 @@ public:
 	uint faces() const { return face_count; }
 
 public:
+	/* interior vertices count */
 	uint vert_count;
+	/* interior boundary vertices count */
 	uint interior_count;
+	/* exterior boundary vertices count */
 	uint exterior_count;
 	uint face_count;
 
 	list<uint> interior_bound;
 	list<HIdVertex> exterior_bound;
+
+	/* map between external id and internal id */
+	unordered_map<uint, uint> id_map; 
 
 private:
 	ofstream vert_out;
@@ -138,8 +169,17 @@ public:
 	 */
 	bool openForWrite(const char* dir_path, const HTripleIndex<uint> grid_index);
 	bool openForRead(const char* dir_path, const HTripleIndex<uint> grid_index);
+	bool patchToPly(const char* dir_path, const HTripleIndex<uint> grid_index);
+	bool pairCollapse(
+			char* dir_path, HTripleIndex<uint> grid_index, uint vert_start_id,
+			PairCollapse *pcol, uint target, TargetOption target_opt = target_vert);
+	bool pairCollapseToPly(
+			char* dir_path, HTripleIndex<uint> grid_index, 
+			uint total_verts, uint total_target);
 
 private:
+	inline void getPatchPath(const char* dir_path, const HTripleIndex<uint> grid_index, 
+								char *vert_name, char *face_name);
 	inline void getVertPatchName(const HTripleIndex<uint> &grid_index, char *buf);
 	inline void getFacePatchName(const HTripleIndex<uint> &grid_index, char *buf);
 
@@ -284,6 +324,30 @@ void HGridPatch::getFacePatchName(const HTripleIndex<uint> &grid_index, char *bu
 	ostringstream oss_name;
 	oss_name << "face_" << grid_index.i << "_" << grid_index.j << "_" << grid_index.k;
 	stringToCstr(oss_name.str(), buf);
+}
+
+void HGridPatch::getPatchPath(const char* dir_path, const HTripleIndex<uint> grid_index, 
+				  char *vert_name, char *face_name) {
+
+	string str;
+
+	getVertPatchName(grid_index, vert_name);
+	getFacePatchName(grid_index, face_name);
+
+	if (dir_path) {
+	  str = dir_path;
+	  str += hPathSeperator();
+	}
+	str += vert_name;
+	stringToCstr(str, vert_name);
+
+	str.clear();
+	if (dir_path) {
+	  str = dir_path;
+	  str += hPathSeperator();
+	}
+	str += face_name;
+	stringToCstr(str, face_name);
 }
 
 #endif //__H_MESH_PATCH__
