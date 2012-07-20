@@ -24,6 +24,7 @@
 #include "ply_stream.h"
 #include "util_common.h"
 #include "mesh_patch.h"
+#include "grid_patch.h"
 #include "hash_def.h"
 
 using std::ofstream;

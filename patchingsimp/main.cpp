@@ -3,6 +3,7 @@
 
 #include "patching_simp.h"
 #include "trivial.h"
+#include "mem_stream.h"
 
 using std::ofstream;
 using std::fstream;
@@ -15,6 +16,12 @@ static uint target = 4000;
 
 int main(int argc, char** argv)
 {
+	mstream<int> m;
+
+	m << 1 << 2 << 3;
+
+	return 0;
+
 	PatchingSimp psimp;
 	ofstream flog("patchingsimp.log", fstream::app);
 	bool ret;

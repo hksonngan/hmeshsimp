@@ -224,12 +224,28 @@
 						Name="VCCLCompilerTool"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\ooc_vertex_clustering.h"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -262,6 +278,14 @@
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -529,6 +553,18 @@
 		<Filter
 			Name="patching_simp"
 			>
+			<File
+				RelativePath=".\grid_patch.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\grid_patch.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mem_stream.h"
+				>
+			</File>
 			<File
 				RelativePath=".\mesh_patch.cpp"
 				>

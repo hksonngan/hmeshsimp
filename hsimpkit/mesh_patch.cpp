@@ -29,21 +29,24 @@ bool HMeshPatch::openForWrite(const char* vert_name, const char* face_name) {
 		cerr << "#ERROR: " << vert_name << " vertex file open for write failed" << endl;
 		return false;
 	}
+#ifdef WRITE_PATCH_BINARY
 	// count of vertices
 	WRITE_UINT(vert_out, n);
 	// count of interior boundary vertices
 	WRITE_UINT(vert_out, n);
 	// count of exterior boundary vertices
 	WRITE_UINT(vert_out, n);
-
+#endif
 
 	face_out.open(face_name, fstream::binary | fstream::out);
 	if (!face_out.good()) {
 		cerr << "#ERROR: " << face_name << " face file open for write failed" << endl;
 		return false;
 	}
+#ifdef WRITE_PATCH_BINARY
 	// count of faces
-	face_out.write((char *)&n, sizeof(uint));
+	WRITE_UINT(face_out, n);
+#endif
 
 	return true;
 }
@@ -67,13 +70,20 @@ bool HMeshPatch::closeForWrite() {
 	interior_bound.clear();
 	std::sort(interior.pointer(0), interior.pointer(0) + interior.count());
 
+#ifndef WRITE_PATCH_BINARY
+	vert_out << endl;
+#endif
+
 	for (i = 0, interior_count = 0; i < interior.count(); interior_count ++) {
 
 		n = interior[i];
 		i ++;
 
 		// write the vertex id
-		vert_out.write((char *)&n, sizeof(uint));
+		WRITE_UINT(vert_out, n);
+#ifndef WRITE_PATCH_BINARY
+		vert_out << endl;
+#endif
 		if (!vert_out.good()) {
 			cerr << "#ERROR: write interior boundary vertex " << n << " failed" << endl;
 			return false;
@@ -82,6 +92,9 @@ bool HMeshPatch::closeForWrite() {
 		// in case of duplication
 		for (; i < interior.count() && interior[i] == n; i ++);
 	}
+#ifndef WRITE_PATCH_BINARY
+	vert_out << endl;
+#endif
 	interior.freeSpace();
 	
 	exterior.clear();
@@ -98,6 +111,9 @@ bool HMeshPatch::closeForWrite() {
 
 		// write the vertex
 		idv.write(vert_out);
+#ifndef WRITE_PATCH_BINARY
+		vert_out << endl;
+#endif
 		if (!vert_out.good()) {
 			cerr << "#ERROR: write exterior boundary vertex " << idv.id << " failed" << endl;
 			return false;
@@ -107,11 +123,17 @@ bool HMeshPatch::closeForWrite() {
 		for (; i < exterior.count() && exterior[i] == idv; i ++);
 	}
 
+#ifndef WRITE_PATCH_BINARY
+	vert_out << endl;
+#endif
+
+#ifdef WRITE_PATCH_BINARY
 	// write the counts
 	vert_out.seekp(0);
 	WRITE_UINT(vert_out, vert_count);
 	WRITE_UINT(vert_out, interior_count);
 	WRITE_UINT(vert_out, exterior_count);
+#endif
 
 	vert_out.close();
 	if (!vert_out.good()) {
@@ -121,8 +143,10 @@ bool HMeshPatch::closeForWrite() {
 
 	/* write face count */
 
+#ifdef WRITE_PATCH_BINARY
 	face_out.seekp(0);
 	WRITE_UINT(face_out, face_count);
+#endif
 
 	face_out.close();
 	if (!face_out.good()) {
@@ -140,20 +164,30 @@ bool HMeshPatch::openForRead(const char* vert_name, const char* face_name) {
 		cerr << "#ERROR: " << vert_name << " vertex file open for read failed" << endl;
 		return false;
 	}
+#ifdef WRITE_PATCH_BINARY
 	// count of vertices
 	READ_UINT(vert_in, vert_count);
 	// count of interior boundary vertices
 	READ_UINT(vert_in, interior_count);
 	// count of exterior boundary vertices
 	READ_UINT(vert_in, exterior_count);
+#else
+	vert_count = 0;
+	interior_count = 0;
+	exterior_count = 0;
+#endif
 
 	face_in.open(face_name, fstream::binary | fstream::in);
 	if (!face_in.good()) {
 		cerr << "#ERROR: " << face_name << " face file open for read failed" << endl;
 		return false;
 	}
+#ifdef WRITE_PATCH_BINARY
 	// count of faces
 	READ_UINT(face_in, face_count);
+#else
+	face_count = 0;
+#endif
 
 	return true;
 }
@@ -178,6 +212,7 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 	pcol->allocVerts(vert_count + exterior_count);
 	pcol->allocFaces(face_count);
 
+	id_map.clear();
 	for (i = 0; i < vert_count; i ++) {
 		if (!nextInteriorVertex(orig_id, v))
 			return false;
@@ -239,7 +274,7 @@ bool HMeshPatch::toPly(PairCollapse *pcol, const char* ply_name) {
 		CollapsableVertex &v = pcol->v(i);
 		if (v.valid(i) && !v.unreferred()) {
 			fout << v.x << " " << v.y << " " << v.z << endl;
-			v.setNewId(valid_count);
+			v.setOutId(valid_count);
 			valid_count ++;
 		}
 	}
@@ -271,8 +306,10 @@ bool HIBTriangles::openIBTFileForWrite(const char* dir_path) {
 	stringToCstr(str, buf);
 
 	ibt_out.open(buf, fstream::binary | fstream::out);
+#ifdef WRITE_PATCH_BINARY
 	// count of triangles
 	WRITE_UINT(ibt_out, n);
+#endif
 	if (ibt_out.good())
 		return true;
 	cerr << "#ERROR: open interior boundary triangles file for write failed" << endl;
@@ -281,9 +318,11 @@ bool HIBTriangles::openIBTFileForWrite(const char* dir_path) {
 
 bool HIBTriangles::closeIBTFileForWrite() {
 
+#ifdef WRITE_PATCH_BINARY
 	// write the count of triangles to the beginning of the file
 	ibt_out.seekp(0);
 	WRITE_UINT(ibt_out, face_count);
+#endif
 
 	ibt_out.close();
 	if (ibt_out.good())
@@ -305,8 +344,12 @@ bool HIBTriangles::openIBTFileForRead(const char* dir_path) {
 	stringToCstr(str, buf);
 
 	ibt_in.open(buf, fstream::binary | fstream::in);
+#ifdef WRITE_PATCH_BINARY
 	// count of triangles
 	READ_UINT(ibt_in, face_count);
+#else
+	face_count = 0;
+#endif
 
 	if (ibt_out.good())
 		return true;
@@ -317,98 +360,5 @@ bool HIBTriangles::openIBTFileForRead(const char* dir_path) {
 bool HIBTriangles::closeIBTFileForRead() {
 
 	ibt_out.close();
-	return true;
-}
-
-
-/* -- HGridPatch -- */
-
-bool HGridPatch::openForWrite(const char* dir_path, const HTripleIndex<uint> grid_index) {
-
-	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
-	getPatchPath(dir_path, grid_index, vert_name, face_name);
-
-	if(!HMeshPatch::openForWrite(vert_name, face_name))
-		return false;
-	return true;
-}
-
-bool HGridPatch::openForRead(const char* dir_path, const HTripleIndex<uint> grid_index) {
-
-	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
-	getPatchPath(dir_path, grid_index, vert_name, face_name);
-
-	if(!HMeshPatch::openForRead(vert_name, face_name))
-		return false;
-	return true;
-}
-
-bool HGridPatch::patchToPly(const char* dir_path, const HTripleIndex<uint> grid_index) {
-
-	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
-	getPatchPath(dir_path, grid_index, vert_name, face_name);
-
-	char ply_name[__FILE_NAME_BUF_SIZE];
-	ostringstream oss;
-
-	if (dir_path) 
-		oss << dir_path << hPathSeperator();
-	oss << grid_index.i << "_" << grid_index.j << "_" << grid_index.k << ".ply";
-	stringToCstr(oss.str(), ply_name);
-
-	//PairCollapse *pcol = new QuadricEdgeCollapse();
-	QuadricEdgeCollapse ecol;
-	if (!readPatch(vert_name, face_name, &ecol))
-		return false;
-	if (!toPly(&ecol, ply_name))
-		return false;
-	id_map.clear();
-
-	//delete[] pcol;
-	return true;
-}
-
-bool HGridPatch::pairCollapse(
-		char* dir_path, HTripleIndex<uint> grid_index, uint vert_start_id,
-		PairCollapse *pcol, uint target, TargetOption target_opt) {
-
-	//char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
-	//getPatchPath(dir_path, grid_index, vert_name, face_name);
-
-	//return HMeshPatch::pairCollapse(vert_name, face_name, vert_start_id, pcol, target, target_opt);
-
-	return true;
-}
-
-bool HGridPatch::pairCollapseToPly(
-		char* dir_path, HTripleIndex<uint> grid_index, uint total_verts, uint total_target) {
-
-	QuadricEdgeCollapse ecol;
-	uint target;
-	ostringstream oss;
-	char ply_name[__FILE_NAME_BUF_SIZE];
-	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
-	
-	getPatchPath(dir_path, grid_index, vert_name, face_name);
-
-	// retrieve the simplified patch name
-	if (dir_path) 
-		oss << dir_path << hPathSeperator();
-	oss << grid_index.i << "_" << grid_index.j << "_" << grid_index.k << "_simp.ply";
-	stringToCstr(oss.str(), ply_name);
-
-	if (!readPatch(vert_name, face_name, &ecol))
-		return false;
-
-	target = ((float) ecol.vertexCount()) / 
-				((float) total_verts) * total_target;
-	ecol.intialize();
-	ecol.targetVert(target);
-
-	if (!toPly(&ecol, ply_name))
-		return false;
-
-	id_map.clear();
-
 	return true;
 }

@@ -32,6 +32,7 @@ void PairCollapse::addVertex(HVertex vert) {
 	cvert.Set(vert.x, vert.y, vert.z);
 	cvert.markv(UNREFER);
 	cvert.setNewId(vertices.count());
+	cvert.setOutId(vertices.count());
 	vertices.push_back(cvert);
 	vertices[vertices.count() - 1].allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
 }

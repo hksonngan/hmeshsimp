@@ -178,3 +178,4 @@ bool PatchingSimp::simplfiyPatchesToPly(uint target_vert) {
 		}
 	}
 }
+

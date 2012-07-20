@@ -21,13 +21,30 @@
 #include "lru_cache.h"
 
 
+/* -- for debug -- */
+#define WRITE_PATCH_BINARY
+
 /* -- macros -- */
 
-#define WRITE_BLOCK(out, n, size)			out.write((char *)&n, size)
-#define WRITE_UINT(out, n)					out.write((char *)&n, sizeof(uint))
+#define WRITE_BLOCK_BIN(out, n, size)			out.write((char *)&n, size)
+#define WRITE_UINT_BIN(out, n)					out.write((char *)&n, sizeof(uint))
 
-#define READ_BLOCK(in, n, size)				in.read((char *)&n, size)
-#define READ_UINT(in, n)					in.read((char *)&n, sizeof(uint))
+#define READ_BLOCK_BIN(in, n, size)				in.read((char *)&n, size)
+#define READ_UINT_BIN(in, n)					in.read((char *)&n, sizeof(uint))
+
+#ifdef WRITE_PATCH_BINARY
+	#define WRITE_BLOCK(out, n, size)			WRITE_BLOCK_BIN(out, n, size)
+	#define WRITE_UINT(out, n)					WRITE_UINT_BIN(out, n)
+
+	#define READ_BLOCK(in, n, size)				READ_BLOCK_BIN(in, n, size)
+	#define READ_UINT(in, n)					READ_UINT_BIN(in, n)
+#else
+	#define WRITE_BLOCK(out, n, size)			out << n << " "
+	#define WRITE_UINT(out, n)					out << n << " "
+
+	#define READ_BLOCK(in, n, size)				in >> n
+	#define READ_UINT(in, n)					in >> n 
+#endif
 
 #define C_READ_BLOCK(fp, n, size, count)	fread((void *)&n, size, count, fp)
 #define C_WRITE_BLOCK(fp, n, size, count)	fwrite((void *)&n, size, count, fp)
@@ -367,9 +384,9 @@ public:
 	// binary(!) read
 	bool read(ifstream& fin) {
 
-		READ_BLOCK(fin, v.x, VERT_ITEM_SIZE);
-		READ_BLOCK(fin, v.y, VERT_ITEM_SIZE);
-		READ_BLOCK(fin, v.z, VERT_ITEM_SIZE);
+		READ_BLOCK_BIN(fin, v.x, VERT_ITEM_SIZE);
+		READ_BLOCK_BIN(fin, v.y, VERT_ITEM_SIZE);
+		READ_BLOCK_BIN(fin, v.z, VERT_ITEM_SIZE);
 
 		if (fin.good())
 			return true;
@@ -391,9 +408,9 @@ public:
 	// binary(!) write
 	bool write(ofstream& fout) { 
 
-		WRITE_BLOCK(fout, v.x, VERT_ITEM_SIZE);
-		WRITE_BLOCK(fout, v.y, VERT_ITEM_SIZE);
-		WRITE_BLOCK(fout, v.z, VERT_ITEM_SIZE);
+		WRITE_BLOCK_BIN(fout, v.x, VERT_ITEM_SIZE);
+		WRITE_BLOCK_BIN(fout, v.y, VERT_ITEM_SIZE);
+		WRITE_BLOCK_BIN(fout, v.z, VERT_ITEM_SIZE);
 
 		if (fout.good())
 			return true;
