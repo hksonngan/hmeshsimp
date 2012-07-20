@@ -49,10 +49,17 @@ public:
 public:
 	CollapsedVertex() { markv(UNREFER); };
 	void setNewId(uint _id) { new_id = _id; }
-	void markv(uchar m) { mark = m; }
-	bool valid(uint v_index) { return v_index == new_id; }
+	void markv(uchar m) { 
+		if (m == REFERRED) {
+			if (mark == UNREFER)
+				mark = REFERRED;
+		}
+		else
+			mark = m;
+ 	}
+	bool valid(uint v_index) { return v_index == new_id; } /* valid referred to uncollapsed */
 	bool unreferred() { return mark == UNREFER; }
-	bool interior() { return mark == UNREFER || mark == REFERRED; }
+	bool interior() { return mark != EXTERIOR; }
 	bool interior_bound() { return mark == INTERIOR_BOUND; }
 	bool exterior() { return mark == EXTERIOR; }
 };

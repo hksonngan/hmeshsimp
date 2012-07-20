@@ -97,11 +97,11 @@ public:
 	// simplify targeting vertex
 	// this function should be overrided
 	// in specific derivative class
-	bool targetVert(uint targe_count);
+	bool targetVert(uint target_count);
 	// simplify targeting face
 	// this function should be overrided
 	// in specific derivative class
-	bool targetFace(uint targe_count);
+	bool targetFace(uint target_count);
 
 
 	////////////////////////////////////
@@ -158,8 +158,18 @@ public:
 	char* getInfo() { return INFO_BUF; };
 	void clearInfo() { info_buf_len = 0; INFO_BUF[0] = '\0'; };
 	void totalTime();
+
 	uint vertexCount() const { return vertices.count(); }
 	uint faceCount() const { return faces.count(); }
+	uint validVerts() const { return valid_verts; }
+	uint validFaces() const { return valid_faces; }
+
+	CollapsableVertex& v(int i) const { return vertices[i]; }
+	CollapsableFace& f(int i) const { return faces[i]; }
+	bool f_interior (int i) const {
+		return vertices[faces[i].i].interior() && 
+			vertices[faces[i].j].interior() && 
+			vertices[faces[i].k].interior(); }
 
 	// clear heap
 	void clear();
@@ -176,8 +186,6 @@ protected:
 	HDynamArray<CollapsableFace>	faces;
 	uint	valid_faces;
 	MxHeap	pair_heap;
-
-	uint	valid_vert_count;
 
 	FaceIndexComp	faceIndexComp;
 
