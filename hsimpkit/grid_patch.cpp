@@ -8,9 +8,7 @@ using std::endl;
 using std::streampos;
 
 
-#define __FILE_NAME_BUF_SIZE 400
-
-bool HGridPatch::openForWrite(const char* dir_path, const HTripleIndex<uint> grid_index) {
+bool HGridPatch::openForWrite(const char* dir_path, const HTriple<uint> grid_index) {
 
 	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
 	getPatchPath(dir_path, grid_index, vert_name, face_name);
@@ -20,7 +18,7 @@ bool HGridPatch::openForWrite(const char* dir_path, const HTripleIndex<uint> gri
 	return true;
 }
 
-bool HGridPatch::openForRead(const char* dir_path, const HTripleIndex<uint> grid_index) {
+bool HGridPatch::openForRead(const char* dir_path, const HTriple<uint> grid_index) {
 
 	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
 	getPatchPath(dir_path, grid_index, vert_name, face_name);
@@ -30,14 +28,14 @@ bool HGridPatch::openForRead(const char* dir_path, const HTripleIndex<uint> grid
 	return true;
 }
 
-bool HGridPatch::patchToPly(const char* dir_path, const HTripleIndex<uint> grid_index) {
+bool HGridPatch::patchToPly(const char* dir_path, const HTriple<uint> grid_index) {
 
 	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
 	char ply_name[__FILE_NAME_BUF_SIZE];
 	int i;
 	uint orig_id; // external id
 	HVertex v;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 	ostringstream oss;
 
 	/* retrieve the names */
@@ -66,7 +64,6 @@ bool HGridPatch::patchToPly(const char* dir_path, const HTripleIndex<uint> grid_
 	if (!HMeshPatch::openForRead(vert_name, face_name))
 		return false;
 
-	id_map.clear();
 	for (i = 0; i < vert_count; i ++) {
 		if (!nextInteriorVertex(orig_id, v))
 			return false;
@@ -99,7 +96,7 @@ bool HGridPatch::patchToPly(const char* dir_path, const HTripleIndex<uint> grid_
 }
 
 bool HGridPatch::pairCollapseToPly(
-		char* dir_path, HTripleIndex<uint> grid_index, uint total_verts, uint total_target) {
+		char* dir_path, HTriple<uint> grid_index, uint total_verts, uint total_target) {
 
 	QuadricEdgeCollapse ecol;
 	uint target;
@@ -120,20 +117,12 @@ bool HGridPatch::pairCollapseToPly(
 
 	target = ((double) vert_count) / 
 				((double) total_verts) * total_target + exterior_count;
-	//if (interior_count < 10)
-	//	target = interior_count;
-	//else if (interior_count < 100) {
-	//	if (interior_count / 2 > target)
-	//		target = interior_count / 2;
-	//}
 
 	ecol.intialize();
 	ecol.targetVert(target);
 
 	if (!toPly(&ecol, ply_name))
 		return false;
-
-	id_map.clear();
 
 	return true;
 }

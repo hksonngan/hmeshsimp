@@ -16,12 +16,11 @@
 #include <sstream>
 #include <list>
 
-#include <boost/unordered_map.hpp>
 
-#include "util_common.h"
 #include "trivial.h"
 #include "pcol_iterative.h"
 #include "os_dependent.h"
+#include "io_common.h"
 
 using std::ostream;
 using std::ofstream;
@@ -29,8 +28,6 @@ using std::ifstream;
 using std::fstream;
 using std::ostringstream;
 using std::list;
-
-using boost::unordered::unordered_map;
 
 
 /*
@@ -47,8 +44,6 @@ using boost::unordered::unordered_map;
 
 /* ================================ & DEFINITION & ============================= */
 
-#define VERT_ITEM_SIZE sizeof(float)
-
 enum TargetOption { target_face, target_vert };
 
 /* interior boundary triangles */
@@ -57,11 +52,11 @@ public:
 	HIBTriangles() { face_count = 0; }
 
 	bool openIBTFileForWrite(const char* dir_path);
-	inline bool addIBTriangle(const HTripleIndex<uint> &f);
+	inline bool addIBTriangle(const HTriple<uint> &f);
 	bool closeIBTFileForWrite();
 
 	bool openIBTFileForRead(const char* dir_path);
-	inline bool nextIBTriangle(HTripleIndex<uint> &f);
+	inline bool nextIBTriangle(HTriple<uint> &f);
 	bool closeIBTFileForRead();
 
 	uint faceCount() const { return face_count; }
@@ -111,7 +106,7 @@ public:
 	inline bool addInteriorVertex(const uint &orig_id, const HVertex &v);
 	inline void addInteriorBound(const uint &orig_id);
 	inline void addExteriorBound(const uint &orig_id, const HVertex &v);
-	inline bool addFace(const HTripleIndex<uint> &f);
+	inline bool addFace(const HTriple<uint> &f);
 
 	/////////////////////////////////
 	// READ
@@ -121,17 +116,22 @@ public:
 	inline bool nextInteriorVertex(uint &orig_id, HVertex &v);
 	inline bool nextInteriorBound(uint &orig_id);
 	inline bool nextExteriorBound(uint &orig_id, HVertex &v);
-	inline bool nextFace(HTripleIndex<uint> &f);
+	inline bool nextFace(HTriple<uint> &f);
 
 	/////////////////////////////////
 	// SIMPLIFY
 
 	bool readPatch(char *vert_patch, char *face_patch, PairCollapse *pcol);
 	bool toPly(PairCollapse *pcol, const char* ply_name);
-	inline bool writeVert(ostream &out);
-	template<class OutType> bool pairCollapse(
-			char *vert_name, char *face_name, uint vert_start_id,
-			uint target, ostream &vout, OutType fout);
+	/* simp_verts: count of vertices after decimation */
+	template<class VOutType, class FOutType, class IdMapStreamType>
+	bool pairCollapse(
+			char *vert_name, char *face_name, uint vert_start_id, uint total_verts,
+			uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream,
+			__OUT uint &simp_verts);
+	template<class VOutType, class FOutType, class IdMapStreamType>
+	bool simpOutput(PairCollapse *pcol, uint vert_start_id, 
+			VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream);
 
 	/////////////////////////////////
 	// ACCESSORS
@@ -154,7 +154,7 @@ public:
 	list<HIdVertex> exterior_bound;
 
 	/* map between external id and internal id */
-	unordered_map<uint, uint> id_map;
+	uint_map id_map;
 
 private:
 	ofstream vert_out;
@@ -165,6 +165,36 @@ private:
 
 
 /* ================================ & IMPLEMENTATION & ============================= */
+
+/* -- HIBTriangles -- */
+
+bool HIBTriangles::addIBTriangle(const HTriple<uint> &f) {
+
+	WRITE_UINT(ibt_out, f.i);
+	WRITE_UINT(ibt_out, f.j);
+	WRITE_UINT(ibt_out, f.k);
+	face_count ++;
+#ifndef WRITE_PATCH_BINARY
+	ibt_out << endl;
+#endif
+
+	if (ibt_out.good())
+		return true;
+	cerr << "#ERROR: writing interior boundary triangle failed" << endl;
+	return false;
+}
+
+bool HIBTriangles::nextIBTriangle(HTriple<uint> &f) {
+
+	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
+	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
+	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
+
+	if (ibt_out.good())
+		return true;
+	cerr << "#ERROR: writing interior boundary triangle failed" << endl;
+	return false;
+}
 
 /* -- HMeshPatch -- */
 
@@ -199,7 +229,7 @@ void HMeshPatch::addExteriorBound(const uint &orig_id, const HVertex &v) {
 	exterior_bound.push_back(idv);
 }
 
-bool HMeshPatch::addFace(const HTripleIndex<uint> &f) {
+bool HMeshPatch::addFace(const HTriple<uint> &f) {
 
 	WRITE_UINT(face_out, f.i);
 	WRITE_UINT(face_out, f.j);
@@ -254,7 +284,7 @@ bool HMeshPatch::nextExteriorBound(uint &orig_id, HVertex &v) {
 	return false;
 }
 
-bool HMeshPatch::nextFace(HTripleIndex<uint> &f) {
+bool HMeshPatch::nextFace(HTriple<uint> &f) {
 
 	READ_UINT(face_in, f.i);
 	READ_UINT(face_in, f.j);
@@ -266,35 +296,80 @@ bool HMeshPatch::nextFace(HTripleIndex<uint> &f) {
 	return false;
 }
 
+template<class VOutType, class FOutType, class IdMapStreamType>
+bool HMeshPatch::simpOutput(PairCollapse *pcol, uint vert_start_id, 
+		VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream) {
 
-/* -- HIBTriangles -- */
+	int i;
+	uint valid_count = 0;
+	HTriple<uint> face;
+	HVertex vertex;
 
-bool HIBTriangles::addIBTriangle(const HTripleIndex<uint> &f) {
-	
-	WRITE_UINT(ibt_out, f.i);
-	WRITE_UINT(ibt_out, f.j);
-	WRITE_UINT(ibt_out, f.k);
-	face_count ++;
-#ifndef WRITE_PATCH_BINARY
-	ibt_out << endl;
-#endif
+	for (i = 0; i < pcol->vertexCount(); i ++) {
+		CollapsableVertex &v = pcol->v(i);
+		vertex.Set(v.x, v.y, v.z);
 
-	if (ibt_out.good())
-		return true;
-	cerr << "#ERROR: writing interior boundary triangle failed" << endl;
-	return false;
+		if (v.valid(i)) {
+			if (!v.unreferred() && !v.exterior()) {
+				if (!vout.add(v)) {
+					cerr << "#ERROR: -HMeshPatch::simpOutput- write vertex failed" << endl;
+					return false;
+				}
+				valid_count ++;
+				v.setOutId(valid_count + vert_start_id);
+			}
+		}
+		else {
+			CollapsableVertex v2 = pcol->v(v.new_id);
+			v.setOutId(v2.output_id);
+		}
+	}
+
+	list<uint>::iterator iter;
+	for (iter = interior_bound.begin(); iter != interior_bound.end(); iter ++) {
+		CollapsableVertex &v = pcol->v(id_map[*iter]);
+		bound_id_stream.add(*iter, v.output_id);
+	}
+
+	for (i = 0; i < pcol->faceCount(); i ++) {
+		CollapsableFace &f = pcol->f(i);
+		face.set(pcol->v(f.i).output_id, pcol->v(f.j).output_id, pcol->v(f.k).output_id);
+
+		if (f.valid()) {
+			if (!fout.add(face)) {
+				cerr << "#ERROR: -HMeshPatch::simpOutput- add face failed" << endl;
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
-bool HIBTriangles::nextIBTriangle(HTripleIndex<uint> &f) {
+template<class VOutType, class FOutType, class IdMapStreamType>
+bool HMeshPatch::pairCollapse(
+		char *vert_name, char *face_name, uint vert_start_id, uint total_verts,
+		uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream,
+		__OUT uint &simp_verts) {
 
-	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
-	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
-	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
+	QuadricEdgeCollapse ecol;
+	uint target;
+	ostringstream oss;
 
-	if (ibt_out.good())
-		return true;
-	cerr << "#ERROR: writing interior boundary triangle failed" << endl;
-	return false;
+	if (!readPatch(vert_name, face_name, &ecol))
+		return false;
+
+	target = ((double) vert_count) / 
+				((double) total_verts) * total_target + exterior_count;
+
+	ecol.intialize();
+	ecol.targetVert(target);
+
+	simp_verts = ecol.validVerts() - exterior_count;
+
+	if (!simpOutput(&ecol, vert_start_id, vout, fout, bound_id_stream));	
+
+	return true;
 }
 
 #endif //__H_MESH_PATCH__

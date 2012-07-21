@@ -59,4 +59,6 @@ inline void switchBytes(char* ptr, int size)
 	}
 }
 
+extern char* getPlyBinaryFormat();
+
 #endif //__TRIVIAL__

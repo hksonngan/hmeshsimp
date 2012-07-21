@@ -201,9 +201,9 @@ void HVertexClusterSimp::clear()
 	z_slice = 0;
 }
 
-HTripleIndex<uint> HVertexClusterSimp::retrieveIndex(HVertex v)
+HTriple<uint> HVertexClusterSimp::retrieveIndex(HVertex v)
 {
-	HTripleIndex<uint> i;
+	HTriple<uint> i;
 
 	i.i = (int)((v.x - min_x) / x_slice);
 	if (i.i >= x_partition) {
@@ -224,7 +224,7 @@ HTripleIndex<uint> HVertexClusterSimp::retrieveIndex(HVertex v)
 bool HVertexClusterSimp::addSoupTriangle(HSoupTriangle triangle)
 {
 	// index for three vertices in clusters
-	HTripleIndex<uint> i1, i2, i3;
+	HTriple<uint> i1, i2, i3;
 
 	if (x_slice == 0) {
 		x_slice = (max_x - min_x) / x_partition;
@@ -284,7 +284,7 @@ const char* getPolicyStr(RepCalcPolicy p)
 	return NULL;
 }
 
-void HVertexClusterSimp::getClusterRange(HTripleIndex<uint> index, float &_max_x, float &_min_x, 
+void HVertexClusterSimp::getClusterRange(HTriple<uint> index, float &_max_x, float &_min_x, 
 										 float &_max_y, float &_min_y, float &_max_z, float &_min_z)
 {
 	_min_x = min_x + index.i * x_slice;
@@ -333,7 +333,7 @@ bool HVertexClusterSimp::writeToPly(char* filename)
 					p_cluster->setVIndex(c);
 
 					// calculating representative vertex
-					getClusterRange(HTripleIndex<uint>(i, j, k), cmaxx, cminx, cmaxy, cminy, cmaxz, cminz);
+					getClusterRange(HTriple<uint>(i, j, k), cmaxx, cminx, cmaxy, cminy, cmaxz, cminz);
 					p_cluster->calcRepresentativeVertex(rep_calc_policy, cmaxx, cminx, cmaxy, cminy, cmaxz, cminz);
 
 					// write

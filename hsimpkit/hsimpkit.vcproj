@@ -357,20 +357,16 @@
 				RelativePath=".\random.h"
 				>
 			</File>
-			<File
-				RelativePath=".\util_common.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\util_common.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="common"
 			>
 			<File
-				RelativePath=".\compiler_config.h"
+				RelativePath=".\common_def.h"
+				>
+			</File>
+			<File
+				RelativePath=".\common_types.h"
 				>
 			</File>
 			<File
@@ -386,7 +382,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\h_math.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\h_math.h"
+				>
+			</File>
+			<File
 				RelativePath=".\h_time.h"
+				>
+			</File>
+			<File
+				RelativePath=".\io_common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\os_dependent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\os_dependent.h"
 				>
 			</File>
 			<File
@@ -395,18 +411,6 @@
 			</File>
 			<File
 				RelativePath=".\trivial.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="os"
-			>
-			<File
-				RelativePath=".\os_dependent.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\os_dependent.h"
 				>
 			</File>
 		</Filter>
@@ -559,6 +563,10 @@
 			</File>
 			<File
 				RelativePath=".\grid_patch.h"
+				>
+			</File>
+			<File
+				RelativePath=".\id_map_stream.h"
 				>
 			</File>
 			<File

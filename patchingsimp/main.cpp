@@ -4,6 +4,7 @@
 #include "patching_simp.h"
 #include "trivial.h"
 #include "mem_stream.h"
+#include "h_algorithm.h"
 
 using std::ofstream;
 using std::fstream;
@@ -12,15 +13,21 @@ using std::endl;
 
 static char* filename;
 static uint x_div = 2, y_div = 2, z_div = 2;
-static uint target = 4000;
+static uint target = 1000;
 
 int main(int argc, char** argv)
 {
-	mstream<int> m;
+	//mstream<int> m;
+	//m << 1 << 2 << 3;
+	//return 0;
 
-	m << 1 << 2 << 3;
-
-	return 0;
+	//HDynamArray<int> arr;
+	//arr.randGen(100, 20000);
+	//insertion_sort<int, HDynamArray<int>>(arr, 100);
+	//for (int i = 0; i < arr.count(); i ++) {
+	//	cout << arr[i] << endl;
+	//}
+	//return 0;
 
 	PatchingSimp psimp;
 	ofstream flog("patchingsimp.log", fstream::app);
@@ -49,6 +56,8 @@ int main(int argc, char** argv)
 	flog << psimp.info();
 	if (!ret)
 		return EXIT_FAILURE;
+
+	return 0;
 
 	psimp.patchesToPly();
 	psimp.simplfiyPatchesToPly(target);

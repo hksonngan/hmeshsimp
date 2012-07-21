@@ -176,6 +176,9 @@ bool HMeshPatch::openForRead(const char* vert_name, const char* face_name) {
 	interior_count = 0;
 	exterior_count = 0;
 #endif
+	interior_bound.clear();
+	exterior_bound.clear();
+	id_map.clear();
 
 	face_in.open(face_name, fstream::binary | fstream::in);
 	if (!face_in.good()) {
@@ -205,14 +208,13 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 	int i;
 	uint orig_id; // external id
 	HVertex v;
-	HTripleIndex<uint> f, f_internal;
+	HTriple<uint> f, f_internal;
 
 	if (!HMeshPatch::openForRead(vert_patch, face_patch))
 		return false;
 	pcol->allocVerts(vert_count + exterior_count);
 	pcol->allocFaces(face_count);
 
-	id_map.clear();
 	for (i = 0; i < vert_count; i ++) {
 		if (!nextInteriorVertex(orig_id, v))
 			return false;

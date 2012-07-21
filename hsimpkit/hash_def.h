@@ -11,14 +11,14 @@
 #ifndef __HASH_DEF__
 #define __HASH_DEF__
 
-#include "util_common.h"
+#include "common_types.h"
 #include <boost/unordered_set.hpp>
 
 using boost::unordered::unordered_set;
 
 
 /* -- the face index (three uniform cluster index, 
-      thus three HTripleIndex which is three integer)
+      thus three HTriple which is three integer)
 	  hash definition -- */
 
 /* the hash functor */
@@ -55,16 +55,16 @@ public:
 /* type of degenerated face container for vertex clustering */
 typedef unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HFaceIndexSet;
 
-/* -- the HTripleIndex<uint> hash definitions -- */
+/* -- the HTriple<uint> hash definitions -- */
 
 /* -- hash -- */
 
 /* the hash functor */
 /* !!this name is a little improper, will change it or not */ 
-class HTripleIndexHash
+class HTripleHash
 {
 public:
-	size_t operator()(const HTripleIndex<uint>& index) const {
+	size_t operator()(const HTriple<uint>& index) const {
 		unsigned long h = 0;
 		uint arr[3];
 
@@ -79,22 +79,22 @@ public:
 };
 
 /* the unsequenced equal functor (which means <1,2,3> = <2,1,3>) */
-class HTripleIndexEqual
+class HTripleEqual
 {
 public:
-	bool operator()(const HTripleIndex<uint>& h1, const HTripleIndex<uint>& h2) const {
+	bool operator()(const HTriple<uint>& h1, const HTriple<uint>& h2) const {
 		return h1.unsequencedEqual(h2);
 	}
 };
 
 /* type of degenerated face container for spatial division */
-typedef unordered_set<HTripleIndex<uint>, HTripleIndexHash, HTripleIndexEqual> HTripleIndexSet;
+typedef unordered_set<HTriple<uint>, HTripleHash, HTripleEqual> HTripleSet;
 
 /* the sequenced equal functor (which means <1,2,3> != <2,1,3>) */
-class HTripleIndexSequencedEqual
+class HTripleSequencedEqual
 {
 public:
-	bool operator()(const HTripleIndex<uint>& h1, const HTripleIndex<uint>& h2) const {
+	bool operator()(const HTriple<uint>& h1, const HTriple<uint>& h2) const {
 		return h1 == h2;
 	}
 };

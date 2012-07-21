@@ -22,10 +22,11 @@
 
 #include "lru_cache.h"
 #include "ply_stream.h"
-#include "util_common.h"
+
 #include "mesh_patch.h"
 #include "grid_patch.h"
 #include "hash_def.h"
+#include "h_dynamarray.h"
 
 using std::ofstream;
 using std::ostringstream;
@@ -49,11 +50,11 @@ using boost::unordered::unordered_map;
 
 /* map between grid index and the patch object */
 
-typedef HTripleIndex<uint> HPatchIndex;
+typedef HTriple<uint> HPatchIndex;
 typedef 
 unordered_map<
 	HPatchIndex, HGridPatch*, 
-	HTripleIndexHash, HTripleIndexSequencedEqual> 
+	HTripleHash, HTripleSequencedEqual> 
 HIndexPatchMap;
 
 /* out-of-core mesh divide base on the uniform grid */
@@ -97,6 +98,8 @@ public:
 	/////////////////////////////////////
 	// SIMPLIFY
 	bool simplfiyPatchesToPly(uint target_vert);
+	bool mergeSimp(ostream &out, uint target_vert);
+	bool mergeSimpPly(uint target_vert);
 
 	/////////////////////////////////////
 	// OUTPUT
@@ -129,9 +132,9 @@ private:
 	inline void partitionInit();
 	inline bool partitionEnd();
 	inline void getSlice();
-	inline void getGridIndex(const HVertex &v, HTripleIndex<uint> &i);
+	inline void getGridIndex(const HVertex &v, HTriple<uint> &i);
 	inline HGridPatch* getPatch(const HPatchIndex &pi);
-	inline bool addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3);
+	inline bool addFaceToPatch(const HTriple<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3);
 
 private:
 
@@ -142,8 +145,12 @@ private:
 	 * a hash map, key is the grid coordinate, 
 	 * value is the patch object 
 	 */
-	HIndexPatchMap indexPatchMap;
-	HIBTriangles ibt;
+	HIndexPatchMap 
+				indexPatchMap;
+	HDynamArray<HTriple<uint>> 
+				patchIndices;
+	HIBTriangles 
+				ibt;
 
 	/* num of vertices & faces */
 	uint		vert_count;
@@ -164,6 +171,14 @@ private:
 	char		*vertbin_name;
 	LRUCache<LRUVertex>	
 				vert_bin;
+
+	/* the map between original id of interior 
+	 * boundary vertices and the output id */
+	uint_map	bound_id_stream;
+
+	/* vertices count after decimation */
+	uint		simp_verts;
+	uint		simp_faces;
 
 	/* the temporary file base directory */
 	char		*tmp_base;
@@ -297,6 +312,7 @@ bool PatchingSimp::partitionEnd() {
 
 	vert_bin.clearCache();
 
+	patchIndices.resize(indexPatchMap.size());
 	for (iter = indexPatchMap.begin(), i = 0; iter != indexPatchMap.end(); iter ++, i ++) {
 
 		if (iter->second->closeForWrite() == false) {
@@ -306,9 +322,13 @@ bool PatchingSimp::partitionEnd() {
 			return false;
 		}
 
+		patchIndices.push_back(iter->first);
+
 		oss << "\t\t" << i << "\t" << iter->first.i << "_" << iter->first.j << "_" << iter->first.k 
 			<< "\t" << iter->second->verts() << "\t" << iter->second->interiors()
 			<< "\t" << iter->second->exteriors() << "\t" << iter->second->faces() << endl;
+
+		delete iter->second;
 	}
 
 	info(oss);
@@ -316,7 +336,7 @@ bool PatchingSimp::partitionEnd() {
 	return true;
 }
 
-void PatchingSimp::getGridIndex(const HVertex &v, HTripleIndex<uint> &i) {
+void PatchingSimp::getGridIndex(const HVertex &v, HTriple<uint> &i) {
 
 	i.i = (int)((v.x - min_x) / x_slice);
 	if (i.i >= x_div) {
@@ -349,9 +369,9 @@ HGridPatch* PatchingSimp::getPatch(const HPatchIndex &pi) {
 	return pPatch;
 }
 
-bool PatchingSimp::addFaceToPatch(const HTripleIndex<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3) {
+bool PatchingSimp::addFaceToPatch(const HTriple<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3) {
 
-	HTripleIndex<uint> v1pindex, v2pindex, v3pindex;
+	HTriple<uint> v1pindex, v2pindex, v3pindex;
 	HGridPatch *pPatch1, *pPatch2, *pPatch3;
 
 	getGridIndex(v1, v1pindex);

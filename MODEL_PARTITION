@@ -10,6 +10,7 @@ Patch Growing
   [Turk. Re-tiling polygonal surfaces]
  
 Data paritioning
+
   Although it is easy to partition the input model, it is more difficult to partition the output model. A cluster represents a primitive in the simplified model. In R-Simp the stopping criteria is the number of clusters N. In a parallel or a serialized parallel algorithm N = N1 + N2 ... + Nn , where Ni is the number of clusters in partition i. It is diffocult to determine Ni because it depends on the surface in the other partitions. There are several ways to approximate Ni but it is not known how to obtain the exact value at the present time. 
   
 Loss of Ordering In Patching Simplification (TAKEN FROM [Brodsky & Pedersen. Parallel Model Simplification of Very Large Polygonal Meshes])

@@ -47,12 +47,21 @@ string getFileExtension(const char *filepath) {
 	return filename.substr(i + 1);
 }
 
-EndianOrder getSystemEndianMode()
-{
+EndianOrder getSystemEndianMode() {
+
 	unsigned short test = 0x1122;
 
 	if( *( (unsigned char*) &test ) == 0x11 )
 		return H_BIG_ENDIAN;
 	else
 		return H_LITTLE_ENDIAN;
+}
+
+char* getPlyBinaryFormat() {
+
+	EndianOrder e = getSystemEndianMode();
+	if (H_BIG_ENDIAN)
+		return "binary_big_endian 1.0";
+	else
+		return "binary_little_endian 1.0";
 }

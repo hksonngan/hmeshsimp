@@ -32,7 +32,7 @@
 #include <Eigen/Eigenvalues>
 
 /* my own code */
-#include "util_common.h"
+
 #include "vertex_cluster.h"
 #include "hash_def.h"
 #include "double_heap.h"
@@ -153,7 +153,7 @@ public:
 	inline void addVertex(HVertex v);
 	// caution: better add the faces after 
 	// you've added all the vertices
-	inline void addFace(HTripleIndex<uint> i3);
+	inline void addFace(HTriple<uint> i3);
 	bool readPly(char *filename);
 	bool divide(int target_count);
 	bool toPly(char *filename);
@@ -193,11 +193,11 @@ private:
 	// all the vertices, gvl
 	HSDVertex2 *vertices; int vertexCount;
 	// all the faces, gfl
-	HTripleIndex<uint> *faces; int faceCount;
+	HTriple<uint> *faces; int faceCount;
 	// all the clusters in a heap
 	DoubleHeap<HSDVertexCluster2> clusters;
 	// degenerated face hash set
-	HTripleIndexSet degFaces;
+	HTripleSet degFaces;
 
 	// bounding box
 	float max_x, min_x, max_y, min_y, max_z, min_z;
@@ -346,7 +346,7 @@ inline void HSpatialDivision2::addVertex(HVertex v)
 	vertexCount ++;
 }
 
-inline void HSpatialDivision2::addFace(HTripleIndex<uint> i3)
+inline void HSpatialDivision2::addFace(HTriple<uint> i3)
 {
 	faces[faceCount] = i3;
 	faceCount ++;
@@ -397,7 +397,7 @@ inline void HSpatialDivision2::partition8(
 
 	int i;
 	list<uint>::iterator iter;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 
 	for (i = 0; i < 8; i ++) {
 		vcArr[i].weakClear();
@@ -473,7 +473,7 @@ inline void HSpatialDivision2::partition4(
 
 	int i;
 	list<uint>::iterator iter;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 
 	for (i = 0; i < 4; i ++) {
 		vcArr[i].weakClear();
@@ -532,7 +532,7 @@ inline void HSpatialDivision2::partition2(
 
 	int i;
 	list<uint>::iterator iter;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 
 	for (i = 0; i < 2; i ++) {
 		vcArr[i].weakClear();
@@ -583,7 +583,7 @@ inline void HSpatialDivision2::splitConnectedRange(HSDVertexCluster2 &vc)
 
 	int i;
 	list<uint>::iterator iter;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 	// local cluster index start from 0, -1 denotes that it hasn't been given a cluster id
 	int curCluster = 0;
 
@@ -661,7 +661,7 @@ inline void HSpatialDivision2::searchConnectivityBF(uint vSrcIndex, uint cluster
 	
 	uint vIndex;
 	list<uint>::iterator iter;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 
 	// push from front, pop from back
 	vertices[vSrcIndex].clusterIndex = clusterIndex;
