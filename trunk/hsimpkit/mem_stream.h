@@ -19,6 +19,10 @@ public:
 	mstream<T>& operator<< (T e) { 
 		push_back(e); 
 		return *this; }
+
+	bool add(T e) { 
+		push_back(e); 
+		return true; }
 };
 
 #endif //__H_MEM_STREAM__

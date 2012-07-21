@@ -11,7 +11,7 @@
 #define __PLY_STREAM__
 
 #include "ply/ply.h"
-#include "util_common.h"
+#include "common_types.h"
 #include <iostream>
 
 typedef struct Vertex {
@@ -49,7 +49,7 @@ public:
 	bool close();
 	inline bool nextVertex(HVertex &v);
 	inline bool nextFace(HFace &f);
-	//inline bool nextFace(HTripleIndex<uint> &f);
+	//inline bool nextFace(HTriple<uint> &f);
 
 	uint getVertexCount() const { return vCount; }
 	uint getFaceCount() const { return fCount; }
@@ -79,7 +79,7 @@ static inline void freePointersInFace(Face *face) {
 	}
 }
 
-bool PlyStream::nextFace(HFace &f)
+bool PlyStream::nextFace(HTriple<uint> &f)
 {
 	if (readFCount >= fCount) {
 		return false;
@@ -103,14 +103,6 @@ bool PlyStream::nextFace(HFace &f)
 
 	return true;
 }
-
-//bool PlyStream::nextFace(HTripleIndex<uint> &f) {
-//	if (!nextFace(_face))
-//		return false;
-//	f.set(_face.i, _face.j, _face.k);
-//
-//	return true;
-//}
 
 bool PlyStream::nextVertex(HVertex &v)
 {

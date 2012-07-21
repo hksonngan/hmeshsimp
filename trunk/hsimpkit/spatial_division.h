@@ -27,7 +27,7 @@
 #include <boost/unordered_set.hpp>
 #include <Eigen/Eigenvalues>
 
-#include "util_common.h"
+
 #include "vertex_cluster.h"
 #include "hash_def.h"
 #define PRINT_HEAP
@@ -373,7 +373,7 @@ public:
 	void addVertex(HVertex v);
 	// caution: better add the faces after 
 	// you've added all the vertices
-	void addFace(HTripleIndex<uint> i3);
+	void addFace(HTriple<uint> i3);
 	bool readPly(char *filename);
 	bool divide(int target_count);
 	bool toPly(char *filename);
@@ -420,7 +420,7 @@ private:
 	HSDVertex *vertices;
 	int vertexCount;
 	// all the faces, gfl
-	HTripleIndex<uint> *faces;
+	HTriple<uint> *faces;
 	int faceCount;
 	/// abandoned
 	// vertex index map
@@ -429,7 +429,7 @@ private:
 	// all the clusters in a heap
 	DoubleHeap<HSDVertexCluster> clusters;
 	// degenerated face hash set
-	HTripleIndexSet degFaces;
+	HTripleSet degFaces;
 	// partition functors
 	// patition8 4 2 and splitConnectedRange should use different object of ArraySelfPartition
 	ArraySelfPartition<HSDVertex, HSDVertex*> vertPartition;

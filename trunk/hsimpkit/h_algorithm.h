@@ -224,4 +224,28 @@ void merge_arr(
 	merge_sorted_arr<ElemType, ContainerType>(arr1, arr1_count, arr2, arr2_count, dst);
 }
 
+template<class ElemType, class ContainerType>
+inline void insertion_sort(ContainerType &arr, int n) {
+
+	ElemType temp;
+	int index1, index2, index3;
+
+	// insertion sort
+	for (index1 = 1; index1 < n; index1 ++) {
+
+		for (index2 = 0; index2 < index1; index2 ++)
+			if (arr[index2] > arr[index1])
+				break;
+
+		if (index1 == index2)
+			continue;
+
+		temp = arr[index1];
+		for (index3 = index1; index3 > index2; index3 --) {
+			arr[index3] = arr[index3 - 1];
+		}
+		arr[index2] = temp;
+	}
+}
+
 #endif //__H_ALGORITHM__

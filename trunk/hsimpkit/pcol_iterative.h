@@ -19,7 +19,7 @@
 #include <fstream>
 #include "pcol_vertex.h"
 #include "pcol_other_structures.h"
-#include "util_common.h"
+#include "common_types.h"
 #include "h_dynamarray.h"
 #include "MixKit/MxHeap.h"
 #include "h_aug_time.h"

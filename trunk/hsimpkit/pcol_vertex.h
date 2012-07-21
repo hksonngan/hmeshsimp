@@ -15,7 +15,7 @@
 #include <list>
 #include <climits>
 
-#include "util_common.h"
+#include "common_types.h"
 #include "h_dynamarray.h"
 #include "pcol_other_structures.h"
 #include "MixKit/MxQMetric3.h"

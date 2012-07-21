@@ -11,7 +11,7 @@
 #define __PCOL_OTHER__
 
 #include "MixKit/MxHeap.h"
-#include "util_common.h"
+#include "common_types.h"
 
 #define MAX_CHAR 0xff
 #define FACE_INVALID MAX_CHAR
@@ -75,7 +75,7 @@ public:
    to the valid vertices, so the indices may be
    changed along the collapse. But if it is invalidated,
    it will never change. */
-class CollapsableFace: public HTripleIndex<uint> {
+class CollapsableFace: public HTriple<uint> {
 public:
 	CollapsableFace() { mark = 0; }
 	void markFace(uchar m) { mark = m; }

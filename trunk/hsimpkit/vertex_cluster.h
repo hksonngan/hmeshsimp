@@ -19,7 +19,8 @@
 #include "math/chapill_vec3.h"
 #include "math/chapill_vec4.h"
 #include "math/mat44.h"
-#include "util_common.h"
+#include "h_math.h"
+#include "common_types.h"
 #include "hash_def.h"
 
 
@@ -92,7 +93,7 @@ private:
 };
 
 using boost::unordered::unordered_map;
-typedef unordered_map<HTripleIndex<uint>, HVertexCluster, HTripleIndexHash, HTripleIndexEqual> HClusterMap;
+typedef unordered_map<HTriple<uint>, HVertexCluster, HTripleHash, HTripleEqual> HClusterMap;
 
 /* vertex clusters container */
 class HVertexClusterContainer
@@ -101,19 +102,19 @@ public:
 	bool create(uint _x_partition, uint _y_partition, uint _z_partition);
 	bool clear();
 
-	HVertexCluster* get(const HTripleIndex<uint> &index) const {
+	HVertexCluster* get(const HTriple<uint> &index) const {
 		return get(index.i, index.j, index.k); }
 
 	HVertexCluster* get(const uint i, const uint j, const uint k) const {
 		return pp_cluster[i * y_partition * z_partition + j * z_partition + k]; }
 
-	bool exist(const HTripleIndex<uint> &index) const {
+	bool exist(const HTriple<uint> &index) const {
 		return get(index) != NULL; }
 
 	bool exist(const uint i, const uint j, const uint k) const {
 		return get(i, j, k) != NULL; }
 
-	bool addFace(HTripleIndex<uint> index, HSoupTriangle tri) {
+	bool addFace(HTriple<uint> index, HSoupTriangle tri) {
 		addFace(index.i, index.j, index.k, tri);
 		return true;
 	}
@@ -123,7 +124,7 @@ public:
 	bool addFace(uint i, uint j, uint k, HSoupTriangle tri);
 
 	// add a vertex to a corresponding cluster for calculating of mean vertex
-	void addVertex(HTripleIndex<uint> index, HVertex vertex){
+	void addVertex(HTriple<uint> index, HVertex vertex){
 		addVertex(index.i, index.j, index.k, vertex); }
 
 	void addVertex(uint i, uint j, uint k, HVertex vertex);
@@ -157,8 +158,8 @@ public:
 	bool addSoupTriangle(HSoupTriangle triangle);
 	bool generateIndexedMesh();
 	bool writeToPly(char* filename);
-	HTripleIndex<uint> retrieveIndex(HVertex v);
-	void getClusterRange(HTripleIndex<uint> index, float &_max_x, float &_min_x, float &_max_y, float &_min_y, float &_max_z, float &_min_z);
+	HTriple<uint> retrieveIndex(HVertex v);
+	void getClusterRange(HTriple<uint> index, float &_max_x, float &_min_x, float &_max_y, float &_min_y, float &_max_z, float &_min_z);
 
 private:
 	/* use hash map to store the degenerated face index */

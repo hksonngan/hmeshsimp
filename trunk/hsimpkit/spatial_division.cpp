@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "util_common.h"
+#include "common_types.h"
 #include "math/chapill_vec3.h"
 #include "ply_stream.h"
 #include <fstream>
@@ -203,7 +203,7 @@ void HSpatialDivision::addVertex(HVertex v)
 	vertexCount ++;
 }
 
-void HSpatialDivision::addFace(HTripleIndex<uint> i3)
+void HSpatialDivision::addFace(HTriple<uint> i3)
 {
 	faces[faceCount] = i3;
 	faceCount ++;
@@ -256,7 +256,7 @@ bool HSpatialDivision::readPly(char *filename)
 	PlyStream plyStream;
 	uint i;
 	HVertex v;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 
 	if (plyStream.openForRead(filename) == false) {
 		return false;
@@ -264,7 +264,7 @@ bool HSpatialDivision::readPly(char *filename)
 
 	// set the capacity for the gvl and gfl
 	vertices = new HSDVertex[plyStream.getVertexCount()];
-	faces = new HTripleIndex<uint>[plyStream.getFaceCount()];
+	faces = new HTriple<uint>[plyStream.getFaceCount()];
 	//vIndexMap.resize(plyStream.getVertexCount());
 	notifyVertSwap.vertices = vertices;
 	
@@ -579,7 +579,7 @@ bool HSpatialDivision::toPly(char *filename)
 		fout << v.x << " " << v.y << " " << v.z << endl;
 	}
 
-	HTripleIndexSet::iterator iter;
+	HTripleSet::iterator iter;
 	for (iter = degFaces.begin(); iter != degFaces.end(); iter ++)
 	{
 		fout << "3 " << iter->i << " " << iter->j << " " << iter->k << std::endl;
@@ -598,7 +598,7 @@ void HSpatialDivision::generateIndexedMesh()
 {
 	int i, vindex, j, i1, i2, i3;
 	HSDVertexCluster sdc;
-	HTripleIndex<uint> tripleIndex;
+	HTriple<uint> tripleIndex;
 	int *indexMap = new int[vertexCount];
 
 	for (i = 0; i < clusters.count(); i ++) {

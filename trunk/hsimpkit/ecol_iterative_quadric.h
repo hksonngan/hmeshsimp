@@ -17,6 +17,7 @@
 // for some constants and typedefs
 //#include "MxStdSlim.h"
 #include "gfx/geom3d.h"
+#include "h_math.h"
 
 
 /// definitions from _QSLIM_

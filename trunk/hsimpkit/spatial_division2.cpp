@@ -2,7 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <time.h>
-#include "util_common.h"
+#include "common_types.h"
 #include "math/chapill_vec3.h"
 #include "ply_stream.h"
 #include "stdio.h"
@@ -97,7 +97,7 @@ bool HSpatialDivision2::readPly(char *filename)
 	PlyStream plyStream;
 	integer i;
 	HVertex v;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 
 	htime.setCheckPoint();
 
@@ -107,7 +107,7 @@ bool HSpatialDivision2::readPly(char *filename)
 
 	// set the capacity for the gvl and gfl
 	vertices = new HSDVertex2[plyStream.getVertexCount()];
-	faces = new HTripleIndex<uint>[plyStream.getFaceCount()];
+	faces = new HTriple<uint>[plyStream.getFaceCount()];
 
 	for (i = 0; i < plyStream.getVertexCount(); i ++) {
 
@@ -357,7 +357,7 @@ bool HSpatialDivision2::toPly(char *filename)
 		fout << v.x << " " << v.y << " " << v.z << endl;
 	}
 
-	HTripleIndexSet::iterator iter;
+	HTripleSet::iterator iter;
 	for (iter = degFaces.begin(); iter != degFaces.end(); iter ++)
 	{
 		fout << "3 " << iter->i << " " << iter->j << " " << iter->k << std::endl;
@@ -383,7 +383,7 @@ void HSpatialDivision2::generateIndexedMesh()
 {
 	int i, vindex, i1, i2, i3;
 	HSDVertexCluster2 sdc;
-	HTripleIndex<uint> tripleIndex;
+	HTriple<uint> tripleIndex;
 	list<uint>::iterator iter;
 
 	for (i = 0; i < clusters.count(); i ++) {
@@ -410,7 +410,7 @@ void HSpatialDivision2::generateIndexedMesh()
 void HSpatialDivision2::searchConnectivity(uint vIndex, uint clusterIndex) {
 
 	list<uint>::iterator iter;
-	HTripleIndex<uint> f;
+	HTriple<uint> f;
 
 	vertices[vIndex].clusterIndex = clusterIndex;
 
