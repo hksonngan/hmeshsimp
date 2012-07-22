@@ -212,8 +212,14 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 
 	if (!HMeshPatch::openForRead(vert_patch, face_patch))
 		return false;
+	
 	pcol->allocVerts(vert_count + exterior_count);
 	pcol->allocFaces(face_count);
+
+	interior_bound.clear();
+	interior_bound.resize(interior_count);
+	exterior_bound.clear();
+	id_map.clear();
 
 	for (i = 0; i < vert_count; i ++) {
 		if (!nextInteriorVertex(orig_id, v))
@@ -225,6 +231,7 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 	for (i = 0; i < interior_count; i ++) {
 		if (!nextInteriorBound(orig_id))
 			return false;
+		interior_bound.push_back(orig_id);
 		(pcol->v(id_map[orig_id])).markv(INTERIOR_BOUND);
 	}
 
