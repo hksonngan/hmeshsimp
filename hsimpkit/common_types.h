@@ -127,12 +127,7 @@ public:
 	// occurring in different order
 	void sortIndex(ElemType *arr) const
 	{
-		ElemType temp;
-		int index1, index2, index3;
-
-		arr[0] = i;
-		arr[1] = j;
-		arr[2] = k;
+		arr[0] = i; arr[1] = j; arr[2] = k;
 
 		// insertion sort
 		insertion_sort<ElemType, ElemType*>(arr, 3);
@@ -145,13 +140,33 @@ public:
 typedef HTriple<uint> HFace;
 typedef HTriple<uint> HClusterIndex;
 
-inline void write_face(ostream &out, const HTriple<uint> &f) {
-	uint n = 3;
+inline void write_face_txt(ostream &out, const HTriple<uint> &f) {
 
-	WRITE_UINT(out, n);
+	out << "3 " << f.i << " " << f.j << " " << f.k << endl;
+}
+
+inline void write_vert_txt(ostream &out, const HVertex &v) {
+
+	out << v.x << " " << v.y << " " << v.z << endl;
+}
+
+inline void write_face(ostream &out, const HTriple<uint> &f) {
+	uchar n = 3;
+
+	WRITE_BLOCK(out, n, sizeof(uchar));
 	WRITE_UINT(out, f.i);
 	WRITE_UINT(out, f.j);
 	WRITE_UINT(out, f.k);
+#ifndef WRITE_PATCH_BINARY
+	out << endl;
+#endif
+}
+
+inline void write_vert(ostream &out, const HVertex &v) {
+
+	WRITE_BLOCK(out, v.x, VERT_ITEM_SIZE);
+	WRITE_BLOCK(out, v.y, VERT_ITEM_SIZE);
+	WRITE_BLOCK(out, v.z, VERT_ITEM_SIZE);
 #ifndef WRITE_PATCH_BINARY
 	out << endl;
 #endif

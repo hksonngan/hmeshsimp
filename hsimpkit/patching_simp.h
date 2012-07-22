@@ -98,8 +98,10 @@ public:
 	/////////////////////////////////////
 	// SIMPLIFY
 	bool simplfiyPatchesToPly(uint target_vert);
-	bool mergeSimp(ostream &out, uint target_vert);
-	bool mergeSimpPly(uint target_vert);
+	template<class VOutType, class FOutType, class IdMapStreamType>
+	bool mergeSimp(uint target_vert, VOutType &vout, FOutType &fout, 
+					IdMapStreamType &bound_id_map);
+	bool mergeSimpPly(uint target_vert, bool binary = true);
 
 	/////////////////////////////////////
 	// OUTPUT
@@ -171,10 +173,6 @@ private:
 	char		*vertbin_name;
 	LRUCache<LRUVertex>	
 				vert_bin;
-
-	/* the map between original id of interior 
-	 * boundary vertices and the output id */
-	uint_map	bound_id_stream;
 
 	/* vertices count after decimation */
 	uint		simp_verts;

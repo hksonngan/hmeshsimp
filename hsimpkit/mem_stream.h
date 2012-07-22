@@ -23,6 +23,8 @@ public:
 	bool add(T e) { 
 		push_back(e); 
 		return true; }
+
+	bool good() { return true; }
 };
 
 #endif //__H_MEM_STREAM__

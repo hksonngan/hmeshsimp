@@ -13,7 +13,7 @@ using std::endl;
 
 static char* filename;
 static uint x_div = 2, y_div = 2, z_div = 2;
-static uint target = 1000;
+static uint target = 20000;
 
 int main(int argc, char** argv)
 {
@@ -35,10 +35,15 @@ int main(int argc, char** argv)
 	char tmp_dir[200];
 
 	// F:/plys/bunny/bun_zipper.ply
-	// d:/bunny/bun_zipper.ply
 	// F:/plys/happy_recon/happy_vrip.ply
 
-	filename = "d:/bunny/bun_zipper.ply";
+	// d:/bunny/bun_zipper.ply
+	// d:/happy_recon/happy_vrip.ply
+	// D:/hmeshsimp/patchingsimp/bun_zipper_patches/bun_zipper_psimp_bin.ply
+	// d:/xyzrgb_statuette.ply
+	// d:/lucy.ply
+
+	filename = "d:/lucy.ply";
 	stringToCstr(getFilename(filename) + "_patches", tmp_dir);
 
 	flog << "\t#" << getTime();
@@ -55,12 +60,12 @@ int main(int argc, char** argv)
 	cout << psimp.info();
 	flog << psimp.info();
 	if (!ret)
-		return EXIT_FAILURE;
+		return EXIT_FAILURE;;
 
-	return 0;
+	//psimp.patchesToPly();
+	//psimp.simplfiyPatchesToPly(target);
 
-	psimp.patchesToPly();
-	psimp.simplfiyPatchesToPly(target);
+	psimp.mergeSimpPly(target, true);
 
 	return EXIT_SUCCESS;
 }

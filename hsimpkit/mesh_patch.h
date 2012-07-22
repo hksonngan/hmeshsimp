@@ -44,7 +44,7 @@ using std::list;
 
 /* ================================ & DEFINITION & ============================= */
 
-enum TargetOption { target_face, target_vert };
+enum TargetOption { TARGET_FACE, TARGET_VERT };
 
 /* interior boundary triangles */
 class HIBTriangles {
@@ -186,9 +186,9 @@ bool HIBTriangles::addIBTriangle(const HTriple<uint> &f) {
 
 bool HIBTriangles::nextIBTriangle(HTriple<uint> &f) {
 
-	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
-	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
-	READ_BLOCK(ibt_in, f.i, VERT_ITEM_SIZE);
+	READ_UINT(ibt_in, f.i);
+	READ_UINT(ibt_in, f.j);
+	READ_UINT(ibt_in, f.k);
 
 	if (ibt_out.good())
 		return true;
@@ -315,12 +315,12 @@ bool HMeshPatch::simpOutput(PairCollapse *pcol, uint vert_start_id,
 					cerr << "#ERROR: -HMeshPatch::simpOutput- write vertex failed" << endl;
 					return false;
 				}
-				valid_count ++;
 				v.setOutId(valid_count + vert_start_id);
+				valid_count ++;
 			}
 		}
 		else {
-			CollapsableVertex v2 = pcol->v(v.new_id);
+			CollapsableVertex &v2 = pcol->v(v.new_id);
 			v.setOutId(v2.output_id);
 		}
 	}
@@ -335,7 +335,7 @@ bool HMeshPatch::simpOutput(PairCollapse *pcol, uint vert_start_id,
 		CollapsableFace &f = pcol->f(i);
 		face.set(pcol->v(f.i).output_id, pcol->v(f.j).output_id, pcol->v(f.k).output_id);
 
-		if (f.valid()) {
+		if (f.valid() && pcol->f_interior(i)) {
 			if (!fout.add(face)) {
 				cerr << "#ERROR: -HMeshPatch::simpOutput- add face failed" << endl;
 				return false;
