@@ -139,10 +139,6 @@ private:
 	inline bool addFaceToPatch(const HTriple<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3);
 
 private:
-
-	/////////////////////////////////////
-	// PARTITION
-
 	/* 
 	 * a hash map, key is the grid coordinate, 
 	 * value is the patch object 
