@@ -220,6 +220,9 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 	interior_bound.resize(interior_count);
 	exterior_bound.clear();
 	id_map.clear();
+	id_map.rehash(vert_count + exterior_count);
+
+	cout << "\tid map init buckets: " << id_map.bucket_count();
 
 	for (i = 0; i < vert_count; i ++) {
 		if (!nextInteriorVertex(orig_id, v))
@@ -242,6 +245,9 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 		pcol->addVertex(v);
 		(pcol->v(vert_count + i)).markv(EXTERIOR);
 	}
+
+	cout << " final buckets: " << id_map.bucket_count() << endl
+		<< "\tavg load: " << id_map.load_factor() << " max load: " << id_map.max_load_factor() << endl;
 
 	for (i = 0; i < face_count; i ++) {
 		if (!nextFace(f))

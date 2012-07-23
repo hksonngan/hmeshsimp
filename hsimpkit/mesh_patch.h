@@ -127,8 +127,7 @@ public:
 	template<class VOutType, class FOutType, class IdMapStreamType>
 	bool pairCollapse(
 			char *vert_name, char *face_name, uint vert_start_id, uint total_verts,
-			uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream,
-			__OUT uint &simp_verts);
+			uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream);
 	template<class VOutType, class FOutType, class IdMapStreamType>
 	bool simpOutput(PairCollapse *pcol, uint vert_start_id, 
 			VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream);
@@ -349,8 +348,7 @@ bool HMeshPatch::simpOutput(PairCollapse *pcol, uint vert_start_id,
 template<class VOutType, class FOutType, class IdMapStreamType>
 bool HMeshPatch::pairCollapse(
 		char *vert_name, char *face_name, uint vert_start_id, uint total_verts,
-		uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream,
-		__OUT uint &simp_verts) {
+		uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream) {
 
 	QuadricEdgeCollapse ecol;
 	uint target;
@@ -364,8 +362,6 @@ bool HMeshPatch::pairCollapse(
 
 	ecol.intialize();
 	ecol.targetVert(target);
-
-	simp_verts = ecol.validVerts() - exterior_count;
 
 	if (!simpOutput(&ecol, vert_start_id, vout, fout, bound_id_stream));	
 

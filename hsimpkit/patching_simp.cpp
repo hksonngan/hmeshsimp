@@ -186,21 +186,26 @@ bool PatchingSimp::mergeSimpPly(uint target_vert, bool binary) {
 
 	int i;
 	HGridPatch patch;
-	uint verts_gen;
 	mstream<HTriple<uint>> face_stream;
-	mstream<HTriple<uint>> ib_faces;
 	mstream<HVertex> vert_stream;
-	HTriple<uint> face;
 	/* the map between original id of interior 
 	 * boundary vertices and the output id */
 	IdMapMStream bound_id_map;
+	uint init_buckets;
 
 	temp_time.start();
 
-	bound_id_map.map.rehash(ibt.faceCount() / 3);
+	bound_id_map.map.rehash(ibt.faceCount() / 2);
+	init_buckets = bound_id_map.map.bucket_count();
 
 	if (!mergeSimp(target_vert, vert_stream, face_stream, bound_id_map)) 
 		return false;
+
+	INFO << "\tbound id map, init buckets: " << init_buckets << " final buckets: " << bound_id_map.map.bucket_count() << endl
+		<< "\tavg nodes per bucket: " << bound_id_map.map.load_factor() << " max nodes: " << bound_id_map.map.max_load_factor() << endl;
+
+	cout << "\tbound id map, init buckets: " << init_buckets << " final buckets: " << bound_id_map.map.bucket_count() << endl
+		<< "\tavg nodes per bucket: " << bound_id_map.map.load_factor() << " max nodes: " << bound_id_map.map.max_load_factor() << endl;
 
 	string out_name;
 	if (tmp_base) {
