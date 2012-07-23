@@ -30,8 +30,7 @@ public:
 	template<class VOutType, class FOutType, class IdMapStreamType> 
 	bool pairCollapse(
 			char* dir_path, HTriple<uint> grid_index, uint vert_start_id, uint total_verts,
-			uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream,
-			__OUT uint &simp_verts);
+			uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream);
 	bool pairCollapseToPly(
 			char* dir_path, HTriple<uint> grid_index, 
 			uint total_verts, uint total_target);
@@ -84,15 +83,14 @@ void HGridPatch::getPatchPath(const char* dir_path, const HTriple<uint> grid_ind
 template<class VOutType, class FOutType, class IdMapStreamType> 
 bool HGridPatch::pairCollapse(
 		char* dir_path, HTriple<uint> grid_index, uint vert_start_id, uint total_verts,
-		uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream,
-		__OUT uint &simp_verts) {
+		uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream) {
 
 	char vert_name[__FILE_NAME_BUF_SIZE], face_name[__FILE_NAME_BUF_SIZE];
 	getPatchPath(dir_path, grid_index, vert_name, face_name);
 
 	return HMeshPatch::pairCollapse(
 			vert_name, face_name, vert_start_id, total_verts,
-			total_target, vout, fout, bound_id_stream, simp_verts);
+			total_target, vout, fout, bound_id_stream);
 }
 
 #endif //__H_GRID_PATCH__

@@ -469,22 +469,29 @@ bool PatchingSimp::mergeSimp(uint target_vert, VOutType &vout, FOutType &fout, I
 	int i;
 	HGridPatch patch;
 	uint verts_gen;
+	uint faces_gen;
 	mstream<HTriple<uint>> ib_faces;
 	HTriple<uint> face;
 	uint simp_ibts;
 	HAugTime simp_time;
 
-	INFO << "\t-----------------------------------------------" << endl;
+	INFO << "\t-----------------------------------------------" << endl
+		<< "\tsimp patches info:" << endl
+		<< "\t\tindex\tverts\tfaces\ttime" << endl;
 
 	cout << "\t-----------------------------------------------" << endl
-		 << "\tsimplifying patches..." << endl;
+		 << "\tsimplifying patches..." << endl
+		 << "\tsimp patches info:" << endl
+		 << "\t\tindex\tverts\tfaces\ttime" << endl;
 	
 	simp_verts = 0;
+	simp_faces = 0;
 	for (i = 0; i < patchIndices.count(); i ++) {
 		simp_time.start();
 
-		if (!patch.pairCollapse(tmp_base, patchIndices[i], simp_verts, vert_count, 
-			target_vert, vout, fout, bound_id_map, verts_gen)) {
+		if (!patch.pairCollapse(
+				tmp_base, patchIndices[i], simp_verts, vert_count, 
+				target_vert, vout, fout, bound_id_map)) {
 
 				INFO << "#ERROR: simplifying patch " << patchIndices[i].i << "_" << patchIndices[i].j 
 					<< "_" << patchIndices[i].k << " to merge failed" << endl;
@@ -495,12 +502,15 @@ bool PatchingSimp::mergeSimp(uint target_vert, VOutType &vout, FOutType &fout, I
 
 		simp_time.end();
 
-		INFO << "\tpatch " << patchIndices[i].i << "_" << patchIndices[i].j << "_" << patchIndices[i].k 
-			<< ", simp verts: " << verts_gen << " simp time: " << simp_time << endl;
-		cout << "\tpatch " << patchIndices[i].i << "_" << patchIndices[i].j << "_" << patchIndices[i].k 
-			<< ", simp verts: " << verts_gen << " simp time: " << simp_time << endl;
+		verts_gen = vout.count() - simp_verts;
+		simp_verts = vout.count();
+		faces_gen = fout.count() - simp_faces;
+		simp_faces = fout.count();
 
-		simp_verts += verts_gen;
+		INFO << "\t\t" << patchIndices[i].i << "_" << patchIndices[i].j << "_" << patchIndices[i].k 
+			<< "\t" << verts_gen << "\t" << faces_gen << "\t" << simp_time << endl;
+		cout << "\t\t" << patchIndices[i].i << "_" << patchIndices[i].j << "_" << patchIndices[i].k 
+			<< "\t" << verts_gen << "\t" << faces_gen << "\t" << simp_time << endl;
 	}
 
 	/* process the interior boundary triangles */

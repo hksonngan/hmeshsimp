@@ -17,12 +17,6 @@ static uint target = 20000;
 
 int main(int argc, char** argv)
 {
-	ostringstream oss;
-	oss << "!!!!!!!!";
-	oss.clear();
-	oss.seekp(0);
-	oss << "~~~~~~~~";
-
 	PatchingSimp psimp;
 	ofstream flog("patchingsimp.log", fstream::app);
 	bool ret;
@@ -31,6 +25,7 @@ int main(int argc, char** argv)
 	// F:/plys/bunny/bun_zipper.ply
 	// F:/plys/happy_recon/happy_vrip.ply
 	// F:/plys/xyzrgb_statuette.ply
+	// F:/plys/lucy.ply
 
 	// d:/bunny/bun_zipper.ply
 	// d:/happy_recon/happy_vrip.ply
@@ -38,10 +33,10 @@ int main(int argc, char** argv)
 	// d:/xyzrgb_statuette.ply
 	// d:/lucy.ply
 
-	filename = "F:/plys/xyzrgb_statuette.ply";
+	filename = "F:/plys/lucy.ply";
 	x_div = 2;
-	y_div = 2;
-	z_div = 2;
+	y_div = 3;
+	z_div = 3;
 	target = 30000;
 
 	stringToCstr(getFilename(filename) + "_patches", tmp_dir);
