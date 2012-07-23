@@ -27,11 +27,14 @@
 #include "grid_patch.h"
 #include "hash_def.h"
 #include "h_dynamarray.h"
+#include "h_aug_time.h"
 
 using std::ofstream;
 using std::ostringstream;
 using std::streampos;
 using std::string;
+using std::cout;
+using std::cerr;
 using std::endl;
 
 using boost::unordered::unordered_map;
@@ -64,7 +67,6 @@ class PatchingSimp {
 	// CONSTATNTS
 
 private:
-	static const uint INIT_INFO_BUF_SIZE = 4000;
 	static const float MAX_OCCUPANCY;
 	static const uint MAX_BUCKET_COUNT = 1000;
 	static const uint MAX_CACHE_BUCKETS = 30000;
@@ -74,6 +76,7 @@ public:
 	PatchingSimp() {
 		vertbin_name = NULL;
 		tmp_base = NULL;
+		info_buf_size = 0;
 	}
 	~PatchingSimp() {
 		if (vertbin_name)
@@ -111,21 +114,12 @@ public:
 	/////////////////////////////////////
 	// INFO
 
-	const char* info() { return INFO.c_str(); }
-	string& infoString() { return INFO; }
-	inline void clearInfo();
+	inline const char* info();
 
 	/* set the temporary file directory */
 	bool tmpBase(char *s);
 
 private:
-	
-	/////////////////////////////////////
-	// INFO
-
-	inline void info(ostringstream &oss);
-	inline void addInfo(const char *s);
-	inline void addInfo(ostringstream &oss);
 
 	/////////////////////////////////////
 	// PARTITION
@@ -143,68 +137,63 @@ private:
 	 * a hash map, key is the grid coordinate, 
 	 * value is the patch object 
 	 */
-	HIndexPatchMap 
-				indexPatchMap;
+	HIndexPatchMap	indexPatchMap;
 	HDynamArray<HTriple<uint>> 
-				patchIndices;
-	HIBTriangles 
-				ibt;
+					patchIndices;
+	HIBTriangles 	ibt;
 
 	/* num of vertices & faces */
-	uint		vert_count;
-	uint		face_count;
+	uint			vert_count;
+	uint			face_count;
 
 	/* bound box */
-	float		max_x, min_x; 
-	float		max_y, min_y; 
-	float		max_z, min_z;
+	float			max_x, min_x; 
+	float			max_y, min_y; 
+	float			max_z, min_z;
 
-	uint		x_div, y_div, z_div;
-	float		x_slice, y_slice, z_slice;
+	uint			x_div, y_div, z_div;
+	float			x_slice, y_slice, z_slice;
 
 	/* file name opened */
-	char		*file_name;
+	char*			file_name;
 
 	/* vertex cache file */
-	char		*vertbin_name;
+	char*			vertbin_name;
 	LRUCache<LRUVertex>	
-				vert_bin;
+					vert_bin;
 
 	/* vertices count after decimation */
-	uint		simp_verts;
-	uint		simp_faces;
+	uint			simp_verts;
+	uint			simp_faces;
 
 	/* the temporary file base directory */
-	char		*tmp_base;
-	LRUVertex	tmpv;
+	char*			tmp_base;
+	LRUVertex		tmpv;
+
+	HAugTime		total_time;
+	HAugTime		temp_time;
 
 	/* return information */
-	string		INFO;
+	ostringstream	INFO;
+	char*			info_buf;
+	uint			info_buf_size;
 };
 
 
 /* ========================== & IMPLEMENTATION & ======================= */
 
-void PatchingSimp::info(ostringstream &oss) {
+const char* PatchingSimp::info() {
 
-	clearInfo();
-	addInfo(oss);
+	if (info_buf_size < INFO.str().length() + 1) {
+		delete[] info_buf;
+		info_buf_size = INFO.str().length() + 1;
+		info_buf = new char[info_buf_size];
+	}
+	stringToCstr(INFO.str(), info_buf);
+
+	return info_buf;
 }
 
-void PatchingSimp::addInfo(const char *s) {
-
-	INFO += s;
-}
-
-void PatchingSimp::addInfo(ostringstream &oss) {
-
-	INFO += oss.str();
-}
-
-void PatchingSimp::clearInfo() {
-
-	INFO.clear();
-}
 
 bool PatchingSimp::addVertexFirst(const int &i, const HVertex &v) {
 	
@@ -264,6 +253,8 @@ void PatchingSimp::getSlice() {
 
 void PatchingSimp::partitionInit() {
 
+	temp_time.setStartPoint();
+
 	getSlice();
 
 	/* index patch hash */
@@ -285,24 +276,31 @@ void PatchingSimp::partitionInit() {
 bool PatchingSimp::partitionEnd() {
 
 	HIndexPatchMap::iterator iter;
-	ostringstream oss;
 	int i;
 
 	if (ibt.closeIBTFileForWrite() == false) {
-		oss.clear();
-		oss << "#ERROR: close ibt file for write failed" << endl;
-		info(oss);
+		INFO << "#ERROR: close ibt file for write failed" << endl;
+		cerr << "#ERROR: close ibt file for write failed" << endl;
 		return false;
 	}
 
-	oss << "\t_______________________________________________" << endl
+	INFO << "\t-----------------------------------------------" << endl
 		<< "\tsecond pass complete" << endl
 		<< "\tgrid size: " << x_div << "x" << y_div << "x" << z_div << endl
 		<< vert_bin.info("\t")
 		<< "\tibtriangles count: " << ibt.faceCount() << endl
 		<< "\tpatch count: " << indexPatchMap.size() << endl
 		<< "\tpatches info: " << endl
-		<< "\t\tid\tindex\tverts\tibverts\tebverts\tfaces" << endl;
+		<< "\t\tindex\tverts\tibverts\tebverts\tfaces" << endl;
+
+	cout << "\t-----------------------------------------------" << endl
+		<< "\tsecond pass complete" << endl
+		<< "\tgrid size: " << x_div << "x" << y_div << "x" << z_div << endl
+		<< vert_bin.info("\t")
+		<< "\tibtriangles count: " << ibt.faceCount() << endl
+		<< "\tpatch count: " << indexPatchMap.size() << endl
+		<< "\tpatches info: " << endl
+		<< "\t\ttindex\tverts\tibverts\tebverts\tfaces" << endl;
 
 	vert_bin.clearCache();
 
@@ -310,22 +308,28 @@ bool PatchingSimp::partitionEnd() {
 	for (iter = indexPatchMap.begin(), i = 0; iter != indexPatchMap.end(); iter ++, i ++) {
 
 		if (iter->second->closeForWrite() == false) {
-			oss.clear();
-			oss << "#ERROR: close patch " << iter->first.i << "_" << iter->first.j << "_" << iter->first.k << " files for write failed" << endl;
-			info(oss);
+			INFO << "#ERROR: close patch " << iter->first.i << "_" << iter->first.j << "_" << iter->first.k << " files for write failed" << endl;
+			cerr << "#ERROR: close patch " << iter->first.i << "_" << iter->first.j << "_" << iter->first.k << " files for write failed" << endl;
 			return false;
 		}
 
 		patchIndices.push_back(iter->first);
 
-		oss << "\t\t" << i << "\t" << iter->first.i << "_" << iter->first.j << "_" << iter->first.k 
+		INFO << "\t\t" << iter->first.i << "_" << iter->first.j << "_" << iter->first.k 
+			<< "\t" << iter->second->verts() << "\t" << iter->second->interiors()
+			<< "\t" << iter->second->exteriors() << "\t" << iter->second->faces() << endl;
+
+		cout << "\t\t" << iter->first.i << "_" << iter->first.j << "_" << iter->first.k 
 			<< "\t" << iter->second->verts() << "\t" << iter->second->interiors()
 			<< "\t" << iter->second->exteriors() << "\t" << iter->second->faces() << endl;
 
 		delete iter->second;
 	}
 
-	info(oss);
+	temp_time.setEndPoint();
+	total_time += temp_time;
+	INFO << "\ttime consuming: " << temp_time << endl;
+	cout << "\ttime consuming: " << temp_time << endl;
 
 	return true;
 }
@@ -455,6 +459,91 @@ bool PatchingSimp::addFaceToPatch(const HTriple<uint> &face, const HVertex v1, c
 		pPatch3->addExteriorBound(face.i, v1);
 		pPatch3->addExteriorBound(face.j, v2);
 	}
+
+	return true;
+}
+
+template<class VOutType, class FOutType, class IdMapStreamType>
+bool PatchingSimp::mergeSimp(uint target_vert, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_map) {
+
+	int i;
+	HGridPatch patch;
+	uint verts_gen;
+	mstream<HTriple<uint>> ib_faces;
+	HTriple<uint> face;
+	uint simp_ibts;
+	HAugTime simp_time;
+
+	INFO << "\t-----------------------------------------------" << endl;
+
+	cout << "\t-----------------------------------------------" << endl
+		 << "\tsimplifying patches..." << endl;
+	
+	simp_verts = 0;
+	for (i = 0; i < patchIndices.count(); i ++) {
+		simp_time.start();
+
+		if (!patch.pairCollapse(tmp_base, patchIndices[i], simp_verts, vert_count, 
+			target_vert, vout, fout, bound_id_map, verts_gen)) {
+
+				INFO << "#ERROR: simplifying patch " << patchIndices[i].i << "_" << patchIndices[i].j 
+					<< "_" << patchIndices[i].k << " to merge failed" << endl;
+				cerr << "#ERROR: simplifying patch " << patchIndices[i].i << "_" << patchIndices[i].j 
+					<< "_" << patchIndices[i].k << " to merge failed" << endl;
+				return false;
+		}
+
+		simp_time.end();
+
+		INFO << "\tpatch " << patchIndices[i].i << "_" << patchIndices[i].j << "_" << patchIndices[i].k 
+			<< ", simp verts: " << verts_gen << " simp time: " << simp_time << endl;
+		cout << "\tpatch " << patchIndices[i].i << "_" << patchIndices[i].j << "_" << patchIndices[i].k 
+			<< ", simp verts: " << verts_gen << " simp time: " << simp_time << endl;
+
+		simp_verts += verts_gen;
+	}
+
+	/* process the interior boundary triangles */
+	if (!ibt.openIBTFileForRead(tmp_base))
+		return false;
+
+	ib_faces.resize(ibt.faceCount() / 4);
+	for (i = 0; i < ibt.faceCount(); i ++) {
+		if (!ibt.nextIBTriangle(face))
+			return false;
+
+		face.i = bound_id_map[face.i];
+		face.j = bound_id_map[face.j];
+		face.k = bound_id_map[face.k];
+		if (face.i != face.j && face.i != face.k  && face.j != face.k)
+			ib_faces.add(face);
+	}
+	ibt.closeIBTFileForRead();
+
+	if (ib_faces.count() > 0)
+		sort(ib_faces.pointer(0), ib_faces.pointer(ib_faces.count() - 1), face_comp);
+
+	
+	for (i = 0, simp_ibts = 0; i < ib_faces.count(); simp_ibts ++) {
+		face = ib_faces[i];
+		fout.add(face);
+		if (!fout.good()) {
+			INFO << "#ERROR: adding ibtriangle to simplified face stream failed" << endl;
+			cerr << "#ERROR: adding ibtriangle to simplified face stream failed" << endl;
+			return false;
+		}
+		// ignore duplication
+		for (; i < ib_faces.count() && ib_faces[i] == face; i ++);
+	}
+
+	INFO << "\tib simp faces: " << simp_ibts << endl;
+	cout << "\tib simp faces: " << simp_ibts << endl;
+
+	simp_verts = vout.count();
+	simp_faces = fout.count();
+
+	INFO << "\ttotal simp verts: " << simp_verts << " total simp faces: " << simp_faces << endl;
+	cout << "\ttotal simp verts: " << simp_verts << " total simp faces: " << simp_faces << endl;
 
 	return true;
 }
