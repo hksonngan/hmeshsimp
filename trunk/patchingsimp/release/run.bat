@@ -7,5 +7,5 @@
 ::F:\plys\hand.ply
 ::d:/dragon_recon/dragon_vrip.ply
 ::d:/bunny/bun_zipper.ply
-patchingsimp.exe -t 3000 F:\plys\dragon_recon\dragon_vrip.ply
+patchingsimp.exe -t 3000 d:/dragon_recon/dragon_vrip.ply
 pause
