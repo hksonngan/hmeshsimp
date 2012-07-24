@@ -13,11 +13,25 @@ void trimExtAndAppend(char *src, char *dst, char *app)
 
 string getFilename(const char *filepath)
 {
+	string filename = getExtFilename(filepath);
+
+	int end;
+
+	end = filename.find_last_of('.');
+	if (end == string::npos) {
+		end = filename.size();
+	}
+
+	return filename.substr(0, end);
+}
+
+string getExtFilename(const char *filepath) {
+
 	string filename(filepath);
 
 	int index1 = filename.find_last_of('\\');
 	int index2 = filename.find_last_of('/');
-	int start, end;
+	int start;
 
 	if (index1 == string::npos && index2 != string::npos) {
 		start = index2 + 1;
@@ -32,12 +46,7 @@ string getFilename(const char *filepath)
 		start = 0;
 	}
 
-	end = filename.find_last_of('.');
-	if (end == string::npos) {
-		end = filename.size();
-	}
-
-	return filename.substr(start, end - start);
+	return filename.substr(start);
 }
 
 string getFileExtension(const char *filepath) {
@@ -55,6 +64,22 @@ EndianOrder getSystemEndianMode() {
 		return H_BIG_ENDIAN;
 	else
 		return H_LITTLE_ENDIAN;
+}
+
+char* getTime() {
+
+	time_t rawtime;
+	struct tm * timeinfo;
+	time (&rawtime);
+	timeinfo = localtime (&rawtime);
+
+	return asctime(timeinfo);
+}
+
+void stringToCstr(string &str, char* cstr)
+{
+	memcpy(cstr, str.c_str(), str.size() * sizeof(char));
+	cstr[str.size()] = '\0';
 }
 
 char* getPlyBinaryFormat() {

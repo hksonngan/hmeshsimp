@@ -22,29 +22,20 @@ enum EndianOrder { H_BIG_ENDIAN, H_LITTLE_ENDIAN };
 // trim the extention of the file name and append some str
 extern void trimExtAndAppend(char *src, char *dst, char *app);
 
-// get file name without extensions and directory path
+// get file name without extension and directory path
 extern string getFilename(const char *filepath);
+
+// get file name with extension
+extern string getExtFilename(const char *filepath);
 
 extern string getFileExtension(const char *filepath);
 
 // get the system endian mode
 extern EndianOrder getSystemEndianMode();
 
-inline char* getTime() {
+extern char* getTime();
 
-	time_t rawtime;
-	struct tm * timeinfo;
-	time (&rawtime);
-	timeinfo = localtime (&rawtime);
-
-	return asctime(timeinfo);
-}
-
-inline void stringToCstr(string &str, char* cstr)
-{
-	memcpy(cstr, str.c_str(), str.size() * sizeof(char));
-	cstr[str.size()] = '\0';
-}
+extern void stringToCstr(string &str, char* cstr);
 
 // switch bytes for a variable
 inline void switchBytes(char* ptr, int size)

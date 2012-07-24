@@ -21,12 +21,12 @@ using std::ofstream;
 
 #define BUF_SIZE 1000
 
-char*	infilename;
-char	outfilename[BUF_SIZE];
-int		target = -1;
-double	boundary_weight = INIT_BOUND_WEIGHT;
+static char*	infilename;
+static char		outfilename[BUF_SIZE];
+static int		target = -1;
+static double	boundary_weight = INIT_BOUND_WEIGHT;
 
-static char *options = "t:b:h";
+static char		*options = "t:b:h";
 
 static char *usage_string = 
 "\t-t <n>\ttarget faces of the simplified mesh\n"
@@ -49,7 +49,7 @@ static void usage_error(char *msg = NULL)
 	exit(1);
 }
 
-void process_cmdline(int argc, char **argv)
+static void process_cmdline(int argc, char **argv)
 {
 	int opt, ival;
 	double fval;
