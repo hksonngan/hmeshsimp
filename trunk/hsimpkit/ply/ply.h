@@ -33,10 +33,6 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #ifndef __PLY_H__
 #define __PLY_H__
 
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
-
 #include <stdio.h>
 #include <stddef.h>
 
@@ -161,8 +157,5 @@ extern int equal_strings(char *, char *);
 extern EndianOrder SYSTEM_ENDIAN_MODE;
 extern EndianOrder FILE_ENDIAN_MODE;
 
-//#ifdef __cplusplus
-//}
-//#endif
 #endif /* !__PLY_H__ */
 
