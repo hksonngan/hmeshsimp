@@ -45,11 +45,17 @@ PlyProperty vert_props[] = { /* list of property information for a vertex */
   {"x", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,x), 0, 0, 0, 0},
   {"y", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,y), 0, 0, 0, 0},
   {"z", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,z), 0, 0, 0, 0},
+  {"r", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,r), 0, 0, 0, 0},
+  {"g", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,g), 0, 0, 0, 0},
+  {"b", PLY_FLOAT, PLY_FLOAT, offsetof(Vertex,b), 0, 0, 0, 0},
 };
 
 PlyProperty face_props[] = { /* list of property information for a vertex */
   {"vertex_indices", PLY_INT, PLY_INT, offsetof(Face,verts),
    1, PLY_UCHAR, PLY_UCHAR, offsetof(Face,nverts)},
+  {"r", PLY_FLOAT, PLY_FLOAT, offsetof(Face,r), 0, 0, 0, 0},
+  {"g", PLY_FLOAT, PLY_FLOAT, offsetof(Face,g), 0, 0, 0, 0},
+  {"b", PLY_FLOAT, PLY_FLOAT, offsetof(Face,b), 0, 0, 0, 0},
 };
 
 
@@ -89,26 +95,14 @@ void ply_read_file(char* filename)
 
   /*** Read in the original PLY object ***/
 
-
-  // modified by ht
-  //ply  = ply_read (stdin, &nelems, &elist);
-    //a space for PlyFile is malloced in the function
-    //it must be freed after using, as well as elist - houtao
-	ply = ply_open_for_reading(filename, &nelems, &elist, &file_type, &version);
-	if(ply == NULL)
-	{
-		std::cout << "ply file open failed" << std::endl;
-		return;
-	}
- //def
- //PlyFile *ply_open_for_reading(
-	// char *filename,
-	// int *nelems,
-	// char ***elem_names,
-	// int *file_type,
-	// float *version
-	// )
-  //ply_get_info (ply, &version, &file_type);
+  //a space for PlyFile is malloced in the function
+  //it must be freed after using, as well as elist - houtao
+  ply = ply_open_for_reading(filename, &nelems, &elist, &file_type, &version);
+  if(ply == NULL)
+  {
+    std::cout << "ply file open failed" << std::endl;
+    return;
+  }
 
   for (i = 0; i < nelems; i++) {
 
@@ -130,6 +124,10 @@ void ply_read_file(char* filename)
       ply_get_property (ply, elem_name, &vert_props[0]);
       ply_get_property (ply, elem_name, &vert_props[1]);
       ply_get_property (ply, elem_name, &vert_props[2]);
+	  ply_get_property (ply, elem_name, &vert_props[3]);
+	  ply_get_property (ply, elem_name, &vert_props[4]);
+	  ply_get_property (ply, elem_name, &vert_props[5]);
+
 	  // the function malloc an OtherProperty and return it
 	  // but luckily that vert_other is a global variable
 	  // and can be freed in clean_ply() - houtao
@@ -153,6 +151,10 @@ void ply_read_file(char* filename)
       /* set up for getting face elements */
 
       ply_get_property (ply, elem_name, &face_props[0]);
+	  ply_get_property (ply, elem_name, &face_props[1]);
+	  ply_get_property (ply, elem_name, &face_props[2]);
+	  ply_get_property (ply, elem_name, &face_props[3]);
+
       face_other = ply_get_other_properties (ply, elem_name,
                      offsetof(Face,other_props));
 
@@ -190,78 +192,3 @@ void ply_read_file(char* filename)
   //the ply variable is freed in the function - houtao
   ply_close (ply);
 }
-
-
-/******************************************************************************
-Write out the PLY file to standard out.
-******************************************************************************/
-
-//void write_ply_model_to_file_as_smf(char *filename)
-//{
-//    int i, j;
-//    Vertex v;
-//    Face f;
-//	// modified by ht
-//	std::fstream fout(filename, fstream::out);
-//
-//    fout << "# Generated from PLY data by ply2smf" << endl;
-//    fout << "# " << nverts << " vertices" << endl;
-//    fout << "# " << nfaces << " faces" << endl;
-//
-//    for(i = 0; i < nverts; i ++)
-//    {
-//		v = vlist[i];
-//		//fout << "v " << v->x << " " << v->y << " " << v->z << endl;
-//		fout << "v " << vlist[i].x << " " << vlist[i].y << " " << vlist[i].z << endl;
-//    }
-//
-//
-//    for(i=0; i<nfaces; i++)
-//    {
-//		f = flist[i];
-//
-//		//if( f->nverts == 3 )
-//		//	fout << "f " << f->verts[0]+1 << " "
-//		//	<< f->verts[1]+1 << " "
-//		//	<< f->verts[2]+1 << endl;
-//		//else
-//		//{
-//		//	fout << "f";
-//		//	for(j=0; j<f->nverts; j++)
-//		//		fout << " " << f->verts[j] + 1;
-//		//	fout << endl;
-//		//}
-//
-//		if( flist[i].nverts == 3 )
-//			fout << "f " << flist[i].verts[0]+1 << " "
-//			<< flist[i].verts[1]+1 << " "
-//			<< flist[i].verts[2]+1 << endl;
-//		else
-//		{
-//			fout << "f";
-//			for(j=0; j < flist[i].nverts; j++)
-//				fout << " " << flist[i].verts[j] + 1;
-//			fout << endl;
-//		}
-//    }
-//
-//	fout.close();
-//
-//	cerr << filename << " stored locally in disk" << endl;
-//}
-
-/******************************************************************************
-Main program.
-******************************************************************************/
-
-//int ply2smf_entry(char *inputfile, char *outputfile)
-//{
-//	clean_ply();
-//	ply_read_file(inputfile);
-//	//write_ply_model_to_file_as_smf(outputfile);
-//	clean_ply();
-//
-//	//cerr << outputfile << " converted, stored locally in disk" << endl;
-//
-//	return 0;
-//}

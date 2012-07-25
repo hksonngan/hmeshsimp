@@ -18,14 +18,16 @@
 #include "ply.h"
 
 typedef struct Vertex {
-	float x,y,z;
-	void *other_props;       /* other properties */
+	float	x, y, z;
+	float	r, g, b;
+	void	*other_props;       /* other properties */
 } Vertex;
 
 typedef struct Face {
-	unsigned char nverts;    /* number of vertex indices in list */
-	int *verts;              /* vertex index list */
-	void *other_props;       /* other properties */
+	unsigned char	nverts;    /* number of vertex indices in list */
+	int		*verts;              /* vertex index list */
+	float	r, g, b;
+	void	*other_props;       /* other properties */
 } Face;
 
 extern PlyProperty vert_props[];
