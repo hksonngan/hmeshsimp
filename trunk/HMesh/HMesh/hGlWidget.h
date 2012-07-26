@@ -33,14 +33,20 @@ protected:
 	void mouseMoveEvent(QMouseEvent * event);
 	void wheelEvent(QWheelEvent * event);
 
+private:
+	void computeNormals();
+	void calcBoundingBox();
+	void drawModel();
+	void setLights();
+	void setMaterial();
+	void applyTransform();
+
 public:
 	hGlWidget();
 	void setDrawQSlim();
 	void setDrawPly();
 	void setDrawTris();
 	void openFile(QString _file_name);
-	void computeNormals();
-	void calcBoundingBox();
 
 	void primitiveMode(PrimitiveMode m) { _primitive_mode = m; }
 	void colorMode(ColorMode m) { _color_mode = m; }

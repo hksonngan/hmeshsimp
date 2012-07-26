@@ -40,52 +40,19 @@ hGlWidget::hGlWidget()
 
 void hGlWidget::initializeGL()
 {
-	// Default mode
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	//glShadeModel(GL_FLAT);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_NORMALIZE);
-
-	// Lights properties
-	float ambientProperties[]  = {0.7f, 0.7f, 0.7f, 1.0f};
-	float diffuseProperties[]  = {0.8f, 0.8f, 0.8f, 1.0f};
-	float specularProperties[] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-	glLightfv( GL_LIGHT0, GL_AMBIENT, ambientProperties);
-	glLightfv( GL_LIGHT0, GL_DIFFUSE, diffuseProperties);
-	glLightfv( GL_LIGHT0, GL_SPECULAR, specularProperties);
-	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 1.0);
-
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	//glClearColor(0, 0, 0, 1.0f);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClearDepth(1.0f);
-
-	// Default : lighting
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHTING);
 
 	// Default : blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	// Default : material
-	float	MatAmbient[]  = {0.0f, 0.5f, 0.75f, 1.0f};
-	float	MatDiffuse[]  = {0.0f, 0.5f, 1.0f, 1.0f};
-	float	MatSpecular[]  = {0.75f, 0.75f, 0.75f, 1.0f};
-	float	MatShininess[]  = { 64 };
-	float	MatEmission[]  = {0.0f, 0.0f, 0.0f, 1.0f};
-
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, MatAmbient);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MatDiffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, MatSpecular);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, MatShininess);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, MatEmission);
-
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearDepth(1.0f);
 
 	// specifies which buffer to draw into
 	glDrawBuffer(GL_BACK);
@@ -95,59 +62,22 @@ void hGlWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(0.0, 0.0, -5.0);
-	glTranslatef(_trans_point.x, _trans_point.y, _trans_point.z);
-	glScalef(_scale, _scale, _scale);
-	// rotate
-	glMultMatrixd(_glmat);
-	// translate to (0, 0, 0)
-	glTranslatef(-_center_x, -_center_y, -_center_z);
-
-	
 	if(_draw_ply)
 	{
-		//glPolygonMode(GL_FRONT, GL_LINE);
-		glPolygonMode(GL_FRONT, GL_FILL);
-		//glDisable(GL_LIGHTING);
-		Vertex v;
-		Face f;
-
-		glColor3f(0.1f, 0.1f, 0.1f);
-		glBegin(GL_TRIANGLES);
-
-		for(int i = 0; i < nfaces; i ++)
-		{
-			f = flist[i];
-
-			if( f.nverts == 3 )
-			{
-				if (_primitive_mode == FLAT || _primitive_mode == FLAT_LINES)
-					glNormal3f(fnormals[i].x, fnormals[i].y, fnormals[i].z);
-
-				if (_primitive_mode == SMOOTH)
-					glNormal3f(vnormals[flist[i].verts[0]].x, vnormals[flist[i].verts[0]].y, vnormals[flist[i].verts[0]].z);
-				v = vlist[f.verts[0]];
-				glVertex3f(v.x, v.y, v.z);
-
-				if (_primitive_mode == SMOOTH)
-					glNormal3f(vnormals[flist[i].verts[0]].x, vnormals[flist[i].verts[0]].y, vnormals[flist[i].verts[0]].z);
-				v = vlist[f.verts[1]];
-				glVertex3f(v.x, v.y, v.z);
-
-				if (_primitive_mode == SMOOTH)
-					glNormal3f(vnormals[flist[i].verts[0]].x, vnormals[flist[i].verts[0]].y, vnormals[flist[i].verts[0]].z);
-				v = vlist[f.verts[2]];
-				glVertex3f(v.x, v.y, v.z);
-			}
-			else
-			{
-				cerr << "#error! non-triangle while drawing ply models" << endl;
-			}
+		if (_primitive_mode == FLAT_LINES || _primitive_mode == WIREFRAME) {
+			glDisable(GL_LIGHTING);
+			glColor3f(0.0f, 0.0f, 0.0f);
+			glPolygonMode(GL_FRONT, GL_LINE);
+			drawModel();
 		}
-
-		glEnd();
+		
+		if (_primitive_mode != WIREFRAME) {
+			setLights();
+			applyTransform();
+			setMaterial();
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			drawModel();	
+		}
 	}
 
 	if (_draw_tris)
@@ -395,6 +325,130 @@ void hGlWidget::openFile(QString _file_name)
 	}
 }
 
+void hGlWidget::drawModel() {
+
+	Vertex v;
+	Face f;
+
+	glBegin(GL_TRIANGLES);
+
+	for(int i = 0; i < nfaces; i ++)
+	{
+		f = flist[i];
+
+		if( f.nverts == 3 ) {
+			// draw front face
+			if (_primitive_mode == FLAT || _primitive_mode == FLAT_LINES)
+				glNormal3f(fnormals[i].x, fnormals[i].y, fnormals[i].z);
+
+			if (_primitive_mode == SMOOTH) {
+				HNormal &nm = vnormals[flist[i].verts[0]];
+				glNormal3f(nm.x, nm.y, nm.z);
+			}
+			v = vlist[f.verts[0]];
+			glVertex3f(v.x, v.y, v.z);
+
+			if (_primitive_mode == SMOOTH) {
+				HNormal &nm = vnormals[flist[i].verts[1]];
+				glNormal3f(nm.x, nm.y, nm.z);
+			}
+			v = vlist[f.verts[1]];
+			glVertex3f(v.x, v.y, v.z);
+
+			if (_primitive_mode == SMOOTH) {
+				HNormal &nm = vnormals[flist[i].verts[2]];
+				glNormal3f(nm.x, nm.y, nm.z);
+			}
+			v = vlist[f.verts[2]];
+			glVertex3f(v.x, v.y, v.z);
+
+			// draw back face
+			if (_primitive_mode == FLAT || _primitive_mode == FLAT_LINES)
+				glNormal3f(fnormals[i].x, fnormals[i].y, fnormals[i].z);
+
+			if (_primitive_mode == SMOOTH) {
+				HNormal &nm = vnormals[flist[i].verts[0]];
+				glNormal3f(nm.x, nm.y, nm.z);
+			}
+			v = vlist[f.verts[0]];
+			glVertex3f(v.x, v.y, v.z);
+
+			if (_primitive_mode == SMOOTH) {
+				HNormal &nm = vnormals[flist[i].verts[2]];
+				glNormal3f(nm.x, nm.y, nm.z);
+			}
+			v = vlist[f.verts[2]];
+			glVertex3f(v.x, v.y, v.z);
+
+			if (_primitive_mode == SMOOTH) {
+				HNormal &nm = vnormals[flist[i].verts[1]];
+				glNormal3f(nm.x, nm.y, nm.z);
+			}
+			v = vlist[f.verts[1]];
+			glVertex3f(v.x, v.y, v.z);
+		}
+		else {
+			cerr << "#error! non-triangle while drawing ply models" << endl;
+		}
+	}
+
+	glEnd();
+}
+
+void hGlWidget::applyTransform() {
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0.0, 0.0, -5.0);
+	glTranslatef(_trans_point.x, _trans_point.y, _trans_point.z);
+	glScalef(_scale, _scale, _scale);
+	// rotate
+	glMultMatrixd(_glmat);
+	// locate model to (0, 0, 0)
+	glTranslatef(-_center_x, -_center_y, -_center_z);
+}
+
+void hGlWidget::setLights() {
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	// Lights properties
+	float ambientProperties[]	= {0.7f, 0.7f, 0.7f, 1.0f};
+	float diffuseProperties[]	= {0.8f, 0.8f, 0.8f, 1.0f};
+	float specularProperties[]	= {1.0f, 1.0f, 1.0f, 1.0f};
+	float lightPosition[]		= {0.0f, 0.0f, -0.3f, 0.0f};
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientProperties);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseProperties);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularProperties);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 1.0);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+	// Default : lighting
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHTING);
+}
+
+void hGlWidget::setMaterial() {
+
+	// material
+	//float	MatAmbient[]  = {0.0f, 0.5f, 0.75f, 1.0f};
+	float	MatAmbient[]  = {0.1f, 0.15f, 0.35f, 1.0f};
+	float	MatDiffuse[]  = {0.1f, 0.3f, 0.35f, 1.0f};
+	//float	MatSpecular[]  = {0.75f, 0.75f, 0.75f, 1.0f};
+	float	MatSpecular[]  = {0.0f, 0.0f, 0.0f, 1.0f};
+	float	MatShininess[]  = { 64 };
+	float	MatEmission[]  = {0.0f, 0.0f, 0.0f, 1.0f};
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, MatAmbient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, MatDiffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, MatShininess);
+	glMaterialfv(GL_FRONT, GL_EMISSION, MatEmission);
+}
+ 
 void hGlWidget::computeNormals() {
 
 	int i = 0;
@@ -421,9 +475,9 @@ void hGlWidget::computeNormals() {
 		e2 = v2 - v1;
 		nm = e1 ^ e2;
 
-		vnormals[vlist[flist[i].verts[0]] += nm;
-		vnormals[vlist[flist[i].verts[1]] += nm;
-		vnormals[vlist[flist[i].verts[2]] += nm;
+		vnormals[flist[i].verts[0]] += nm;
+		vnormals[flist[i].verts[1]] += nm;
+		vnormals[flist[i].verts[2]] += nm;
 
 		nm.Normalize();
 		fnormals[i] = nm;
@@ -436,9 +490,7 @@ void hGlWidget::computeNormals() {
 void hGlWidget::calcBoundingBox()
 {
 	if (nverts <= 0)
-	{
 		return;
-	}
 
 	_max_x = vlist[0].x;
 	_min_x = vlist[0].x;
@@ -449,30 +501,24 @@ void hGlWidget::calcBoundingBox()
 
 	for(int i = 1; i < nverts; i ++)
 	{
-		if (vlist[i].x > _max_x)
-		{
+		if (vlist[i].x > _max_x) {
 			_max_x = vlist[i].x;
 		}
-		if (vlist[i].x < _min_x)
-		{
+		if (vlist[i].x < _min_x) {
 			_min_x = vlist[i].x;
 		}
 
-		if (vlist[i].y > _max_y)
-		{
+		if (vlist[i].y > _max_y) {
 			_max_y = vlist[i].y;
 		}
-		if (vlist[i].y < _min_y)
-		{
+		if (vlist[i].y < _min_y) {
 			_min_y = vlist[i].y;
 		}
 
-		if (vlist[i].z > _max_z)
-		{
+		if (vlist[i].z > _max_z) {
 			_max_z = vlist[i].z;
 		}
-		if (vlist[i].z < _min_z)
-		{
+		if (vlist[i].z < _min_z) {
 			_min_z = vlist[i].z;
 		}
 	}
