@@ -53,6 +53,7 @@ HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
 			connect(_action_flat, SIGNAL(triggered()), this, SLOT(on_flat()));
 			_action_flat_lines = _menu_primitive->addAction("Flat Lines");
 			connect(_action_flat_lines, SIGNAL(triggered()), this, SLOT(on_flat_lines()));
+		_menu_primitive->setActiveAction(_action_flat);
 		_menu_color_mode = _menu_render->addMenu("Color Mode");
 			_action_vert_color = _menu_color_mode->addAction("Vertex Color");
 			connect(_action_vert_color, SIGNAL(triggered()), this, SLOT(on_vert_color()));
