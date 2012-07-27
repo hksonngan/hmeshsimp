@@ -12,6 +12,9 @@
 
 #include "ply/ply_inc.h"
 
+using std::cout;
+using std::endl;
+
 //using namespace std;
 
 HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
@@ -23,6 +26,8 @@ HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
 	this->setCentralWidget(_hglwidget);
 	_qslim_dialog = new QSlimDialog(this);
 	_qslim_dialog->getLineEdit()->setText(tr("-t 500"));
+	_psimp_dialog = new QSlimDialog(this);
+	_psimp_dialog->getLineEdit()->setText(tr("-t 2000"));
 
 	_file_name = "";
 	//F:/bunny/reconstruction/bun_zipper.ply
@@ -43,6 +48,8 @@ HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
 	_menu_simp = menu_bar->addMenu("Simplification");
 		_action_qslim = _menu_simp->addAction("qSlim");
 		connect(_action_qslim, SIGNAL(triggered()), this, SLOT(on_qslim()));
+		_action_psimp = _menu_simp->addAction("PatchingSimp");
+		connect(_action_psimp, SIGNAL(triggered()), this, SLOT(on_psimp()));
 
 	// render menu
 	_menu_render = menu_bar->addMenu("Render");
@@ -102,7 +109,7 @@ void HMesh::on_qslim()
 	// generate the cmd line input and split
 	//extern int qslim_entry(int argc, char **argv);
 	int decimate_num = 500;
-	QString arg = "execname -o " + pure_name + "_simp.smf " + _qslim_dialog->getLineEdit()->text() + " " + smf_name;
+	QString arg = "execname -o " + pure_name + "_simp.sm " + _qslim_dialog->getLineEdit()->text() + " " + smf_name;
 	QStringList arg_list = arg.split(" ", QString::SkipEmptyParts);
 	char* argv[35];
 	for(int i = 0; i < arg_list.count(); i ++)
@@ -119,4 +126,33 @@ void HMesh::on_qslim()
 	}
 
 	_hglwidget->setDrawQSlim();
+}
+
+void HMesh::on_psimp() {
+
+	if(_file_name == "")
+		return;
+
+	int return_code = _psimp_dialog->exec();
+	if(return_code == QDialog::Rejected) {
+		return;
+	}
+
+	QString arg = "execname " + _psimp_dialog->getLineEdit()->text() + " " + _file_name;
+	QStringList arg_list = arg.split(" ", QString::SkipEmptyParts);
+	char* argv[35];
+	for(int i = 0; i < arg_list.count(); i ++)
+	{
+		argv[i] = new char[strlen(arg_list[i].toLocal8Bit().data()) + 1];
+		memcpy(argv[i], arg_list[i].toLocal8Bit().data(), strlen(arg_list[i].toLocal8Bit().data()) + 1);
+	}
+	extern int psimp_entry(int, char**, bool);
+	psimp_entry(arg_list.count(), argv, false);
+
+	QString pure_name = _file_name.mid(_file_name.lastIndexOf("/") + 1);
+	pure_name = pure_name.mid(0, pure_name.lastIndexOf("."));
+	QString out_name = pure_name + "_patches/" + pure_name + "_psimp_txt.ply";
+
+	_hglwidget->openFile(out_name);
+	update();
 }

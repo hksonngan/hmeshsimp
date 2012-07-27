@@ -76,6 +76,7 @@ public:
 	PatchingSimp() {
 		vertbin_name = NULL;
 		tmp_base = NULL;
+		info_buf = NULL;
 		info_buf_size = 0;
 	}
 	~PatchingSimp() {
@@ -185,7 +186,8 @@ private:
 const char* PatchingSimp::info() {
 
 	if (info_buf_size < INFO.str().length() + 1) {
-		delete[] info_buf;
+		if (info_buf_size > 0 && info_buf)
+			delete[] info_buf;
 		info_buf_size = INFO.str().length() + 1;
 		info_buf = new char[info_buf_size];
 	}

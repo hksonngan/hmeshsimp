@@ -124,9 +124,9 @@ void ply_read_file(char* filename)
       ply_get_property (ply, elem_name, &vert_props[0]);
       ply_get_property (ply, elem_name, &vert_props[1]);
       ply_get_property (ply, elem_name, &vert_props[2]);
-	  ply_get_property (ply, elem_name, &vert_props[3]);
-	  ply_get_property (ply, elem_name, &vert_props[4]);
-	  ply_get_property (ply, elem_name, &vert_props[5]);
+	  //ply_get_property (ply, elem_name, &vert_props[3]);
+	  //ply_get_property (ply, elem_name, &vert_props[4]);
+	  //ply_get_property (ply, elem_name, &vert_props[5]);
 
 	  // the function malloc an OtherProperty and return it
 	  // but luckily that vert_other is a global variable
@@ -151,9 +151,9 @@ void ply_read_file(char* filename)
       /* set up for getting face elements */
 
       ply_get_property (ply, elem_name, &face_props[0]);
-	  ply_get_property (ply, elem_name, &face_props[1]);
-	  ply_get_property (ply, elem_name, &face_props[2]);
-	  ply_get_property (ply, elem_name, &face_props[3]);
+	  //ply_get_property (ply, elem_name, &face_props[1]);
+	  //ply_get_property (ply, elem_name, &face_props[2]);
+	  //ply_get_property (ply, elem_name, &face_props[3]);
 
       face_other = ply_get_other_properties (ply, elem_name,
                      offsetof(Face,other_props));

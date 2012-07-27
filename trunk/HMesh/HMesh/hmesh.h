@@ -19,6 +19,7 @@ private:
 
 	hGlWidget *_hglwidget;
 	QSlimDialog *_qslim_dialog;
+	QSlimDialog *_psimp_dialog;
 
 	// variables for open files
 	QString _prev_path;
@@ -30,6 +31,7 @@ private:
 		QAction* _action_open;
 	QMenu* _menu_simp;			// simplification menu
 		QAction* _action_qslim;
+		QAction* _action_psimp;
 	QMenu* _menu_render;		// render menu
 		QMenu* _menu_primitive;
 			QAction* _action_wireframe;
@@ -42,6 +44,7 @@ private:
 public slots:
 	void on_open_file();
 	void on_qslim();
+	void on_psimp();
 
 	void on_wireframe() { _hglwidget->primitiveMode(WIREFRAME); update(); }
 	void on_flat_lines() { _hglwidget->primitiveMode(FLAT_LINES); update(); }

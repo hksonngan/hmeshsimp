@@ -105,7 +105,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply;../;../libgfx/include;../mixkit/src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -587,6 +587,10 @@
 			</File>
 			<File
 				RelativePath=".\patching_simp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\psimp_entry.cpp"
 				>
 			</File>
 		</Filter>
