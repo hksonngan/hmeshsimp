@@ -3,9 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HMesh", "HMesh\HMesh.vcproj", "{8AECE0D8-FC93-424C-85D9-1F05BC55B281}"
 	ProjectSection(ProjectDependencies) = postProject
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6} = {448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}
 		{5E7FBD62-8A7E-4B9A-9E02-3BC2EE9E335A} = {5E7FBD62-8A7E-4B9A-9E02-3BC2EE9E335A}
-		{A03330D3-129A-4EB5-828C-0112EFE97B77} = {A03330D3-129A-4EB5-828C-0112EFE97B77}
 		{9C860BC0-EA17-41E6-9A9E-B55E3C084AB0} = {9C860BC0-EA17-41E6-9A9E-B55E3C084AB0}
+		{A03330D3-129A-4EB5-828C-0112EFE97B77} = {A03330D3-129A-4EB5-828C-0112EFE97B77}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IcesopCore", "IcesopCore\IcesopCore.vcproj", "{9C860BC0-EA17-41E6-9A9E-B55E3C084AB0}"
@@ -13,6 +14,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mesh", "Mesh\Mesh.vcproj", "{5E7FBD62-8A7E-4B9A-9E02-3BC2EE9E335A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsimpkit", "..\hsimpkit\hsimpkit.vcproj", "{A03330D3-129A-4EB5-828C-0112EFE97B77}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgfx", "..\libgfx\vc6\libgfx\libgfx.vcproj", "{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +39,10 @@ Global
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Debug|Win32.Build.0 = Debug|Win32
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Release|Win32.ActiveCfg = Release|Win32
 		{A03330D3-129A-4EB5-828C-0112EFE97B77}.Release|Win32.Build.0 = Release|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Debug|Win32.Build.0 = Debug|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Release|Win32.ActiveCfg = Release|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

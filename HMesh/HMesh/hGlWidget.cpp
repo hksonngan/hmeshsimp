@@ -64,12 +64,12 @@ void hGlWidget::paintGL()
 
 	if(_draw_ply)
 	{
-		if (_primitive_mode == FLAT_LINES || _primitive_mode == WIREFRAME) {
-			glDisable(GL_LIGHTING);
-			glColor3f(0.0f, 0.0f, 0.0f);
-			glPolygonMode(GL_FRONT, GL_LINE);
-			drawModel();
-		}
+		//if (_primitive_mode == FLAT_LINES || _primitive_mode == WIREFRAME) {
+		//	glDisable(GL_LIGHTING);
+		//	glColor3f(0.0f, 0.0f, 0.0f);
+		//	glPolygonMode(GL_FRONT, GL_LINE);
+		//	drawModel();
+		//}
 		
 		if (_primitive_mode != WIREFRAME) {
 			setLights();

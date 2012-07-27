@@ -116,7 +116,7 @@
 				AdditionalIncludeDirectories="../../include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="false"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="false"
 				PrecompiledHeaderFile=".\Release/libgfx.pch"
 				AssemblerListingLocation=".\Release/"

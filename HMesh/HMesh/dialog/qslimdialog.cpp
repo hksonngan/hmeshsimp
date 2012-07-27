@@ -11,6 +11,7 @@ QSlimDialog::QSlimDialog(QWidget *parent)
 	label = new QLabel(tr("parameters:"));
 	lineEdit = new QLineEdit;
 	label->setBuddy(lineEdit);
+	lineEdit->setFixedWidth(300);
 
 	//caseCheckBox = new QCheckBox(tr("Match &case"));
 	//backwardCheckBox = new QCheckBox(tr("Search &backford"));
@@ -39,7 +40,7 @@ QSlimDialog::QSlimDialog(QWidget *parent)
 	
 	this->setLayout(mainLayout);
 
-	setWindowTitle(tr("QSlim"));
+	setWindowTitle(tr("Params"));
 	setFixedHeight(sizeHint().height()); 
 }
 
