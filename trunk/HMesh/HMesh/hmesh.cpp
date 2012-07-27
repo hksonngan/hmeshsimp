@@ -24,6 +24,7 @@ HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
 
 	_hglwidget = new hGlWidget();
 	this->setCentralWidget(_hglwidget);
+
 	_qslim_dialog = new QSlimDialog(this);
 	_qslim_dialog->getLineEdit()->setText(tr("-t 500"));
 	_psimp_dialog = new QSlimDialog(this);
@@ -35,6 +36,16 @@ HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
 	_file_name = "F:/bunny/reconstruction/bun_zipper.ply";
 	_file_ext = "ply";
 	_prev_path = QDir::currentPath();
+
+	initMenus();
+}
+
+HMesh::~HMesh()
+{
+
+}
+
+void HMesh::initMenus() {
 
 	// initialize menus
 	QMenuBar *menu_bar = this->menuBar();
@@ -54,23 +65,34 @@ HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
 	// render menu
 	_menu_render = menu_bar->addMenu("Render");
 		_menu_primitive = _menu_render->addMenu("Primitive");
-			_action_wireframe = _menu_primitive->addAction("Wireframe");
-			connect(_action_wireframe, SIGNAL(triggered()), this, SLOT(on_wireframe()));
-			_action_flat = _menu_primitive->addAction("Flat");
-			connect(_action_flat, SIGNAL(triggered()), this, SLOT(on_flat()));
-			_action_flat_lines = _menu_primitive->addAction("Flat Lines");
-			connect(_action_flat_lines, SIGNAL(triggered()), this, SLOT(on_flat_lines()));
-		_menu_primitive->setActiveAction(_action_flat);
+			_primitive_group = new QActionGroup(this);
+				_action_wireframe = _menu_primitive->addAction("Wireframe");
+				_action_wireframe->setCheckable(true);
+				_primitive_group->addAction(_action_wireframe);
+				connect(_action_wireframe, SIGNAL(triggered()), this, SLOT(on_wireframe()));
+
+				_action_flat = _menu_primitive->addAction("Flat");
+				_action_flat->setCheckable(true);
+				_primitive_group->addAction(_action_flat);
+				connect(_action_flat, SIGNAL(triggered()), this, SLOT(on_flat()));
+
+				_action_flat_lines = _menu_primitive->addAction("Flat Lines");
+				_action_flat_lines->setCheckable(true);
+				_primitive_group->addAction(_action_flat_lines);
+				connect(_action_flat_lines, SIGNAL(triggered()), this, SLOT(on_flat_lines()));
+				_action_flat_lines->setChecked(true);
 		_menu_color_mode = _menu_render->addMenu("Color Mode");
-			_action_vert_color = _menu_color_mode->addAction("Vertex Color");
-			connect(_action_vert_color, SIGNAL(triggered()), this, SLOT(on_vert_color()));
-			_action_face_color = _menu_color_mode->addAction("Face Color");
-			connect(_action_face_color, SIGNAL(triggered()), this, SLOT(on_face_color()));
-}
+			_color_group = new QActionGroup(this);
+				_action_vert_color = _menu_color_mode->addAction("Vertex Color");
+				_action_vert_color->setCheckable(true);
+				_color_group->addAction(_action_vert_color);
+				connect(_action_vert_color, SIGNAL(triggered()), this, SLOT(on_vert_color()));
 
-HMesh::~HMesh()
-{
-
+				_action_face_color = _menu_color_mode->addAction("Face Color");
+				_action_face_color->setCheckable(true);
+				_color_group->addAction(_action_face_color);
+				connect(_action_face_color, SIGNAL(triggered()), this, SLOT(on_face_color()));
+				_action_face_color->setChecked(true);
 }
 
 void HMesh::on_open_file()

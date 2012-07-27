@@ -64,19 +64,23 @@ void hGlWidget::paintGL()
 
 	if(_draw_ply)
 	{
-		//if (_primitive_mode == FLAT_LINES || _primitive_mode == WIREFRAME) {
-		//	glDisable(GL_LIGHTING);
-		//	glColor3f(0.0f, 0.0f, 0.0f);
-		//	glPolygonMode(GL_FRONT, GL_LINE);
-		//	drawModel();
-		//}
-		
 		if (_primitive_mode != WIREFRAME) {
+			glPolygonOffset(1.0, 1.0);
+			glEnable(GL_POLYGON_OFFSET_FILL);
 			setLights();
 			applyTransform();
 			setMaterial();
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glPolygonMode(GL_FRONT, GL_FILL);
 			drawModel();	
+			glDisable(GL_POLYGON_OFFSET_FILL);
+		}
+
+		if (_primitive_mode == FLAT_LINES || _primitive_mode == WIREFRAME) {
+			glDisable(GL_LIGHTING);
+			glColor3f(0.0f, 0.0f, 0.0f);
+			applyTransform();
+			glPolygonMode(GL_FRONT, GL_LINE);
+			drawModel();
 		}
 	}
 
@@ -390,6 +394,7 @@ void hGlWidget::drawModel() {
 		else {
 			cerr << "#error! non-triangle while drawing ply models" << endl;
 		}
+
 	}
 
 	glEnd();
