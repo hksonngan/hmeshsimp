@@ -15,6 +15,9 @@ public:
 	~HMesh();
 
 private:
+	void initMenus();
+
+private:
 	Ui::HMeshClass ui;
 
 	hGlWidget *_hglwidget;
@@ -34,24 +37,26 @@ private:
 		QAction* _action_psimp;
 	QMenu* _menu_render;		// render menu
 		QMenu* _menu_primitive;
-			QAction* _action_wireframe;
-			QAction* _action_flat_lines;
-			QAction* _action_flat;
+			QActionGroup* _primitive_group;
+				QAction* _action_wireframe;
+				QAction* _action_flat_lines;
+				QAction* _action_flat;
 		QMenu* _menu_color_mode;
-			QAction* _action_vert_color;
-			QAction* _action_face_color;
+			QActionGroup* _color_group;
+				QAction* _action_vert_color;
+				QAction* _action_face_color;
 
 public slots:
 	void on_open_file();
 	void on_qslim();
 	void on_psimp();
 
-	void on_wireframe() { _hglwidget->primitiveMode(WIREFRAME); update(); }
-	void on_flat_lines() { _hglwidget->primitiveMode(FLAT_LINES); update(); }
-	void on_flat() { _hglwidget->primitiveMode(FLAT); }
+	void on_wireframe() { _hglwidget->primitiveMode(WIREFRAME); _hglwidget->update(); }
+	void on_flat_lines() { _hglwidget->primitiveMode(FLAT_LINES); _hglwidget->update(); }
+	void on_flat() { _hglwidget->primitiveMode(FLAT); _hglwidget->update(); }
 	
-	void on_vert_color() { _hglwidget->colorMode(VERT_COLOR); update(); }
-	void on_face_color() { _hglwidget->colorMode(FACE_COLOR); update(); }
+	void on_vert_color() { _hglwidget->colorMode(VERT_COLOR); _hglwidget->update(); }
+	void on_face_color() { _hglwidget->colorMode(FACE_COLOR); _hglwidget->update(); }
 };
 
 #endif // HMESH_H
