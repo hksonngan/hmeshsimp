@@ -37,9 +37,11 @@ void hGlWidget::initializeGL()
 {
 	GLenum err = glewInit();
 	if (GLEW_OK != err) 
-		cerr << "Error: %s\n" << glewGetErrorString(err) << endl;
+		cerr << endl << "Error: %s\n" << glewGetErrorString(err) << endl;
 	else 
-		cout << "Glew init success" << endl;
+		cout << endl << "Glew init success" << endl;
+
+	cout << "Opengl Version: " << glGetString(GL_VERSION) << endl;
 
 	//glShadeModel(GL_FLAT);
 	glShadeModel(GL_SMOOTH);
@@ -49,9 +51,13 @@ void hGlWidget::initializeGL()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
+	GLint buf, sbuf;
+	glGetIntegerv(GL_SAMPLE_BUFFERS, &buf);
+	cout << "Number of sample buffers: " << buf << endl;
+	glGetIntegerv(GL_SAMPLES, &sbuf);
+	cout << "Number of samples: " << sbuf << endl;
 	// antialiasing
 	glEnable(GL_MULTISAMPLE);
-	cout << glGetString(GL_VERSION);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);

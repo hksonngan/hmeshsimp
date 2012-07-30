@@ -55,7 +55,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib $(OutDir)\IcesopCore.lib $(OutDir)\Mesh.lib $(OutDir)\hsimpkit.lib $(OutDir)\libgfx.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib $(OutDir)\IcesopCore.lib $(OutDir)\Mesh.lib $(OutDir)\hsimpkit.lib $(OutDir)\libgfx.lib ..\..\glew-1.8.0\lib\glew32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				AdditionalLibraryDirectories="$(QTDIR)\lib"
 				GenerateDebugInformation="false"

@@ -118,6 +118,8 @@ void HMesh::on_open_file()
 
 void HMesh::on_qslim()
 {
+	return;
+
 	if(_file_name == "")
 		return;
 
