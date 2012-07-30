@@ -81,6 +81,11 @@ void HMesh::initMenus() {
 				_primitive_group->addAction(_action_flat_lines);
 				connect(_action_flat_lines, SIGNAL(triggered()), this, SLOT(on_flat_lines()));
 				_action_flat_lines->setChecked(true);
+
+				_action_smooth = _menu_primitive->addAction("Smooth");
+				_action_smooth->setCheckable(true);
+				_primitive_group->addAction(_action_smooth);
+				connect(_action_smooth, SIGNAL(triggered()), this, SLOT(on_smooth()));
 		_menu_color_mode = _menu_render->addMenu("Color Mode");
 			_color_group = new QActionGroup(this);
 				_action_vert_color = _menu_color_mode->addAction("Vertex Color");
@@ -169,6 +174,7 @@ void HMesh::on_psimp() {
 		memcpy(argv[i], arg_list[i].toLocal8Bit().data(), strlen(arg_list[i].toLocal8Bit().data()) + 1);
 	}
 	extern int psimp_entry(int, char**, bool);
+	cout << endl;
 	psimp_entry(arg_list.count(), argv, false);
 
 	QString pure_name = _file_name.mid(_file_name.lastIndexOf("/") + 1);

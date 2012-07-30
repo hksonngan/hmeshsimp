@@ -41,6 +41,7 @@ private:
 				QAction* _action_wireframe;
 				QAction* _action_flat_lines;
 				QAction* _action_flat;
+				QAction* _action_smooth;
 		QMenu* _menu_color_mode;
 			QActionGroup* _color_group;
 				QAction* _action_vert_color;
@@ -54,6 +55,7 @@ public slots:
 	void on_wireframe() { _hglwidget->primitiveMode(WIREFRAME); _hglwidget->update(); }
 	void on_flat_lines() { _hglwidget->primitiveMode(FLAT_LINES); _hglwidget->update(); }
 	void on_flat() { _hglwidget->primitiveMode(FLAT); _hglwidget->update(); }
+	void on_smooth() { _hglwidget->primitiveMode(SMOOTH); _hglwidget->update(); }
 	
 	void on_vert_color() { _hglwidget->colorMode(VERT_COLOR); _hglwidget->update(); }
 	void on_face_color() { _hglwidget->colorMode(FACE_COLOR); _hglwidget->update(); }

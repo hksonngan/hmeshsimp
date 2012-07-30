@@ -21,12 +21,7 @@ hGlWidget::hGlWidget()
 	fnormals = NULL;
 	vnormals = NULL;
 
-	memset (_glmat, 0, sizeof (_glmat));
-	_glmat[0] = _glmat[5] = _glmat[10] = _glmat[15] = 1;
-	_scale = 10.0;
-	_operateMode = OPERATEMODE_NONE;
-	_trans_point.setValue(0.0, 0.0, 0.0);
-	double _rotate_degree = 0.0;
+	initTransform();
 	_max_x = 0;
 	_min_x = 0;
 	_max_y = 0;
@@ -40,6 +35,12 @@ hGlWidget::hGlWidget()
 
 void hGlWidget::initializeGL()
 {
+	GLenum err = glewInit();
+	if (GLEW_OK != err) 
+		cerr << "Error: %s\n" << glewGetErrorString(err) << endl;
+	else 
+		cout << "Glew init success" << endl;
+
 	//glShadeModel(GL_FLAT);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_NORMALIZE);
@@ -47,6 +48,10 @@ void hGlWidget::initializeGL()
 	// Default : blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+
+	// antialiasing
+	glEnable(GL_MULTISAMPLE);
+	cout << glGetString(GL_VERSION);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -327,6 +332,8 @@ void hGlWidget::openFile(QString _file_name)
 
 		_scale = 3 / _range;
 	}
+
+	initTransform();
 }
 
 void hGlWidget::drawModel() {
@@ -398,6 +405,16 @@ void hGlWidget::drawModel() {
 	}
 
 	glEnd();
+}
+
+void hGlWidget::initTransform() {
+
+	memset (_glmat, 0, sizeof (_glmat));
+	_glmat[0] = _glmat[5] = _glmat[10] = _glmat[15] = 1;
+	_scale = 10.0;
+	_operateMode = OPERATEMODE_NONE;
+	_trans_point.setValue(0.0, 0.0, 0.0);
+	double _rotate_degree = 0.0;
 }
 
 void hGlWidget::applyTransform() {
