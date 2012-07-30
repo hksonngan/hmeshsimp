@@ -6,6 +6,8 @@
 #ifndef H_GL_WIDGET
 #define H_GL_WIDGET
 
+#include <GL/glew.h>
+
 #include <QtGui>
 #include <QGLWidget>
 #include <QString>
@@ -34,6 +36,7 @@ protected:
 	void wheelEvent(QWheelEvent * event);
 
 private:
+	void initTransform();
 	void computeNormals();
 	void calcBoundingBox();
 	void drawModel();
