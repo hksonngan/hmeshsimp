@@ -20,6 +20,15 @@ While the functions differ, they actually invoke the same library called
 'hsimpkit' and is an simple wrapping for the underlying algorithm implemented
 in the library.
 
+All executalbe files reside in the folder '../release' with a README file
+indicating the usage, however you can execute the file without any option
+to see the usage of it. Options are marked by '-' and file name is added
+without any indicator in the end. Such as:
+
+	patchingsimp.exe -t 3000 -x 3 -y 3 -z 3 F:\plys\bunny\bun_zipper.ply
+	(target vertices 3000, bounding box seperated to 3x3x3, input file 
+	located in F:\plys\bunny\bun_zipper.ply)
+
 All projects and codes are written and tested under Windows/VS2005, using a
 nVidia GeForce 9800GT or ATI Mobility Radeon HD 3400 graphics card. There is
 NO GUARANTEE that it will be running properly or even compiled successfully
