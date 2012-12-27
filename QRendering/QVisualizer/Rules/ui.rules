@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="ui"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="ui"
+			DisplayName="ui"
+			CommandLine="&quot;$(QTDIR)\bin\uic.exe&quot; -o .\GeneratedFiles\ui_$(InputName).h &quot;$(InputPath)&quot;"
+			Outputs=".\GeneratedFiles\ui_$(InputName).h"
+			AdditionalDependencies="&quot;$(QTDIR)\bin\uic.exe&quot;"
+			FileExtensions="*.ui"
+			ExecutionDescription="Uic&apos;ing $(InputFileName)..."
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>
