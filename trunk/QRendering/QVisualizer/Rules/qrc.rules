@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="qrc"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="qrc"
+			DisplayName="qrc"
+			CommandLine="&quot;$(QTDIR)\bin\rcc.exe&quot; -name &quot;$(InputName)&quot; -no-compress &quot;$(InputPath)&quot; -o .\GeneratedFiles\qrc_$(InputName).cpp"
+			Outputs=".\GeneratedFiles\qrc_$(InputName).cpp"
+			AdditionalDependencies="&quot;$(QTDIR)\bin\rcc.exe&quot;"
+			FileExtensions="*.qrc"
+			ExecutionDescription="Rcc&apos;ing $(InputFileName)..."
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>
