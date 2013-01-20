@@ -202,6 +202,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\qio.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\qio.h"
+				>
+			</File>
+			<File
 				RelativePath=".\tri_soup_stream.cpp"
 				>
 			</File>
@@ -367,6 +375,10 @@
 			</File>
 			<File
 				RelativePath=".\common_types.h"
+				>
+			</File>
+			<File
+				RelativePath=".\data_type.h"
 				>
 			</File>
 			<File
@@ -591,6 +603,46 @@
 			</File>
 			<File
 				RelativePath=".\psimp_entry.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="mc_simp"
+			>
+			<File
+				RelativePath=".\mc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mc_simp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mc_simp.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mc_table.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mcsimp_types.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mcsimp_types.h"
+				>
+			</File>
+			<File
+				RelativePath=".\raw_set.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\raw_set.h"
 				>
 			</File>
 		</Filter>

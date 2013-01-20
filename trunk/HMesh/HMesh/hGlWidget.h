@@ -8,17 +8,24 @@
 
 #include <GL/glew.h>
 
+#include <string>
+#include <vector>
 #include <QtGui>
 #include <QGLWidget>
 #include <QString>
 #include "common.h"
 #include "tri_soup.h"
 #include "common_types.h"
+#include "mc_simp.h"
+#include "mc.h"
 
 using namespace icesop;
 
+using std::vector;
+
 enum PrimitiveMode { SMOOTH, FLAT, FLAT_LINES, WIREFRAME };
 enum ColorMode { VERT_COLOR, FACE_COLOR };
+enum DrawWhich { NONE, DRAW_PLY, DRAW_TRIS, DRAW_QSLIM, DRAW_MC_TRIS };
 
 class hGlWidget : public QGLWidget
 {
@@ -40,6 +47,7 @@ private:
 	void computeNormals();
 	void calcBoundingBox();
 	void drawModel();
+	void drawPly();
 	void setLights();
 	void setMaterial();
 	void applyTransform();
@@ -49,6 +57,7 @@ public:
 	void setDrawQSlim();
 	void setDrawPly();
 	void setDrawTris();
+	bool setDrawMC(std::string filename, double isovalue);
 	void openFile(QString _file_name);
 
 	void primitiveMode(PrimitiveMode m) { _primitive_mode = m; }
@@ -56,9 +65,10 @@ public:
 
 private:
 	// variables concerning drawing objects
-	bool _draw_qslim;
-	bool _draw_ply;
-	bool _draw_tris;
+	//bool _draw_qslim;
+	//bool _draw_ply;
+	//bool _draw_tris;
+	DrawWhich _drawWhich;
 
 	PrimitiveMode _primitive_mode;
 	ColorMode _color_mode;
@@ -82,6 +92,7 @@ private:
 	HNormal *fnormals;
 
 	TriangleSoupContainer _tris_container;
+	vector<TRIANGLE> _mc_tris;
 };
 
 #endif

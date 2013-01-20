@@ -5,7 +5,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 
@@ -37,6 +37,7 @@
 #define INIT_BOUND_WEIGHT	10000.0f
 
 typedef MxQuadric3 Quadric;
+typedef unordered_map<uint, Quadric> QuadMap;
 
 class QuadricEdgeCollapse: public PairCollapse {
 
@@ -54,6 +55,8 @@ public:
 	// init after the vertices and faces are ready
 	virtual void initialize();
 	inline void addDiscontinuityConstraint(uint vert1, uint vert2, uint face_id);
+	Quadric& q(uint i) { return quadrics.at(i); }
+	inline uint quadCount();
 
 
 	////////////////////////////////////////
@@ -63,11 +66,15 @@ public:
 	// evaluate the target placement and error incurred,
 	// and update the pair's content
 	virtual HVertex evaluatePair(CollapsablePair *pair);
-	virtual void collapsePair(pCollapsablePair &pair);
+	virtual void collapsePair(pCollapsablePair pair);
 
 protected:
 	// every vertex has a quadric
+#if ARRAY_USE == ARRAY_NORMAL
 	HDynamArray<q_matrix> quadrics;
+#else
+	QuadMap quadrics;
+#endif
 
 public:
 
@@ -82,14 +89,14 @@ public:
 
 void QuadricEdgeCollapse::addDiscontinuityConstraint(uint vert1, uint vert2, uint face_id) {
 
-	Vec3 org(vertices[vert1].x, vertices[vert1].y, vertices[vert1].z), 
-		dest(vertices[vert2].x, vertices[vert2].y, vertices[vert2].z);
+	Vec3 org(v(vert1).x, v(vert1).y, v(vert1).z), 
+		dest(v(vert2).x, v(vert2).y, v(vert2).z);
 	Vec3 e = dest - org;
 
 	Vec3 n;
 	HNormal hn;
-	CollapsableFace &f = faces[face_id];
-	HFaceFormula::calcFaceNormal(vertices[f.i], vertices[f.j], vertices[f.k], hn);
+	CollapsableFace &face = f(face_id);
+	HFaceFormula::calcFaceNormal(v(face.i), v(face.j), v(face.k), hn);
 	assign(n, hn);
 
 	Vec3 n2 = e ^ n;
@@ -99,14 +106,21 @@ void QuadricEdgeCollapse::addDiscontinuityConstraint(uint vert1, uint vert2, uin
 	Q *= boundary_weight;
 
 	if( weighting_policy == MX_WEIGHT_AREA ||
-	    weighting_policy == MX_WEIGHT_AREA_AVG )
-	{
+	    weighting_policy == MX_WEIGHT_AREA_AVG ) {
 	    Q.set_area(norm2(e));
 	    Q *= Q.area();
 	}
 
-	quadrics[vert1] += Q;
-	quadrics[vert2] += Q;
+	q(vert1) += Q;
+	q(vert2) += Q;
+}
+
+uint QuadricEdgeCollapse::quadCount() { 
+#if ARRAY_USE == ARRAY_NORMAL
+	return quadrics.count();
+#else
+	return quadrics.size();
+#endif
 }
 
 #endif //__ITERATIVE_QUADRIC_EDGE_COLLAPSE__

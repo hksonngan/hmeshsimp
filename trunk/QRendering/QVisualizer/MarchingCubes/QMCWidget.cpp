@@ -49,7 +49,10 @@ QMCWidget::QMCWidget(QWidget *parent)
     initialized(CL_FALSE), windowWidth(1.0f), windowLevel(0.5f), error(GL_FALSE), settings(), // Configuration
     mouseMode(MOUSE_ROTATE), mouseX(0), mouseY(0), bufferSize(0), totalNumber(0), isoValue(0.0f), isoSurfaceGenerated(GL_FALSE), // OpenGL Context
     clPrograms(), clDevices(), glVBO(0), clContext(0), clQueue(0) // OpenCL Context
-{}
+{
+	genVertexData = NULL;
+	bufferDataSize = 0;
+}
 
 QMCWidget::~QMCWidget()
 {
@@ -102,6 +105,7 @@ unsigned char QMCWidget::initData(const std::string &name)
     return GL_TRUE;
 }
 
+// parse .dat file
 unsigned char QMCWidget::parseDataFile(const std::string &name)
 {
     std::string dataFileContent, line;
@@ -368,7 +372,7 @@ unsigned char QMCWidget::initConfigurations()
     }
 
 	// set the z dimension
-	volumeSize.s[2] = 50;
+	//volumeSize.s[2] = 100;
 
     cl_uint maxSize = 0;
     for (int i = 0; i < 3; i++)
@@ -465,7 +469,8 @@ unsigned char QMCWidget::initArguments()
     }
 
     cl_uint vexlNumber = volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2];
-	QIO::getFileDataOff(dataFilePath + objectFileName, cacheVolumeData.data(), voxelSize * vexlNumber, QIO::getOffset(100, volumeSize.s[0], volumeSize.s[1], format));
+	QIO::getFileData(dataFilePath + objectFileName, cacheVolumeData.data(), voxelSize * vexlNumber);
+	//QIO::getFileDataOff(dataFilePath + objectFileName, cacheVolumeData.data(), voxelSize * vexlNumber, QIO::getOffset(50, volumeSize.s[0], volumeSize.s[1], format));
 
     float volumeMin = FLT_MAX, volumeMax = FLT_MIN;
     QUtility::preprocess(cacheVolumeData.data(), vexlNumber, format, endian, 0, NULL, volumeMin, volumeMax);
@@ -506,12 +511,16 @@ void QMCWidget::initializeGL()
 	glEnable(GL_LIGHTING);
 
 	// Set material properties which will be assigned by glColor
+	// modified by ht
 	GLfloat color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
 	GLfloat specReflection[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specReflection);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specReflection);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specReflection);
 	GLfloat shininess[] = { 16.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+	glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
 
 	// Create light components
 	GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
@@ -615,6 +624,8 @@ void QMCWidget::paintGL()
         
         unsigned int triangleSize = 18 * sizeof(cl_float);
         unsigned int size = totalNumber * triangleSize;
+		bufferDataSize = size;
+
         if (size > CACHE_CL_BUFFER_SIZE) size = CACHE_CL_BUFFER_SIZE / triangleSize * triangleSize;
 
         // Delete the old VBO
@@ -625,14 +636,22 @@ void QMCWidget::paintGL()
             glDeleteBuffers(1, &glVBO);
             if (!QUtility::checkGLStatus(__FILE__, __LINE__, "glDeleteBuffers()")) return;
             bufferSize = 0;
+			
+			// -ht
+			if (!genVertexData)
+				delete[] genVertexData;
         }
 
         // Allocate a new VBO to represent the iso-surface
         if (bufferSize < size)
         {
+
             bufferSize = 1;
             while (bufferSize < size) bufferSize += bufferSize / 8 + 1;
             bufferSize = ((bufferSize - 1) / triangleSize + 1) * triangleSize;
+
+			// -ht
+			genVertexData = new char[bufferSize];
 
             glGenBuffers(1, &glVBO);
             if (!QUtility::checkGLStatus(__FILE__, __LINE__, "glGenBuffers()")) return;
@@ -664,7 +683,8 @@ void QMCWidget::paintGL()
         unsigned int size = bufferSize / triangleSize;
         if (totalNumber <= size && isoSurfaceGenerated)
         {
-            glDrawArrays(GL_TRIANGLES, 0, size * 3);
+            //glDrawArrays(GL_TRIANGLES, 0, size * 3);
+			drawGenFaces();
             glFinish();
         }
         else
@@ -807,14 +827,23 @@ unsigned char QMCWidget::traverseHP(cl_uint size)
         std::cerr << " > LOG: " << bufferSize << std::endl;
 #endif
         
+		status = clEnqueueReadBuffer(clQueue, clVBO, CL_TRUE, 0, bufferDataSize, genVertexData, 0, NULL, 0);
+
         status = clFinish(clQueue);
         if (!QUtility::checkCLStatus(__FILE__, __LINE__, status, "clFinish()")) return GL_FALSE;
         
+		computeBoudnBox();
+		std::cout << " > INFO: bound box info - " << std::endl
+			<< "\tx- " << x_min << " " << x_max << std::endl
+			<< "\ty- " << y_min << " " << y_max << std::endl
+			<< "\tz- " << z_min << " " << z_max << std::endl;
+
         //QDateTime tDrawArrays = QDateTime::currentDateTime();
-        glDrawArrays(GL_TRIANGLES, 0, size * 3);
-        glFinish();
+        //glDrawArrays(GL_TRIANGLES, 0, size * 3);
+        drawGenFaces();
+		glFinish();
         //if (settings.enablePrintingFPS) QUtility::printTimeCost(tDrawArrays.msecsTo(QDateTime::currentDateTime()), "glDrawArrays()");
-        
+
         totalSize += size;
     }
 
@@ -936,4 +965,43 @@ void QMCWidget::printSettings()
     std::cerr << " > LOG: view rotation (" << settings.viewRotation.x << ", " << settings.viewRotation.y << ", " << settings.viewRotation.z << ", " << settings.viewRotation.w << ")." << std::endl;
     std::cerr << " > LOG: view translation (" << settings.viewTranslation.x << ", " << settings.viewTranslation.y << ", " << settings.viewTranslation.z << ")." << std::endl;
     std::cerr << " > LOG: window size (" << settings.width << ", " << settings.height << ")." << std::endl;
+}
+
+void QMCWidget::computeBoudnBox() {
+	float* vertexData = (float*) genVertexData;
+	float x, y, z;
+	x_max = x_min = vertexData[0]; 
+	y_max = y_min = vertexData[1]; 
+	z_max = z_min = vertexData[2];
+
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < totalNumber * 3; i ++) {
+		x = vertexData[i * 6 + 0];
+		y = vertexData[i * 6 + 1];
+		z = vertexData[i * 6 + 2];
+		if (x > x_max)
+			x_max = x;
+		else if (x < x_min)
+			x_min = x;
+		if (y > y_max)
+			y_max = y;
+		else if (y < y_min)
+			y_min = y;
+		if (z > z_max)
+			z_max = z;
+		else if (z < z_min)
+			z_min = z;
+	}
+	glEnd();
+}
+
+void QMCWidget::drawGenFaces() {
+	float* vertexData = (float*) genVertexData;
+
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < totalNumber * 3; i ++) {
+		glVertex3f(vertexData[i * 6 + 0], vertexData[i * 6 + 1], vertexData[i * 6 + 2]);
+		glNormal3f(vertexData[i * 6 + 3], vertexData[i * 6 + 4], vertexData[i * 6 + 5]);
+	}
+	glEnd();
 }

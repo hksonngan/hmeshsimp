@@ -8,12 +8,12 @@
 
 #include "tri_soup_stream.h"
 
-typedef struct TripleFloat
+typedef struct
 {
 	float x, y, z;
 } TripleFloat;
 
-typedef struct SoupTriangle
+typedef struct
 {
 	TripleFloat vert1;
 	TripleFloat vert2;

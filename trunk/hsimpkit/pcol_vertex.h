@@ -5,7 +5,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 
@@ -21,11 +21,14 @@
 #include "MixKit/MxQMetric3.h"
 
 
-#define UNREFER			UCHAR_MAX		// interior unreferred vertex mark
-#define REFERRED		UCHAR_MAX - 1	// interior referred vertex mark
+#define UNREFER			0	// interior unreferred vertex mark
+#define REFERRED		1	// interior referred vertex mark
 /* below used when simplifying a patch of a mesh */
-#define INTERIOR_BOUND	UCHAR_MAX - 2	// interior boundary (must be referred) vertex mark
-#define EXTERIOR		UCHAR_MAX - 3	// exterior boundary (must be referred) vertex mark
+#define INTERIOR_BOUND	2	// interior boundary (must be referred) vertex mark
+#define EXTERIOR		3	// exterior boundary (must be referred) vertex mark
+/* below used for incremental simplifying */
+#define UNFINAL			4	// unfinalized vertices
+#define FINAL			5	// finalized vertices (the succeeding faces won't reference the vertex)
 
 using std::list;
 
@@ -42,7 +45,6 @@ public:
 	uint	new_id;		// the id after the collapse
 	uint	output_id;	// the id of the output model
 	uchar	mark;
-	/// I think it's useless!!!
 	//HVertex	new_vertex;	// the new vertex after the collapse
 						// used for collapsing sequence file
 
@@ -58,7 +60,7 @@ public:
 		else
 			mark = m;
  	}
-	bool valid(uint v_index) { return v_index == new_id; } /* valid referred to uncollapsed */
+	bool valid(uint v_index) const { return v_index == new_id; } /* valid referred to uncollapsed */
 	bool unreferred() { return mark == UNREFER; }
 	bool interior() { return mark != EXTERIOR; }
 	bool interior_bound() { return mark == INTERIOR_BOUND; }
@@ -82,7 +84,7 @@ public:
 	 * would be 'adjacent collapsable 
 	 * edges'. The adjacent pairs should
 	 * be updated with the collapse
-	 * operation
+	 * operation.
 	 * One of the element is NULL means
 	 * that it has been decimated during
 	 * the collapse of the corresponding

@@ -312,7 +312,7 @@ void scanHP(
     __global uchar* hp,
     uint4 size,
     uint target,
-    uint* hight,
+    uint* height,
     uint4* index
     )
 {
@@ -320,8 +320,8 @@ void scanHP(
     (*index).y *= 2;
     (*index).z *= 2;
     uint4 hpIndex = *index;
-    *hight -= 1;
-    uint hpHight = *hight;
+    *height -= 1;
+    uint hpHight = *height;
 
     uint neighbors[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     if (hpHight < 2)
@@ -454,10 +454,10 @@ __kernel void traverseHP(
     // Compute cube index
     uint4 index = { 0, 0, 0, 0 };
     #if HP_HEIGHT > 11
-    scanHP(hp9, size11, target, &height, &index);
+    scanHP(hp11, size11, target, &height, &index);
     #endif
     #if HP_HEIGHT > 10
-    scanHP(hp9, size10, target, &height, &index);
+    scanHP(hp10, size10, target, &height, &index);
     #endif
     #if HP_HEIGHT > 9
     scanHP(hp9, size9, target, &height, &index);

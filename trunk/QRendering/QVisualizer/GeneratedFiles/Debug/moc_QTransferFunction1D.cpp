@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'QTransferFunction1D.h'
 **
-** Created: Tue Apr 17 11:29:36 2012
+** Created: Wed Jan 2 15:03:26 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

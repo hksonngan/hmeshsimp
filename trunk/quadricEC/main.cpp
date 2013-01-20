@@ -124,6 +124,7 @@ int main(int argc, char** argv) {
 	r = qec.writePly(outfilename);
 	flog << qec.getInfo();
 	cout << qec.getInfo();
+	cout << "\tquadrics count: " << qec.quadCount() << endl << endl;
 	qec.clearInfo();
 	if (!r)
 		return 1;

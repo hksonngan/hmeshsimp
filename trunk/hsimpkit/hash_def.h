@@ -68,7 +68,7 @@ public:
 		unsigned long h = 0;
 		uint arr[3];
 
-		index.sortIndex(arr);
+		index._sortIndex(arr);
 
 		h += arr[0] & 0x000003ff; h <<= 10;
 		h += arr[1] & 0x000003ff; h <<= 10;

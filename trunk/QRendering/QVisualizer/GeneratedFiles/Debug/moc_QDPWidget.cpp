@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'QDPWidget.h'
 **
-** Created: Tue Apr 17 12:00:15 2012
+** Created: Wed Jan 2 15:03:30 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

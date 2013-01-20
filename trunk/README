@@ -1,52 +1,12 @@
-* HMESHSIMP is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+ HMESHSIMP is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ HMESHSIMP is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-* ALL RIGHTS RESERVED. HOU TAO. waytofall916@gmail.com
-
-This project now includes some seperate executable files and one underlying
-library supporting them.
-
-The executable files are:
-
-	HMesh:				a GUI program for mesh simplification, using Qt
-	hoocsimp:			an out-of-core vertex clustering algorithm
-	hspacedivision:		an R-Simp algorithm implementation
-	patchingsimp:		a patch-based simplification for massive meshes
-	quadircED:			a edge collapse framework for iterative simplification
-
-While the functions differ, they actually invoke the same library called
-'hsimpkit' and is an simple wrapping for the underlying algorithm implemented
-in the library.
-
-All executalbe files reside in the folder '../release' with a README file
-indicating the usage, however you can execute the file without any option
-to see the usage of it. Options are marked by '-' and file name is added
-without any indicator in the end. Such as:
-
-	patchingsimp.exe -t 3000 -x 3 -y 3 -z 3 F:\plys\bunny\bun_zipper.ply
-	(target vertices 3000, bounding box seperated to 3x3x3, input file 
-	located in F:\plys\bunny\bun_zipper.ply)
-
-All projects and codes are written and tested under Windows/VS2005, using a
-nVidia GeForce 9800GT or ATI Mobility Radeon HD 3400 graphics card. There is
-NO GUARANTEE that it will be running properly or even compiled successfully
-in another platform.
-
-There are some other external source codes and projects used, which are libgfx 
-developped by M.Garland as an basic graphic library and ply by G.Turk for
-the manipulations of ply file format. However, there are some other short 
-codes used for some math operations and basic data structures, which may not 
-be listed here.
-
-Most of the codes are written by HOU TAO as a master thesis implementation 
-as well as graphics programming training.
-
-There are temporarily some documents written, which are:
-
-	ECOL_DESIGN:		the design of my own patch based simplification
-	MODEL_PARTITION:	some comments about mesh partition from some published
-						essays
-						
-The documents may not be sufficient, though.
+ You should have received a copy of the GNU General Public License
+ along with HMESHSIMP.  If not, see <http://www.gnu.org/licenses/>.

@@ -28,6 +28,7 @@ public:
 	/* accessors */
 	inline ElemType& operator[] (unsigned int i) const { return data[i]; }
 	inline ElemType& elem(unsigned int i) const { return data[i]; }
+	inline ElemType& at(unsigned int i) const { return data[i]; }
 	inline ElemType* pointer(unsigned int i) { return data + i; }
 	inline int count() const { return size; }
 	inline int getCapacity() const { return capacity; }
@@ -76,7 +77,6 @@ protected:
 
 template<class ElemType>
 HDynamArray<ElemType>::HDynamArray(char *_id, int _init_cap) {
-
 	if (_init_cap <= 0) {
 		init_cap = DEFAULT_INIT_CAP;
 		capacity = 0;
@@ -98,13 +98,11 @@ HDynamArray<ElemType>::HDynamArray(char *_id, int _init_cap) {
 
 template<class ElemType>
 HDynamArray<ElemType>::~HDynamArray() {
-	
 	freeSpace();
 }
 
 template<class ElemType>
 void HDynamArray<ElemType>::push_back(ElemType e) {
-
 	if (size >= capacity) {
 		if (capacity == 0) 
 			resize(init_cap);
@@ -118,7 +116,6 @@ void HDynamArray<ElemType>::push_back(ElemType e) {
 
 template<class ElemType>
 void HDynamArray<ElemType>::resize(int _capacity)  {
-
 	if (_capacity > capacity) {
 		ElemType *new_data = new ElemType[_capacity];
 		if (data) {

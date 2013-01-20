@@ -1,19 +1,17 @@
 #include "hGlWidget.h"
 
 #include <algorithm>
-
 #include "common.h"
 #include "icesop_common.h"
 #include "ply/ply_inc.h"
 #include "tri_soup_stream.h"
+#include "h_math.h"
 
 #define _max_of_three(a, b, c, _max)  _max = max(a, b); _max = max(c, _max);
 
 hGlWidget::hGlWidget()
 {
-	_draw_qslim = false;
-	_draw_ply = false;
-	_draw_tris = false;
+	_drawWhich = NONE;
 
 	_primitive_mode = FLAT_LINES;
 	_color_mode = FACE_COLOR;
@@ -37,7 +35,7 @@ void hGlWidget::initializeGL()
 {
 	GLenum err = glewInit();
 	if (GLEW_OK != err) 
-		cerr << endl << "Error: %s\n" << glewGetErrorString(err) << endl;
+		cerr << endl << "Error: " << glewGetErrorString(err) << endl;
 	else 
 		cout << endl << "Glew init success" << endl;
 
@@ -73,33 +71,30 @@ void hGlWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if(_draw_ply)
-	{
-		if (_primitive_mode != WIREFRAME) {
-			glPolygonOffset(1.0, 1.0);
-			glEnable(GL_POLYGON_OFFSET_FILL);
-			setLights();
-			applyTransform();
-			setMaterial();
-			glPolygonMode(GL_FRONT, GL_FILL);
-			drawModel();	
-			glDisable(GL_POLYGON_OFFSET_FILL);
-		}
-
-		if (_primitive_mode == FLAT_LINES || _primitive_mode == WIREFRAME) {
-			glDisable(GL_LIGHTING);
-			glColor3f(0.0f, 0.0f, 0.0f);
-			applyTransform();
-			glPolygonMode(GL_FRONT, GL_LINE);
-			drawModel();
-		}
+	if (_primitive_mode != WIREFRAME) {
+		glPolygonOffset(1.0, 1.0);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		setLights();
+		applyTransform();
+		setMaterial();
+		glPolygonMode(GL_FRONT, GL_FILL);
+		drawModel();
+		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 
-	if (_draw_tris)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (_primitive_mode == FLAT_LINES || _primitive_mode == WIREFRAME) {
 		glDisable(GL_LIGHTING);
-		glColor3f(0.1f, 0.1f, 0.1f);
+		glColor3f(0.0f, 0.0f, 0.0f);
+		applyTransform();
+		glPolygonMode(GL_FRONT, GL_LINE);
+		drawModel();
+	}
+}
+
+void hGlWidget::drawModel() {
+	if(_drawWhich == DRAW_PLY){
+		drawPly();
+	} else if (_drawWhich == DRAW_TRIS) {
 		glBegin(GL_TRIANGLES);
 
 		int i;
@@ -111,6 +106,25 @@ void hGlWidget::paintGL()
 		}
 
 		glEnd();
+	} else if (_drawWhich == DRAW_MC_TRIS) {
+		glBegin(GL_TRIANGLES);
+		HNormal nm;
+		HVertex v1, v2, v3;
+
+		int i;
+		for (i = 0; i < _mc_tris.size(); i ++) {
+			v1.Set(_mc_tris[i].p[0].x, _mc_tris[i].p[0].y, _mc_tris[i].p[0].z);
+			v2.Set(_mc_tris[i].p[1].x, _mc_tris[i].p[1].y, _mc_tris[i].p[1].z);
+			v3.Set(_mc_tris[i].p[2].x, _mc_tris[i].p[2].y, _mc_tris[i].p[2].z);
+			nm = triangleNormal(v1, v2, v3);
+
+			glNormal3f(nm.x, nm.y, nm.z);
+			glVertex3f(v1.x, v1.y, v1.z);
+			glVertex3f(v2.x, v2.y, v2.z);
+			glVertex3f(v3.x, v3.y, v3.z);
+		}
+
+		glEnd();	
 	}
 }
 
@@ -125,26 +139,51 @@ void hGlWidget::resizeGL(int width, int height)
 
 void hGlWidget::setDrawQSlim()
 {
-	_draw_qslim = true;
-	_draw_ply = false;
-	_draw_tris = false;
+	_drawWhich = DRAW_QSLIM;
 	update();
 }
 
 void hGlWidget::setDrawPly()
 {
-	_draw_ply = true;
-	_draw_qslim = false;
-	_draw_tris = false;
+	_drawWhich = DRAW_PLY;
 	update();
 }
 
 void hGlWidget::setDrawTris()
 {
-	_draw_tris = true;
-	_draw_ply = false;
-	_draw_qslim = false;
+	_drawWhich = DRAW_TRIS;
 	update();
+}
+
+bool hGlWidget::setDrawMC(std::string filename, double isovalue) {
+	_mc_tris.clear();
+	MCSimp mcsimp;
+
+	if (!mcsimp.genIsosurfaces(filename, isovalue, _mc_tris))
+		return false;
+
+	std::cout << "#iso surfaces gened, faces count: " << _mc_tris.size() << std::endl;
+
+	// bounding boxes
+	RawSet* rawSet = mcsimp.getRawSet();
+	_max_x = rawSet->thickness.s[0] * rawSet->volumeSize.s[0];
+	_min_x = 0;
+	_max_y = rawSet->thickness.s[1] * rawSet->volumeSize.s[1];
+	_min_y = 0;
+	_max_z = 0;
+	_min_z = -(rawSet->thickness.s[2] * rawSet->volumeSize.s[2]);
+
+	_center_x = (_max_x + _min_x) / 2;
+	_center_y = (_max_y + _min_y) / 2;
+	_center_z = (_max_z + _min_z) / 2;
+	_max_of_three(_max_x - _min_x, _max_y - _min_y, _max_z - _min_z, _range);
+
+	_scale = 3 / _range;
+
+	_drawWhich = DRAW_MC_TRIS;
+	update();
+	
+	return true;
 }
 
 void hGlWidget::mousePressEvent(QMouseEvent * event)
@@ -342,7 +381,7 @@ void hGlWidget::openFile(QString _file_name)
 	initTransform();
 }
 
-void hGlWidget::drawModel() {
+void hGlWidget::drawPly() {
 
 	Vertex v;
 	Face f;
@@ -407,7 +446,6 @@ void hGlWidget::drawModel() {
 		else {
 			cerr << "#error! non-triangle while drawing ply models" << endl;
 		}
-
 	}
 
 	glEnd();
@@ -428,7 +466,7 @@ void hGlWidget::applyTransform() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(0.0, 0.0, -5.0);
-	glTranslatef(_trans_point.x, _trans_point.y, _trans_point.z);
+	//glTranslatef(_trans_point.x, _trans_point.y, _trans_point.z);
 	glScalef(_scale, _scale, _scale);
 	// rotate
 	glMultMatrixd(_glmat);
@@ -445,9 +483,9 @@ void hGlWidget::setLights() {
 	float ambientProperties[]	= {0.7f, 0.7f, 0.7f, 1.0f};
 	float diffuseProperties[]	= {0.8f, 0.8f, 0.8f, 1.0f};
 	float specularProperties[]	= {1.0f, 1.0f, 1.0f, 1.0f};
-	float lightPosition[]		= {0.0f, 0.0f, -0.3f, 0.0f};
+	float lightPosition[]		= {0.1f, 0.3f, -0.3f, 0.0f};
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientProperties);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, ambientProperties);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseProperties);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularProperties);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
@@ -466,11 +504,11 @@ void hGlWidget::setMaterial() {
 	float	MatAmbient[]  = {0.1f, 0.15f, 0.35f, 1.0f};
 	float	MatDiffuse[]  = {0.1f, 0.3f, 0.35f, 1.0f};
 	//float	MatSpecular[]  = {0.75f, 0.75f, 0.75f, 1.0f};
-	float	MatSpecular[]  = {0.0f, 0.0f, 0.0f, 1.0f};
+	float	MatSpecular[]  = {0.8f, 0.8f, 0.8, 1.0f};
 	float	MatShininess[]  = { 64 };
 	float	MatEmission[]  = {0.0f, 0.0f, 0.0f, 1.0f};
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT, MatAmbient);
+	//glMaterialfv(GL_FRONT, GL_AMBIENT, MatAmbient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, MatDiffuse);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpecular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, MatShininess);

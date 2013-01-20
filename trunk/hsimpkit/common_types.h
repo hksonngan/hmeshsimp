@@ -76,20 +76,18 @@ public:
 
 	// equals without considering the sequence
 	bool unsequencedEqual(const HTriple &trip) const {
-
 		ElemType arr1[3], arr2[3];
 
-		this->sortIndex(arr1);
-		trip.sortIndex(arr2);
+		this->_sortIndex(arr1);
+		trip._sortIndex(arr2);
 
 		return arr1[0] == arr2[0] && arr1[1] == arr2[1] && arr1[2] == arr2[2];
 	}
 
-	bool operator< (const HTriple &trip_ind) const
-	{
+	bool operator< (const HTriple &trip_ind) const {
 		if (this->i < trip_ind.i)
 			return true;
-		else if (this->i < trip_ind.i)
+		else if (this->i > trip_ind.i)
 			return false;
 		else if (this->j < trip_ind.j)
 			return true;
@@ -102,11 +100,10 @@ public:
 	}
 
 	bool unsequencedLessThan(const HTriple &trip_ind) const {
-
 		ElemType arr1[3], arr2[3];
 		
-		this->sortIndex(arr1);
-		trip_ind.sortIndex(arr2);
+		this->_sortIndex(arr1);
+		trip_ind._sortIndex(arr2);
 		
 		if (arr1[0] < arr2[0])
 			return true;
@@ -125,12 +122,18 @@ public:
 	// sort the index with ascending order so that 
 	// it can be identified with the same indices 
 	// occurring in different order
-	void sortIndex(ElemType *arr) const
-	{
+	void _sortIndex(ElemType *arr) const {
 		arr[0] = i; arr[1] = j; arr[2] = k;
-
 		// insertion sort
 		insertion_sort<ElemType, ElemType*>(arr, 3);
+	}
+
+	void sortIndex() {
+		ElemType arr[3];
+		typedef ElemType ElemTypeArr3[3];
+		arr[0] = i; arr[1] = j; arr[2] = k;
+		insertion_sort<ElemType, ElemTypeArr3>(arr, 3);
+		i = arr[0]; j = arr[1]; k = arr[2];
 	}
 
 public:
