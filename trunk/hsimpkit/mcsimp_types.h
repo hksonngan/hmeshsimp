@@ -57,6 +57,6 @@ class VertexHash {
 using boost::unordered::unordered_map;
 typedef unordered_map<HVertex, unsigned int, VertexHash> VertexIndexMap;
 
-enum InterpOnWhich { Edge, Vert1, Vert2 };
+enum InterpOnWhich { None, Edge, Vert1, Vert2 };
 
 #endif

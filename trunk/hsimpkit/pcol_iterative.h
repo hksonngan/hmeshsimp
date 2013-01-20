@@ -125,8 +125,9 @@ public:
 	virtual void allocVerts(uint _vert_count);
 	virtual void allocFaces(uint _face_count);
 	// DO add vertices first and completely
-	virtual void addVertex(HVertex vert);
-	virtual bool addFace(HFace face);
+	virtual void addVertex(const HVertex& vert);
+	virtual void addVertex(const uint& index, const HVertex& vert, uchar mark);
+	virtual bool addFace(const HFace& face);
 	// collect all valid pairs based on
 	// specific measurement after the 
 	// vertices and faces are ready

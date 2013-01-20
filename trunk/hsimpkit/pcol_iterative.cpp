@@ -33,7 +33,7 @@ void PairCollapse::allocFaces(uint _face_count) {
 #endif
 }
 
-void PairCollapse::addVertex(HVertex vert) {
+void PairCollapse::addVertex(const HVertex& vert) {
 	cvert.Set(vert.x, vert.y, vert.z);
 	cvert.markv(UNREFER);
 
@@ -51,7 +51,24 @@ void PairCollapse::addVertex(HVertex vert) {
 #endif
 }
 
-bool PairCollapse::addFace(HFace face) {
+void PairCollapse::addVertex(const uint& index, const HVertex& vert, uchar mark) {
+	cvert.Set(vert.x, vert.y, vert.z);
+	cvert.markv(mark);
+
+#if ARRAY_USE == ARRAY_NORMAL
+	cvert.setNewId(index);
+	cvert.setOutId(index);
+	vertices.push_back(cvert);
+	v(vertices.count() - 1).allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
+#else
+	cvert.setNewId(index);
+	cvert.setOutId(index);
+	std::pair<ECVertexMap::iterator, bool> _pair = vertices.insert(ECVertexMap::value_type(index, cvert));
+	((_pair.first)->second).allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
+#endif
+}
+
+bool PairCollapse::addFace(const HFace &face) {
 	//face.sortIndex();
 	cface.set(face.i, face.j, face.k);
 

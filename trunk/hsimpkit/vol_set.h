@@ -1,5 +1,5 @@
 /*
- *	Read .raw Volume Set File
+ *	Read Volume Set File
  *	Modified from Jackie Pang in QRendering
  *
  *  Author: Ht
@@ -8,8 +8,8 @@
  *  Copyright (C) Ht. All rights reserved.
  */
 
-#ifndef __RAW_SET_H__
-#define __RAW_SET_H__
+#ifndef __VOLUME_SET_H__
+#define __VOLUME_SET_H__
 
 #include <string>
 #include <fstream>
@@ -30,7 +30,7 @@ typedef struct {
 
 typedef char Byte;
 
-class RawSet {
+class VolumeSet {
 public:
 	// Data file
 	std::string dataFilePath, dataFileName, objectFileName;
@@ -49,8 +49,8 @@ public:
 	Byte *_data;
 
 public:
-	RawSet();
-	~RawSet();
+	VolumeSet();
+	~VolumeSet();
 	bool parseDataFile(const std::string &name);
 	bool nextCube(GRIDCELL &cube);
 	bool hasNext();
