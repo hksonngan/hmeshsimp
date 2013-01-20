@@ -13,10 +13,27 @@
 // for MxBlock
 #define HAVE_CASTING_LIMITS
 
+#define ARRAY_NORMAL	0
+#define ARRAY_USE_HASH	1
+
+//#define _VERBOSE
+
+#define ARRAY_USE	ARRAY_USE_HASH
+
+#ifdef ARRAY_USE
+	#if ARRAY_USE < 0 || ARRAY_USE > 1
+		#error invalid value for ARRAY_USE macro 	
+	#endif
+#else
+	#define ARRAY_USE	ARRAY_NORMAL
+#endif
+
 #include <algorithm>
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <boost/unordered_map.hpp>
+#include <libs/unordered/examples/fnv1.hpp>
 #include "pcol_vertex.h"
 #include "pcol_other_structures.h"
 #include "common_types.h"
@@ -27,12 +44,32 @@
 using std::ofstream;
 using std::cout;
 using std::endl;
+using std::ostringstream;
 
+inline std::size_t hash_value(uint i) {
+	ostringstream oss;
+	oss << i;
+	hash::fnv_1a fnv;
+	return fnv(oss.str());
+}
+
+using boost::unordered::unordered_map;
+typedef unordered_map<uint, CollapsableVertex> ECVertexMap;
+typedef unordered_map<uint, CollapsableFace> ECFaceMap;
 
 typedef CollapsablePair* pCollapsablePair;
 
-static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePair &pair2) {
+#if ARRAY_USE == ARRAY_NORMAL
+	#define _for_loop(container, container_type) for (int __index = 0; __index < (container).count(); __index ++)
+	#define _retrieve_elem(container) (container)[__index]
+	#define _retrieve_index() __index
+#else
+	#define _for_loop(container, container_type) for (container_type::iterator __iter = (container).begin(); __iter != (container).end(); __iter ++)
+	#define _retrieve_elem(container) __iter->second
+	#define _retrieve_index() __iter->first
+#endif
 
+static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePair &pair2) {
 	// the pointer in 'adjacent_col_pairs' may contain NULL pointer
 	// let the NULL pointers go to the end of sorted array
 	if (pair1 == NULL) 
@@ -46,20 +83,33 @@ static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePa
 class FaceIndexComp {
 public:
 	bool operator() (const uint &face_index1, const uint &face_index2) {
-
 		// let invalid faces go the end
 		//if (!faces->elem(face_index1).valid())
 		//	return false;
 		//else (!faces->elem(face_index2).valid())
 		//	return true;
 
-		return faces->elem(face_index1).unsequencedLessThan(faces->elem(face_index2));
+	#if ARRAY_USE == ARRAY_NORMAL
+		return faces->at(face_index1).unsequencedLessThan(faces->at(face_index2));
+	#else
+		ECFaceMap::iterator iter1 = faces->find(face_index1), iter2 = faces->find(face_index2);
+		return (iter1->second).unsequencedLessThan(iter2->second);
+	#endif
 	}
 
+#if ARRAY_USE == ARRAY_NORMAL
 	void setFaces(HDynamArray<CollapsableFace> *_faces) { faces = _faces; }
 
 private:
+	// thread safe ??
 	HDynamArray<CollapsableFace> *faces;
+#else
+	void setFaces(ECFaceMap *_faces) { faces = _faces; }
+
+private:
+	// thread safe ??
+	ECFaceMap *faces;
+#endif
 };
 
 class PairCollapse {
@@ -87,13 +137,13 @@ public:
 	// information of the vertices
 	inline void addCollapsablePair(CollapsablePair *new_pair);
 	// init after the vertices and faces are ready
-	virtual void intialize();
-	void initValids() { valid_verts = vertices.count(); valid_faces = faces.count(); }
+	virtual void initialize();
+	void initValids();
 	inline void unreferVertsCheck();
 	
 	
 	////////////////////////////////////
-	// Computing
+	// Iterating
 	
 	// simplify targeting vertex
 	// this function should be overrided
@@ -119,7 +169,7 @@ public:
 	// in specific derivative class
 	virtual HVertex evaluatePair(CollapsablePair *pair) = 0;
 	// !!an important function
-	virtual void collapsePair(pCollapsablePair &pair);
+	virtual void collapsePair(pCollapsablePair pair);
 
 	// guarantee vert1 < vert2 for all pairs in the arr
 	//inline void keepPairArrOrder(pair_arr &pairs);
@@ -140,6 +190,25 @@ public:
 	inline void mergeFaces(uint vert1, uint vert2);
 	inline void markFaces(face_arr &_faces, unsigned char m);
 	inline void collectMarkFaces(face_arr &faces_in, face_arr &faces_out, unsigned char m);
+	inline void removeFace(uint i);
+
+	///////////////////////////////////////
+	// Accessors
+
+	inline uint vertexCount() const;
+	inline uint faceCount() const;
+	uint validVerts() const { return valid_verts; }
+	uint validFaces() const { return valid_faces; }
+	// these accessors will not add any element if no such
+	// element exists, otherwise it will return a random
+	// new created element which are usually invalid one
+	// not residing in the container, modifying this object
+	// is meaningless
+	inline CollapsableVertex& v(uint i);
+	inline CollapsableFace& f(uint i);
+	inline bool f_interior (int i);
+	// !! test if a face is valid should always use this
+	inline bool face_is_valid(uint i) const;
 
 
 	///////////////////////////////////////
@@ -155,25 +224,15 @@ public:
 	///////////////////////////////////////
 	// Other Than Simplification
 
-	void addInfo(const char *s);
-	char* getInfo() { return INFO_BUF; };
-	void clearInfo() { info_buf_len = 0; INFO_BUF[0] = '\0'; };
+	void addInfo(std::string s);
+	std::string getInfo() { return info; };
+	void clearInfo() { info = ""; };
 	void totalTime();
-
-	uint vertexCount() const { return vertices.count(); }
-	uint faceCount() const { return faces.count(); }
-	uint validVerts() const { return valid_verts; }
-	uint validFaces() const { return valid_faces; }
-
-	CollapsableVertex& v(int i) const { return vertices[i]; }
-	CollapsableFace& f(int i) const { return faces[i]; }
-	bool f_interior (int i) const {
-		return vertices[faces[i].i].interior() && 
-			vertices[faces[i].j].interior() && 
-			vertices[faces[i].k].interior(); }
 
 	// clear heap
 	void clear();
+
+	inline void facesToStr(face_arr &faces, string &str);
 
 protected:
 	/////////////////////////////////////
@@ -182,16 +241,20 @@ protected:
 	static const uint	DFLT_STAR_PAIRS = 6;
 	static const uint	INFO_BUF_CAPACITY = 1000;
 
+#if ARRAY_USE == ARRAY_NORMAL
 	HDynamArray<CollapsableVertex>	vertices;
-	uint	valid_verts;
 	HDynamArray<CollapsableFace>	faces;
+#else
+	ECVertexMap	vertices;
+	ECFaceMap	faces;
+#endif
+	uint	valid_verts;
 	uint	valid_faces;
 	MxHeap	pair_heap;
 
 	FaceIndexComp	faceIndexComp;
 
-	char	INFO_BUF[INFO_BUF_CAPACITY];
-	uint	info_buf_len;
+	string info;
 
 	HAugTime read_time, run_time, write_time;
 
@@ -200,24 +263,42 @@ protected:
 	CollapsableVertex	cvert;
 	CollapsableFace	cface;
 	vert_arr	starVerts1, starVerts2;
+
+#ifdef _VERBOSE
+	int merge_face_count;
+	int last_valid_faces;
+	int another_valid_faces;
+	ofstream fverbose;
+#endif
 };
 
 void PairCollapse::unreferVertsCheck() {
-	
 	valid_verts = 0;
 
+#if ARRAY_USE == ARRAY_NORMAL
 	for (int i = 0; i < vertices.count(); i ++) 
-		if (!vertices[i].unreferred()) 
+		if (!v(i).unreferred()) 
 			valid_verts ++;
+
+#elif ARRAY_USE == ARRAY_USE_HASH
+	for (ECVertexMap::iterator iter = vertices.begin(); iter != vertices.end(); ) {
+		CollapsableVertex& cvert = iter->second;
+		if (!cvert.unreferred()) {
+			valid_verts ++;
+			iter ++;
+		}
+		else
+			iter = vertices.erase(iter);
+	}
+#endif
 }
 
 void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) {
-
 	starVertices->clear();
-	cvert = vertices[vert_index];
+	CollapsableVertex& cvert = v(vert_index);
 
 	for (int i = 0; i < cvert.adjacent_faces.count(); i ++) {
-		cface = faces[cvert.adjacent_faces[i]];
+		CollapsableFace& cface = f(cvert.adjacent_faces[i]);
 		
 		if (cface.i != vert_index && !starVertices->exist(cface.i))
 			starVertices->push_back(cface.i);
@@ -229,9 +310,8 @@ void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) 
 }
 
 void PairCollapse::addCollapsablePair(CollapsablePair *new_pair) {
-
-	vertices[new_pair->vert1].adjacent_col_pairs.push_back(new_pair);
-	vertices[new_pair->vert2].adjacent_col_pairs.push_back(new_pair);
+	v(new_pair->vert1).adjacent_col_pairs.push_back(new_pair);
+	v(new_pair->vert2).adjacent_col_pairs.push_back(new_pair);
 
 	if (!new_pair->is_in_heap()) {
 		pair_heap.insert(new_pair);
@@ -239,6 +319,7 @@ void PairCollapse::addCollapsablePair(CollapsablePair *new_pair) {
 }
 
 void PairCollapse::changePairsOneVert(pair_arr &pairs, uint orig, uint dst) {
+	
 
 	for (int i = 0; i < pairs.count(); i ++) 
 		if (pairs[i]) {
@@ -248,36 +329,28 @@ void PairCollapse::changePairsOneVert(pair_arr &pairs, uint orig, uint dst) {
 }
 
 void PairCollapse::pushValidPairOrRemove(pCollapsablePair &pair, pair_arr &new_pairs) {
-
 	if (pair->valid()) {
 		new_pairs.push_back(pair);
 		//pair_heap.update(pair);
-	}
-	else {
+	} else {
 		pair_heap.remove(pair);
 		delete[] pair;
 	}
 }
 
 void PairCollapse::setOnePairNull(uint vert, pCollapsablePair pair) {
-	
-	if (vert >= 0 && vert < vertices.count()) {
-
-		pair_arr &pairs = vertices[vert].adjacent_col_pairs;
-		for	(int i = 0; i < pairs.count(); i ++)
-			if (pairs[i] == pair) 
-				pairs[i] = NULL;
-	}
+	pair_arr &pairs = v(vert).adjacent_col_pairs;
+	for	(int i = 0; i < pairs.count(); i ++)
+		if (pairs[i] == pair) 
+			pairs[i] = NULL;
 }
 
 void PairCollapse::mergePairs(uint vert1, uint vert2) {
-
 	int i, j;
 
 	/* pre process */
-
-	pair_arr &pairs1 = vertices[vert1].adjacent_col_pairs;
-	pair_arr &pairs2 = vertices[vert2].adjacent_col_pairs;
+	pair_arr &pairs1 = v(vert1).adjacent_col_pairs;
+	pair_arr &pairs2 = v(vert2).adjacent_col_pairs;
 	// change the index of vert2 to vert1 for all pairs adjacent
 	// to vert2, this may cause the order 'vert1 < vert2' broken
 	// and some pairs to be invalid or duplicated
@@ -307,10 +380,8 @@ void PairCollapse::mergePairs(uint vert1, uint vert2) {
 
 	/* merge */
 	for (i = 0, j = 0; i < pairs1.count() || j < pairs2.count();) {
-
 		// pairs[i] and pairs[j] points to the same struct
 		if (i < pairs1.count() && j < pairs2.count() && pairs1[i] == pairs2[j]) {
-			
 			///updateValidPairOrRemove(pairs1[i], new_pairs);
 			// this is the collapsed pair
 			pair_heap.remove(pairs1[i]);
@@ -319,7 +390,6 @@ void PairCollapse::mergePairs(uint vert1, uint vert2) {
 		}
 		// pairs[i] and pairs[j] points to different value equal structs
 		else if (i < pairs1.count() && j < pairs2.count() && *pairs1[i] == *pairs2[j]) {
-			
 			///updateValidPairOrRemove(pairs1[i], new_pairs);
 			// these are the duplicated pairs
 			// update arbitrary one and remove another 
@@ -336,7 +406,6 @@ void PairCollapse::mergePairs(uint vert1, uint vert2) {
 			i ++; j ++;
 		}
 		else if (j >= pairs2.count() || i < pairs1.count() && *pairs1[i] < *pairs2[j]) {
-
 			///updateValidPairOrRemove(pairs1[i], new_pairs);
 			new_pairs.push_back(pairs1[i]);
 			i ++;
@@ -351,12 +420,11 @@ void PairCollapse::mergePairs(uint vert1, uint vert2) {
 	/* post process */
 	/* the variable 'pair' is invalid now!! */
 	reevaluatePairs(new_pairs);
-	pairs1.swap(new_pairs);
+  	pairs1.swap(new_pairs);
 	pairs2.freeSpace();
 }
 
 void PairCollapse::reevaluatePairs(pair_arr &pairs) {
-
 	for (int i = 0; i < pairs.count(); i ++) {
 		evaluatePair(pairs[i]);
 		pair_heap.update(pairs[i]);
@@ -364,27 +432,65 @@ void PairCollapse::reevaluatePairs(pair_arr &pairs) {
 }
 
 void PairCollapse::changeFacesOneVert(face_arr &face_indices, uint orig, uint dst) {
-	
-	for (int i = 0; i < face_indices.count(); i ++) 
-		if (faces[face_indices[i]].valid()) {
-
-			faces[face_indices[i]].changeOneVert(orig, dst);
-			if (!faces[face_indices[i]].indexValid()) 
-				valid_faces --;
+	for (int i = 0; i < face_indices.count(); i ++) {
+		CollapsableFace &cface = f(face_indices[i]);
+		if (cface.valid())  {
+			cface.changeOneVert(orig, dst);
+			//cface.sortIndex();
+		#ifdef _VERBOSE
+			if (!f(face_indices[i]).indexValid()) 
+				another_valid_faces --;
+		#endif
 		}
+	}
 }
 
 void PairCollapse::mergeFaces(uint vert1, uint vert2) {
-
 	int i, j;
 
 	/* pre process */
+	face_arr &_faces1 = v(vert1).adjacent_faces;
+	face_arr &_faces2 = v(vert2).adjacent_faces;
 
-	face_arr &faces1 = vertices[vert1].adjacent_faces;
-	face_arr &faces2 = vertices[vert2].adjacent_faces;
+	face_arr faces1, faces2;
+	faces1.resize(_faces1.count());
+	faces2.resize(_faces2.count());
+
+	for (int i = 0; i < _faces1.count(); i ++) {
+		//if (_faces1[i] == 35148) {
+		//	CollapsableFace cface = f(_faces1[i]);
+		//}
+		if (face_is_valid(_faces1[i])) 
+			faces1.push_back(_faces1[i]);
+	}
+
+	for (int i = 0; i < _faces2.count(); i ++) {
+		//if (_faces2[i] == 35148) {
+		//	CollapsableFace cface = f(_faces2[i]);
+		//}
+		if (face_is_valid(_faces2[i])) 
+			faces2.push_back(_faces2[i]);
+	}
+
+#ifdef _VERBOSE
+	last_valid_faces = valid_faces;
+	if (merge_face_count == 18) {
+		int verbose = 0;
+	}
+	string str1;
+	facesToStr(faces1, str1);
+	string str2;
+	facesToStr(faces2, str2);
+#endif
+
 	// change the index of vert2 to vert1 for all faces adjacent
 	// to vert2, this may cause some faces to be invalid or duplicated
 	changeFacesOneVert(faces2, vert2, vert1);
+
+#ifdef _VERBOSE
+	string str3;
+	facesToStr(faces2, str3);
+#endif
 
 	sort(faces1.pointer(0), faces1.pointer(faces1.count()), faceIndexComp);
 	sort(faces2.pointer(0), faces2.pointer(faces2.count()), faceIndexComp);
@@ -395,51 +501,66 @@ void PairCollapse::mergeFaces(uint vert1, uint vert2) {
 
 	/* merge */
 	for (i = 0, j = 0; i < faces1.count() || j < faces2.count(); ) {
-		
 		// the same face
 		if (i < faces1.count() && j < faces2.count() && faces1[i] == faces2[j]) {
-			if (faces[faces1[i]].valid()) 
+			if (face_is_valid(faces1[i])) 
 				new_faces.push_back(faces1[i]);
-			//else
-			//	valid_faces --;
+			else {
+				removeFace(faces1[i]);
+				//valid_faces --;
+			}
 			i ++; j ++;
 		}
 		// two faces equal after the collapse
-		else if (i < faces1.count() && j < faces2.count() && faces[faces1[i]] == faces[faces2[j]]) {
-			if (faces[faces1[i]].valid()) {
+		else if (i < faces1.count() && j < faces2.count() && f(faces1[i]).unsequencedEqual(f(faces2[j]))) {
+			if (face_is_valid(faces1[i])) {
 				new_faces.push_back(faces1[i]);
-				faces[faces2[j]].invalidate();
-				valid_faces --;
+				f(faces2[j]).invalidate();
+				removeFace(faces2[j]);
+				//valid_faces --;
+			#ifdef _VERBOSE
+				another_valid_faces --;
+			#endif
+			} else {
+				removeFace(faces1[i]);
+				removeFace(faces2[j]);
+				//valid_faces -= 2;
 			}
-			//else
-			//	valid_faces -= 2;
 			i ++; j ++;
 		}
-		else if (j >= faces2.count() || i < faces1.count() && faces[faces1[i]] < faces[faces2[j]]) {
-			if (faces[faces1[i]].valid()) 
+		else if (j >= faces2.count() || i < faces1.count() && f(faces1[i]).unsequencedLessThan(f(faces2[j]))) {
+			if (face_is_valid(faces1[i])) 
 				new_faces.push_back(faces1[i]);
-			//else 
-			//	valid_faces --;
+			else {
+				removeFace(faces1[i]);
+				//valid_faces --;
+			}
 			i ++;
 		}
 		else {
-			if (faces[faces2[j]].valid()) 
+			if (face_is_valid(faces2[j])) 
 				new_faces.push_back(faces2[j]);
-			//else 
-			//	valid_faces --;
+			else {
+				removeFace(faces2[j]);
+				//valid_faces --;
+			}
 			j ++;
 		}
 	}
 
 	/* post process */
-	faces1.swap(new_faces);
-	faces2.freeSpace();
+	_faces1.swap(new_faces);
+	_faces2.freeSpace();
+
+#ifdef _VERBOSE
+	fverbose << "#" << merge_face_count ++ << " valid: " << valid_faces << " "  << last_valid_faces - valid_faces << "-" << endl;
+	fverbose << "\tanother valid: " << another_valid_faces << endl;
+#endif
 }
 
 void PairCollapse::collectEdgeFaces(uint vert1, uint vert2, face_arr &_faces) {
-
-	face_arr &faces1 = vertices[vert1].adjacent_faces;
-	face_arr &faces2 = vertices[vert2].adjacent_faces;
+	face_arr &faces1 = v(vert1).adjacent_faces;
+	face_arr &faces2 = v(vert2).adjacent_faces;
 
 	markFaces(faces1, 0);
 	markFaces(faces2, 1);
@@ -447,19 +568,92 @@ void PairCollapse::collectEdgeFaces(uint vert1, uint vert2, face_arr &_faces) {
 }
 
 void PairCollapse::markFaces(face_arr &_faces, unsigned char m) {
-	
 	for (int i = 0; i < _faces.count(); i ++)
-		faces[_faces[i]].markFace(m);
+		f(_faces[i]).markFace(m);
 }
 
 void PairCollapse::collectMarkFaces(face_arr &faces_in, face_arr &faces_out, unsigned char m) {
-
 	faces_out.clear();
 	faces_out.resize(faces_in.count() / 2);
 
 	for (int i = 0; i < faces_in.count(); i ++) 
-		if (faces[faces_in[i]].markIs(m))
+		if (f(faces_in[i]).markIs(m))
 			faces_out.push_back(faces_in[i]);
+}
+
+uint PairCollapse::vertexCount() const { 
+#if ARRAY_USE == ARRAY_NORMAL
+	return vertices.count(); 
+#else
+	return vertices.size();
+#endif
+}
+uint PairCollapse::faceCount() const {
+#if ARRAY_USE == ARRAY_NORMAL
+	return faces.count();
+#else
+	return faces.size();
+#endif
+}
+
+CollapsableVertex& PairCollapse::v(uint i) { 
+//#if ARRAY_USE == ARRAY_NORMAL
+	return vertices.at(i);
+//#else
+//	ECVertexMap::iterator iter = vertices.find(i);
+//	if (iter != vertices.end())
+//		return iter->second;
+//	else
+//		return CollapsableVertex();
+//#endif
+}
+
+CollapsableFace& PairCollapse::f(uint i) { 
+//#if ARRAY_USE == ARRAY_NORMAL
+	return faces.at(i);
+//#else
+//	ECFaceMap::iterator iter = faces.find(i);
+//	if (iter != faces.end())
+//		return iter->second;
+//	else
+//		return CollapsableFace(0, 0, 0); // return a invalid face
+//#endif
+}
+
+bool PairCollapse::f_interior (int i) {
+	return v(f(i).i).interior() && 
+		v(f(i).j).interior() && v(f(i).k).interior(); 
+}
+
+void PairCollapse::removeFace(uint i) {
+#if ARRAY_USE == ARRAY_USE_HASH
+	//CollapsableFace cface = f(i);
+	//uint n = faces.erase(i);
+	faces.erase(i);
+	//cface = f(i);
+#endif
+	valid_faces --;
+}
+
+bool PairCollapse::face_is_valid(uint i) const {
+#if ARRAY_USE == ARRAY_NORMAL
+	return f(i).valid();
+#else
+	ECFaceMap::const_iterator iter = faces.find(i);
+	if (iter != faces.end())
+		return iter->second.valid();
+	else
+		return false;
+#endif
+}
+
+void PairCollapse::facesToStr(face_arr &ifaces, string &str) {
+	ostringstream oss;
+	for (int i = 0; i < ifaces.count(); i ++) {
+		CollapsableFace cface = f(ifaces[i]);
+		oss << "<" << cface.i << ", " << cface.j << ", " << cface.k << "> ";
+	}
+	str = oss.str();
 }
 
 #endif //__H_ITERATIVE_PAIR_COLLAPSE__ 

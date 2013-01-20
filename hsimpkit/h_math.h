@@ -154,4 +154,15 @@ HQEMatrix<FloatType>& HQEMatrix<FloatType>::operator*= (FloatType f)
 	return *this;
 }
 
+inline HNormal triangleNormal(HVertex &v1, HVertex &v2, HVertex &v3) {
+	HNormal e1, e2, nm;	
+
+	e1 = v3 - v1;
+	e2 = v2 - v1;
+	nm = e1 ^ e2;
+
+	nm.Normalize();
+	return nm;
+}
+
 #endif //__H_MATH__

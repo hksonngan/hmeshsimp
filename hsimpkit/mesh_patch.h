@@ -360,7 +360,7 @@ bool HMeshPatch::pairCollapse(
 	target = ((double) vert_count) / 
 				((double) total_verts) * total_target + exterior_count;
 
-	ecol.intialize();
+	ecol.initialize();
 	ecol.targetVert(target);
 
 	if (!simpOutput(&ecol, vert_start_id, vout, fout, bound_id_stream));	

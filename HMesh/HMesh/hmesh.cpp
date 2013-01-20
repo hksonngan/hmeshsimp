@@ -11,6 +11,7 @@
 #include <QtGui/QLineEdit>
 
 #include "ply/ply_inc.h"
+#include "mc.h"
 
 using std::cout;
 using std::endl;
@@ -61,6 +62,11 @@ void HMesh::initMenus() {
 		connect(_action_qslim, SIGNAL(triggered()), this, SLOT(on_qslim()));
 		_action_psimp = _menu_simp->addAction("PatchingSimp");
 		connect(_action_psimp, SIGNAL(triggered()), this, SLOT(on_psimp()));
+
+	// surface extraction menu
+	_menu_surf_xtract = menu_bar->addMenu("Surface Xtract");	
+		_action_mc = _menu_surf_xtract->addAction("Marching Cubes");
+		connect(_action_mc, SIGNAL(triggered()), this, SLOT(on_mc()));
 
 	// render menu
 	_menu_render = menu_bar->addMenu("Render");
@@ -185,4 +191,13 @@ void HMesh::on_psimp() {
 
 	_hglwidget->openFile(out_name);
 	update();
+}
+
+void HMesh::on_mc() {
+	//"F:/raw/raw_sets/neghip/neghip.dat"
+	//"F:/raw/raw_sets/foot/foot.dat"
+	//"F:/raw/raw_sets/head/head.dat"
+	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
+
+	_hglwidget->setDrawMC("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100.5);
 }

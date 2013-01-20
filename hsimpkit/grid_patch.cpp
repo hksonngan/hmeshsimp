@@ -118,7 +118,7 @@ bool HGridPatch::pairCollapseToPly(
 	target = ((double) vert_count) / 
 				((double) total_verts) * total_target + exterior_count;
 
-	ecol.intialize();
+	ecol.initialize();
 	ecol.targetVert(target);
 
 	if (!toPly(&ecol, ply_name))

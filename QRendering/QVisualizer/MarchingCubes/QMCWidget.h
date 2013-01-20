@@ -9,8 +9,8 @@
  * This file defines the main process of Marching Cubes Algorithm.
  * 
  * @version 1.0
- * @author  Jackie Pang
- * @e-mail: 15pengyi@gmail.com
+ * @author  Jackie Pang, Hou Tao
+ * @e-mail: 15pengyi@gmail.com, waytofall916@gmail.com
  * @date    2012/03/06
  */
 
@@ -89,6 +89,12 @@ public:
     
     // Widget
     QMCControlPanel* panel;
+
+	// generated faces -ht
+	char *genVertexData; // the size is bufferSize, the count of triangles is totalNumber
+	int bufferDataSize;
+	// bound box
+	float x_max, x_min, y_max, y_min, z_max, z_min;
     
     unsigned char destroy();
     
@@ -131,6 +137,9 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
+	void drawGenFaces();
+	void computeBoudnBox();
 };
 
 #endif // QVRWIDGET

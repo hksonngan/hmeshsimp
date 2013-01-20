@@ -26,7 +26,6 @@ string getFilename(const char *filepath)
 }
 
 string getExtFilename(const char *filepath) {
-
 	string filename(filepath);
 
 	int index1 = filename.find_last_of('\\');
@@ -50,14 +49,12 @@ string getExtFilename(const char *filepath) {
 }
 
 string getFileExtension(const char *filepath) {
-
 	string filename(filepath);
 	int i = filename.find_last_of('.');
 	return filename.substr(i + 1);
 }
 
 EndianOrder getSystemEndianMode() {
-
 	unsigned short test = 0x1122;
 
 	if( *( (unsigned char*) &test ) == 0x11 )
@@ -67,7 +64,6 @@ EndianOrder getSystemEndianMode() {
 }
 
 char* getTime() {
-
 	time_t rawtime;
 	struct tm * timeinfo;
 	time (&rawtime);

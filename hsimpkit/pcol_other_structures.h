@@ -29,23 +29,27 @@ public:
 	void set(uint _v1, uint _v2) { vert1 = _v1; vert2 = _v2; }
 
 	// verts indices equals
-	bool operator== (const CollapsablePair &pair) const {
+	bool operator == (const CollapsablePair &pair) const {
 		return vert1 == pair.vert1 && vert2 == pair.vert2;
 	}
+	
 	// verts indices less than
-	bool operator< (const CollapsablePair &pair) const {
+	bool operator < (const CollapsablePair &pair) const {
 		return vert1 < pair.vert1 || 
 			vert1 == pair.vert1 && vert2 < pair.vert2;
 	}
-	bool operator<=  (const CollapsablePair &pair) const {
+
+	bool operator <=  (const CollapsablePair &pair) const {
 		return (*this) < pair || (*this) == pair;
 	}
 
 	bool valid() { return vert1 != vert2; }
+
 	void keepOrder() {
 		if (vert1 > vert2) 
 			hswap(vert1, vert2);
 	}
+
 	void changeOneVert(uint orig, uint dst) {
 		if (vert1 == orig)
 			vert1 = dst;
@@ -54,7 +58,6 @@ public:
 	}
 
 	uint getAnotherVert(uint one_vert) {
-		
 		if (vert1 == one_vert)
 			return vert2;
 		if (vert2 == one_vert)
@@ -78,10 +81,11 @@ public:
 class CollapsableFace: public HTriple<uint> {
 public:
 	CollapsableFace() { mark = 0; }
+	CollapsableFace(uint _i, uint _j, uint _k): HTriple<uint>(_i, _j, _k) {}
 	void markFace(uchar m) { mark = m; }
 	bool markIs(uchar m) { return mark == m; }
 	void invalidate() { markFace(FACE_INVALID); }
-	bool valid() { return mark != FACE_INVALID && indexValid(); }
+	bool valid() const { return mark != FACE_INVALID && indexValid(); }
 
 	// this may cause the face to be invalid
 	void changeOneVert(uint orig, uint dst) {
@@ -96,7 +100,7 @@ public:
 			k = dst;
 	}
 
-	bool indexValid() {
+	bool indexValid() const {
 		return i != j && i != k && j != k;
 	}
 

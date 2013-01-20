@@ -7,10 +7,7 @@
 ::F:\plys\hand.ply
 ::d:/dragon_recon/dragon_vrip.ply
 ::d:/bunny/bun_zipper.ply
-<<<<<<< .mine
+::d:/Armadillo_ascii.ply
 
-quadricEC.exe -t 5989 F:\plys\Armadillo.ply
-=======
-quadricEC.exe -t 5440 d:/dragon_recon/dragon_vrip.ply
->>>>>>> .r78
+quadricEC.exe -t 5000 d:/Armadillo_ascii.ply
 pause
