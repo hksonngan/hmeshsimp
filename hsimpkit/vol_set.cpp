@@ -1,19 +1,19 @@
-#include "raw_set.h"
+#include "vol_set.h"
 #include <sstream>
 #include <iostream>
 
-RawSet::RawSet() {
+VolumeSet::VolumeSet() {
 	upper = NULL;
 	lower = NULL;
 	_data = NULL;
 	systemEndian = getSystemEndianMode();
 }
 
-RawSet::~RawSet() {
+VolumeSet::~VolumeSet() {
 	clear();
 }
 
-void RawSet::trim(std::string &s)
+void VolumeSet::trim(std::string &s)
 {
 	if (!s.empty())
 	{
@@ -29,7 +29,7 @@ void RawSet::trim(std::string &s)
 }
 
 // parse .dat file
-bool RawSet::parseDataFile(const std::string &name)
+bool VolumeSet::parseDataFile(const std::string &name)
 {
 	clear();
 	fileEndian = systemEndian;
@@ -189,13 +189,13 @@ bool RawSet::parseDataFile(const std::string &name)
 	return true;
 }
 
-void RawSet::getXYZ(XYZ &v, unsigned int i, unsigned int j, unsigned int k) {
+void VolumeSet::getXYZ(XYZ &v, unsigned int i, unsigned int j, unsigned int k) {
 	v.x = i * thickness.s[0];
 	v.y = j * thickness.s[1];
 	v.z = -(k * thickness.s[2]);
 }
 
-double RawSet::getDense(Byte* p, unsigned int i, unsigned int j) {
+double VolumeSet::getDense(Byte* p, unsigned int i, unsigned int j) {
 	p += (i + j * volumeSize.s[0]) * formatSize;
 
 	switch(format) {
@@ -208,7 +208,7 @@ double RawSet::getDense(Byte* p, unsigned int i, unsigned int j) {
 	}
 }
 
-double RawSet::getDense2(unsigned int i, unsigned int j, unsigned int k) {
+double VolumeSet::getDense2(unsigned int i, unsigned int j, unsigned int k) {
 	Byte* p = _data + (i + j * volumeSize.s[0] + k * volumeSize.s[0] * volumeSize.s[1]) * formatSize;
 
 	switch(format) {
@@ -221,7 +221,7 @@ double RawSet::getDense2(unsigned int i, unsigned int j, unsigned int k) {
 	}
 }
 
-bool RawSet::nextCube(GRIDCELL &cube) {
+bool VolumeSet::nextCube(GRIDCELL &cube) {
 	if (cursor.s[0] == 0 && cursor.s[1] == 0) {
 		if (cursor.s[2] == 0) {
 			if (!readNextLayer(upper))
@@ -236,7 +236,7 @@ bool RawSet::nextCube(GRIDCELL &cube) {
 	}
 
 	// in the figure of http://paulbourke.net/geometry/polygonise/
-	// the x axis is (0, 3), y axis is (0, 1), z axis is (0, 4)
+	// the x axis is (0, 1), y axis is (0, 3), z axis is (0, 4)
 	// the traversal order of the cues is: 
 	//   0 -> 1 in x dimension
 	//   0 -> 3 in y dimension
@@ -285,11 +285,11 @@ bool RawSet::nextCube(GRIDCELL &cube) {
 	return true;
 }
 
-bool RawSet::hasNext() {
+bool VolumeSet::hasNext() {
 	return cursor.s[2] < volumeSize.s[2] - 1;
 }
 
-void RawSet::clear() {
+void VolumeSet::clear() {
 	fin.close();
 	fin.clear();
 	if (upper) {
@@ -306,7 +306,7 @@ void RawSet::clear() {
 	}
 }
 
-bool RawSet::readNextLayer(Byte *layer) {
+bool VolumeSet::readNextLayer(Byte *layer) {
 	int size = volumeSize.s[0] * volumeSize.s[1] * formatSize;
 	fin.read(layer, size);
 	int readSize = fin.gcount();
@@ -326,7 +326,7 @@ bool RawSet::readNextLayer(Byte *layer) {
 	return true;
 }
 
-bool RawSet::readData(Byte *d, unsigned int size) {
+bool VolumeSet::readData(Byte *d, unsigned int size) {
 	fin.read(d, size);
 	int readSize = fin.gcount();
 

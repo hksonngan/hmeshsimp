@@ -13,11 +13,12 @@
 
 #include <string>
 #include <vector>
+#define ARRAY_USE	1 // use hash as face and vertex array
 #include "pcol_iterative.h"
 #include "ecol_iterative_quadric.h"
 #include "data_type.h"
 #include "mc.h"
-#include "raw_set.h"
+#include "vol_set.h"
 #include "mcsimp_types.h"
 
 using std::string;
@@ -27,17 +28,23 @@ typedef Byte *pByte;
 
 class MCSimp {
 private:
-	//PairCollapse	*pcol;
+	PairCollapse	*pcol;
 	//float			decimateRate;
-	//HVertex			MCCoordStart;	// the top-left coordinate of all cubes
-	//HVertex			cubeLen;		// the length of each edge of the cube in three dimensions
+	//HVertex		MCCoordStart;	// the top-left coordinate of all cubes
+	//HVertex		cubeLen;		// the length of each edge of the cube in three dimensions
 	//HTriple<uint>	sliceCount;
-	double			isolevel;
-	RawSet			rawSet;
+	double			isovalue;
+	VolumeSet		volSet;
 	VertexIndexMap	vertexMap;
 
+	// used for polygonization of cubes
+	HVertex			vertlist[12];
+	InterpOnWhich	onWhich[12];
+	unsigned int	vertIndex[12];
+	unsigned int	vertCount;
+
 public:
-	MCSimp() { }
+	MCSimp(): pcol(NULL) { }
 	//MCSimp(
 	//	float _decimateRate, 
 	//	HTriple<uint> _sliceCount,
@@ -54,9 +61,8 @@ public:
 		uint vertCoordThirdDimOffSet,
 		DATA_TYPE coordDataType = DFLOAT);
 
-	RawSet* getRawSet() { return &rawSet; }
 	bool genIsosurfaces(string filename, double isovalue, vector<TRIANGLE> &tris);
-	bool genDecimate(string filename, double isovalue, double decimateRate);
+	bool genCollapse(string filename, double _isovalue, double decimateRate);
 	void drawMesh();
 
 private:
@@ -67,8 +73,18 @@ private:
 		uint vertCoordFirstDimOffSet, 
 		uint vertCoordSecondDimOffSet, 
 		uint vertCoordThirdDimOffSet);
-	XYZ vertexInterp(double isolevel, XYZ p1, XYZ p2, double valp1, double valp2);
-	int polygonise(HTriple<uint> cubeIndex, GRIDCELL grid, TRIANGLE *triangles);
+	XYZ vertexInterp(XYZ p1, XYZ p2, double valp1, double valp2, InterpOnWhich& onWhich);
+	int polygonise(FLOAT4 gridIndex, GRIDCELL grid, TRIANGLE *triangles);
+	unsigned int getVertIndex(const HVertex &v);
+	void finalizeVert();
+
+	inline bool rightMost(FLOAT4 &cubeIndex);
+	inline bool backMost(FLOAT4 &cubeIndex);
+	inline bool downMost(FLOAT4 &cubeIndex);
+	inline bool rightBackMost(FLOAT4 &cubeIndex);
+	inline bool rightDownMost(FLOAT4 &cubeIndex);
+	inline bool backDownMost(FLOAT4 &cubeIndex);
+	inline bool rightBackDownMost(FLOAT4 &cubeIndex);
 };
 
 void MCSimp::getVert(
@@ -81,6 +97,45 @@ void MCSimp::getVert(
 	vert.x = dataType.getValue<float>(data + vertCoordFirstDimOffSet);
 	vert.y = dataType.getValue<float>(data + vertCoordSecondDimOffSet);
 	vert.z = dataType.getValue<float>(data + vertCoordThirdDimOffSet);
+}
+
+unsigned int MCSimp::getVertIndex(const HVertex &v) {
+	VertexIndexMap::iterator iter = vertexMap.find(v);
+	if (iter == vertexMap.end()) {
+		pcol->addVertex(vertCount, v, UNFINAL);
+		vertexMap[v] = vertCount ++;
+		return vertCount - 1;
+	} else {
+		return iter->second;
+	}
+}
+
+bool rightMost(FLOAT4 &cubeIndex) {
+	return cubeIndex.s[0] == volSet.s[0] - 2;
+}
+
+bool backMost(FLOAT4 &cubeIndex) {
+	return cubeIndex.s[1] == volSet.s[1] - 2;
+}
+
+bool downMost(FLOAT4 &cubeIndex) {
+	return cubeIndex.s[2] == volSet.s[2] - 2;
+}
+
+bool rightBackMost(FLOAT4 &cubeIndex) {
+	return rightMost(cubeIndex) && backMost(cubeIndex);
+}
+
+bool rightDownMost(FLOAT4 &cubeIndex) {
+	return rightMost(cubeIndex) && downMost(cubeIndex);
+}
+
+bool backDownMost(FLOAT4 &cubeIndex) {
+	return backMost(cubeIndex) && downMost(cubeIndex);
+}
+
+bool rightBackDownMost(FLOAT4 &cubeIndex) {
+	return rightMost(cubeIndex) && backMost(cubeIndex) && downMost(cubeIndex);
 }
 
 #endif
