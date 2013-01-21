@@ -136,7 +136,7 @@ public:
 	virtual void collectPairs() = 0;
 	// add the pair to the heap and update the pair adjacent
 	// information of the vertices
-	inline void addCollapsablePair(CollapsablePair *new_pair);
+	virtual void addCollapsablePair(CollapsablePair *new_pair);
 	// init after the vertices and faces are ready
 	virtual void initialize();
 	void initValids();
@@ -307,15 +307,6 @@ void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) 
 			starVertices->push_back(cface.j);
 		if (cface.k != vert_index && !starVertices->exist(cface.k))
 			starVertices->push_back(cface.k);
-	}
-}
-
-void PairCollapse::addCollapsablePair(CollapsablePair *new_pair) {
-	v(new_pair->vert1).adjacent_col_pairs.push_back(new_pair);
-	v(new_pair->vert2).adjacent_col_pairs.push_back(new_pair);
-
-	if (!new_pair->is_in_heap()) {
-		pair_heap.insert(new_pair);
 	}
 }
 

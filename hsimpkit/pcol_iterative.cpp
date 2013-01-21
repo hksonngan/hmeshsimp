@@ -105,6 +105,15 @@ bool PairCollapse::addFace(const HFace &face) {
 	return true;
 }
 
+void PairCollapse::addCollapsablePair(CollapsablePair *new_pair) {
+	v(new_pair->vert1).adjacent_col_pairs.push_back(new_pair);
+	v(new_pair->vert2).adjacent_col_pairs.push_back(new_pair);
+
+	if (!new_pair->is_in_heap()) {
+		pair_heap.insert(new_pair);
+	}
+}
+
 void PairCollapse::initialize() {
 	initValids();
 	unreferVertsCheck();
