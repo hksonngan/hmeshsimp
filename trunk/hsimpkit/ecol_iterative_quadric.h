@@ -51,6 +51,7 @@ public:
 	~QuadricEdgeCollapse();
 	virtual void allocVerts(uint _vert_count);
 	virtual bool addFace(HFace face);
+	virtual void addCollapsablePair(CollapsablePair *new_pair);
 	virtual void collectPairs();
 	// init after the vertices and faces are ready
 	virtual void initialize();
@@ -71,7 +72,7 @@ public:
 protected:
 	// every vertex has a quadric
 #if ARRAY_USE == ARRAY_NORMAL
-	HDynamArray<q_matrix> quadrics;
+	HDynamArray<Quadric> quadrics;
 #else
 	QuadMap quadrics;
 #endif

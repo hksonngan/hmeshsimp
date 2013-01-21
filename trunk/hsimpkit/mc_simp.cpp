@@ -211,113 +211,103 @@ void MCSimp::polygonise(const FLOAT4& gridIndex, const GRIDCELL& grid)
 
    // finalize vertex
    if (edgeTable[cubeindex] & 1) {
-	   v = vertexInterp(grid.p[0], grid.p[1], grid.val[0], grid.val[1], &onWhich[0]);
-	   vertlist[0].Set(v.x, v.y, v.z);
-	   vertIndex[0] = getVertIndex(vertlist[0]);
-
 	   if (downMost(cubeindex) && (onWhich != Vert2 || rightMost(cubeindex))) {
 	       // finalize it   
+		   finalizeVert(vertIndex[0], vertlist[0]);
 	   }
    }
    if (edgeTable[cubeindex] & 2) {
-	   v = vertexInterp(grid.p[1], grid.p[2], grid.val[1], grid.val[2], &onWhich[1]);
-	   vertlist[1].Set(v.x, v.y, v.z);
-	   vertIndex[1] = getVertIndex(vertlist[1]);
-
 	   if (rightDownMost(cubeindex) && (onWhich != Vert2 || backMost(cubeindex))) {
 	       // finalize it
+		   finalizeVert(vertIndex[1], vertlist[1]);
 	   }
    }
    if (edgeTable[cubeindex] & 4) {
-	   v = vertexInterp(grid.p[2], grid.p[3], grid.val[2], grid.val[3], &onWhich[2]);
-	   vertlist[2].Set(v.x, v.y, v.z);
-	   vertIndex[2] = getVertIndex(vertlist[2]);
-
 	   if (backDownMost(cubeindex) && (onWhich != Vert1 || rightMost(cubeindex))) {
 		   // finalize it
+		   finalizeVert(vertIndex[2], vertlist[2]);
 	   }
    }
    if (edgeTable[cubeindex] & 8) {
-	   v = vertexInterp(grid.p[3], grid.p[0], grid.val[3], grid.val[0], &onWhich[3]);
-	   vertlist[3].Set(v.x, v.y, v.z);
-	   vertIndex[3] = getVertIndex(vertlist[3]);
-
 	   if (downMost(cubeindex) && (onWhich != Vert1 || backMost(cubeindex))) {
 		   // finalize it
+		   finalizeVert(vertIndex[3], vertlist[3]);
 	   }
    }
    if (edgeTable[cubeindex] & 16) {
-	   v = vertexInterp(grid.p[4], grid.p[5], grid.val[4], grid.val[5], &onWhich[4]);
-	   vertlist[4].Set(v.x, v.y, v.z);
-	   vertIndex[4] = getVertIndex(vertlist[4]);
-
 	   if (onWhich != Vert2 || rightMost(cubeindex)) {
 		   // finalize it
+		   finalizeVert(vertIndex[4], vertlist[4]);
 	   }
    }
    if (edgeTable[cubeindex] & 32) {
-	   v = vertexInterp(grid.p[5], grid.p[6], grid.val[5], grid.val[6], &onWhich[5]);
-	   vertlist[5].Set(v.x, v.y, v.z);
-	   vertIndex[5] = getVertIndex(vertlist[5]);
-
 	   if (rightMost(cubeindex) && (onWhich != Vert2 || backMost(cubeindex))) {
 		   // finalize it
+		   finalizeVert(vertIndex[5], vertlist[5]);
 	   }
    }
    if (edgeTable[cubeindex] & 64) {
-	   v = vertexInterp(grid.p[6], grid.p[7], grid.val[6], grid.val[7], &onWhich[6]);
-	   vertlist[6].Set(v.x, v.y, v.z);
-	   vertIndex[6] = getVertIndex(vertlist[6]);
-
 	   if (backMost(cubeindex) && (onWhich != Vert1 || rightMost(cubeindex))) {
 		   // finalize it
+		   finalizeVert(vertIndex[6], vertlist[6]);
 	   }
    }
    if (edgeTable[cubeindex] & 128) {
-	   v = vertexInterp(grid.p[7], grid.p[4], grid.val[7], grid.val[4], &onWhich[7]);
-	   vertlist[7].Set(v.x, v.y, v.z);
-	   vertIndex[7] = getVertIndex(vertlist[7]);
-
 	   if (onWhich != Vert1 || backMost(cubeindex)) {
 		   // finalize it
+		   finalizeVert(vertIndex[7], vertlist[7]);
 	   }
    }
    if (edgeTable[cubeindex] & 256) {
-	   v = vertexInterp(grid.p[0], grid.p[4], grid.val[0], grid.val[4], &onWhich[8]);
-	   vertlist[8].Set(v.x, v.y, v.z);
-	   vertIndex[8] = getVertIndex(vertlist[8]);
-
 	   if (onWhich != Vert1 || downMost(cubeindex)) {
 		   // finalize it
+		   finalizeVert(vertIndex[8], vertlist[8]);
 	   }
    }
    if (edgeTable[cubeindex] & 512) {
-	   v = vertexInterp(grid.p[1], grid.p[5], grid.val[1], grid.val[5], &onWhich[9]);
-	   vertlist[9].Set(v.x, v.y, v.z);
-	   vertIndex[9] = getVertIndex(vertlist[9]);
-
 	   if (rightMost(cubeindex) && (onWhich != Vert1 || downMost(cubeindex))) {
 		   // finalize it
+		   finalizeVert(vertIndex[9], vertlist[9]);
 	   }
    }
    if (edgeTable[cubeindex] & 1024) {
-	   v = vertexInterp(grid.p[2], grid.p[6], grid.val[2], grid.val[6], &onWhich[10]);
-	   vertlist[10].Set(v.x, v.y, v.z);
-	   vertIndex[10] = getVertIndex(vertlist[10]);
-
 	   if (rightBackMost(cubeindex) && (onWhich != Vert1 || downMost(cubeindex))) {
 		   // finalize it
+		   finalizeVert(vertIndex[10], vertlist[10]);
 	   }
    }
    if (edgeTable[cubeindex] & 2048) {
-	   v = vertexInterp(grid.p[3], grid.p[7], grid.val[3], grid.val[7], &onWhich[11]);
-	   vertlist[11].Set(v.x, v.y, v.z);
-	   vertIndex[11] = getVertIndex(vertlist[11]);
-
 	   if (backMost(cubeindex) && (onWhich != Vert1 || downMost(cubeindex))) {
 		   // finalize it
+		   finalizeVert(vertIndex[11], vertlist[11]);
 	   }
    }
+}
+
+void MCSimp::finalizeVert(const uint &index, const HVertex &v) {
+	CollapsableVertex &cv = pcol->v(index);
+	if (cv.mark == FINAL)
+		return;
+
+	// first erase from the vertex map
+	vertexMap.erase(v);
+
+	// add pairs
+	vert_arr starVertices;
+	face_arr _faces;
+	pcol->collectStarVertices(index, &starVertices);
+	for (int j = 0; j < starVertices.count(); j ++) {
+		CollapsableVertex &cv2 = pcol->v(starVertices[j]);
+		// add specific edge only once
+		// never collapse the exterior vertices
+		if (cv2.mark == FINAL) {
+			CollapsablePair *new_pair = new CollapsablePair(index, starVertices[j]);
+			new_pair->keepOrder();
+			pcol->addCollapsablePair(new_pair);
+		}
+	}
+
+	cv.markv(FINAL);
 }
 
 bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate) {

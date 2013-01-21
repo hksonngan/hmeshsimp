@@ -75,8 +75,8 @@ private:
 		uint vertCoordThirdDimOffSet);
 	XYZ vertexInterp(XYZ p1, XYZ p2, double valp1, double valp2, InterpOnWhich& onWhich);
 	int polygonise(FLOAT4 gridIndex, GRIDCELL grid, TRIANGLE *triangles);
-	unsigned int getVertIndex(const HVertex &v);
-	void finalizeVert();
+	inline unsigned int getVertIndex(const HVertex &v);
+	void finalizeVert(const uint &index, const HVertex &v);
 
 	inline bool rightMost(FLOAT4 &cubeIndex);
 	inline bool backMost(FLOAT4 &cubeIndex);
@@ -110,31 +110,31 @@ unsigned int MCSimp::getVertIndex(const HVertex &v) {
 	}
 }
 
-bool rightMost(FLOAT4 &cubeIndex) {
-	return cubeIndex.s[0] == volSet.s[0] - 2;
+bool MCSimp::rightMost(FLOAT4 &cubeIndex) {
+	return cubeIndex.s[0] == volSet.volumeSize.s[0] - 2;
 }
 
-bool backMost(FLOAT4 &cubeIndex) {
-	return cubeIndex.s[1] == volSet.s[1] - 2;
+bool MCSimp::backMost(FLOAT4 &cubeIndex) {
+	return cubeIndex.s[1] == volSet.volumeSize.s[1] - 2;
 }
 
-bool downMost(FLOAT4 &cubeIndex) {
-	return cubeIndex.s[2] == volSet.s[2] - 2;
+bool MCSimp::downMost(FLOAT4 &cubeIndex) {
+	return cubeIndex.s[2] == volSet.volumeSize.s[2] - 2;
 }
 
-bool rightBackMost(FLOAT4 &cubeIndex) {
+bool MCSimp::rightBackMost(FLOAT4 &cubeIndex) {
 	return rightMost(cubeIndex) && backMost(cubeIndex);
 }
 
-bool rightDownMost(FLOAT4 &cubeIndex) {
+bool MCSimp::rightDownMost(FLOAT4 &cubeIndex) {
 	return rightMost(cubeIndex) && downMost(cubeIndex);
 }
 
-bool backDownMost(FLOAT4 &cubeIndex) {
+bool MCSimp::backDownMost(FLOAT4 &cubeIndex) {
 	return backMost(cubeIndex) && downMost(cubeIndex);
 }
 
-bool rightBackDownMost(FLOAT4 &cubeIndex) {
+bool MCSimp::rightBackDownMost(FLOAT4 &cubeIndex) {
 	return rightMost(cubeIndex) && backMost(cubeIndex) && downMost(cubeIndex);
 }
 
