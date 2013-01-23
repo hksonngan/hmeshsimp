@@ -15,6 +15,11 @@
 //		MCCoordStart.Set(0, 0, 0);
 //}
 
+MCSimp::MCSimp(double _initDecimateRate): 
+	initDecimateRate(_initDecimateRate),
+	pcol(NULL) {
+}
+
 MCSimp::~MCSimp() {
 	if (pcol)
 		delete pcol;
@@ -49,8 +54,7 @@ bool MCSimp::addTriangles(
 	return true;
 }
 
-bool MCSimp::genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> &tris) 
-
+bool MCSimp::genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> &tris) { 
 	if (!volSet.parseDataFile(filename))
 		return false;
 
@@ -109,12 +113,12 @@ XYZ MCSimp::vertexInterp(XYZ p1, XYZ p2, double valp1, double valp2, InterpOnWhi
 	0 will be returned if the grid cell is either totally above
    of totally below the isovalue.
 */
-void MCSimp::polygonise(const FLOAT4& gridIndex, const GRIDCELL& grid)
+void MCSimp::polygonise(const UINT4& gridIndex, const GRIDCELL& grid)
 {
    int i, ntriang;
    int cubeindex;
-   extern int edgeTable[256];
-   extern int triTable[256][16];
+   using MC::edgeTable;
+   using MC::edgeTable;
    XYZ v;
 
    /*
@@ -133,69 +137,69 @@ void MCSimp::polygonise(const FLOAT4& gridIndex, const GRIDCELL& grid)
 
    /* Cube is entirely in/out of the surface */
    if (edgeTable[cubeindex] == 0)
-      return(0);
+      return;
 
    for (i = 0; i < 12; i ++)
 	   onWhich[i] = None;
 
    /* Find the vertices where the surface intersects the cube */
    if (edgeTable[cubeindex] & 1) {
-      v = vertexInterp(grid.p[0], grid.p[1], grid.val[0], grid.val[1], &onWhich[0]);
+      v = vertexInterp(grid.p[0], grid.p[1], grid.val[0], grid.val[1], onWhich[0]);
 	  vertlist[0].Set(v.x, v.y, v.z);
 	  vertIndex[0] = getVertIndex(vertlist[0]);
    }
    if (edgeTable[cubeindex] & 2) {
-      v = vertexInterp(grid.p[1], grid.p[2], grid.val[1], grid.val[2], &onWhich[1]);
+      v = vertexInterp(grid.p[1], grid.p[2], grid.val[1], grid.val[2], onWhich[1]);
 	  vertlist[1].Set(v.x, v.y, v.z);
 	  vertIndex[1] = getVertIndex(vertlist[1]);
    }
    if (edgeTable[cubeindex] & 4) {
-      v = vertexInterp(grid.p[2], grid.p[3], grid.val[2], grid.val[3], &onWhich[2]);
+      v = vertexInterp(grid.p[2], grid.p[3], grid.val[2], grid.val[3], onWhich[2]);
 	  vertlist[2].Set(v.x, v.y, v.z);
 	  vertIndex[2] = getVertIndex(vertlist[2]);
    }
    if (edgeTable[cubeindex] & 8) {
-      v = vertexInterp(grid.p[3], grid.p[0], grid.val[3], grid.val[0], &onWhich[3]);
+      v = vertexInterp(grid.p[3], grid.p[0], grid.val[3], grid.val[0], onWhich[3]);
 	  vertlist[3].Set(v.x, v.y, v.z);
 	  vertIndex[3] = getVertIndex(vertlist[3]);
    }
    if (edgeTable[cubeindex] & 16) {
-      v = vertexInterp(grid.p[4], grid.p[5], grid.val[4], grid.val[5], &onWhich[4]);
+      v = vertexInterp(grid.p[4], grid.p[5], grid.val[4], grid.val[5], onWhich[4]);
 	  vertlist[4].Set(v.x, v.y, v.z);
 	  vertIndex[4] = getVertIndex(vertlist[4]);
    }
    if (edgeTable[cubeindex] & 32) {
-      v = vertexInterp(grid.p[5], grid.p[6], grid.val[5], grid.val[6], &onWhich[5]);
+      v = vertexInterp(grid.p[5], grid.p[6], grid.val[5], grid.val[6], onWhich[5]);
 	  vertlist[5].Set(v.x, v.y, v.z);
 	  vertIndex[5] = getVertIndex(vertlist[5]);
    }
    if (edgeTable[cubeindex] & 64) {
-      v = vertexInterp(grid.p[6], grid.p[7], grid.val[6], grid.val[7], &onWhich[6]);
+      v = vertexInterp(grid.p[6], grid.p[7], grid.val[6], grid.val[7], onWhich[6]);
 	  vertlist[6].Set(v.x, v.y, v.z);
 	  vertIndex[6] = getVertIndex(vertlist[6]);
    }
    if (edgeTable[cubeindex] & 128) {
-      v = vertexInterp(grid.p[7], grid.p[4], grid.val[7], grid.val[4], &onWhich[7]);
+      v = vertexInterp(grid.p[7], grid.p[4], grid.val[7], grid.val[4], onWhich[7]);
 	  vertlist[7].Set(v.x, v.y, v.z);
 	  vertIndex[7] = getVertIndex(vertlist[7]);
    }
    if (edgeTable[cubeindex] & 256) {
-      v = vertexInterp(grid.p[0], grid.p[4], grid.val[0], grid.val[4], &onWhich[8]);
+      v = vertexInterp(grid.p[0], grid.p[4], grid.val[0], grid.val[4], onWhich[8]);
 	  vertlist[8].Set(v.x, v.y, v.z);
 	  vertIndex[8] = getVertIndex(vertlist[8]);
    }
    if (edgeTable[cubeindex] & 512) {
-      v = vertexInterp(grid.p[1], grid.p[5], grid.val[1], grid.val[5], &onWhich[9]);
+      v = vertexInterp(grid.p[1], grid.p[5], grid.val[1], grid.val[5], onWhich[9]);
 	  vertlist[9].Set(v.x, v.y, v.z);
 	  vertIndex[9] = getVertIndex(vertlist[9]);
    }
    if (edgeTable[cubeindex] & 1024) {
-      v = vertexInterp(grid.p[2], grid.p[6], grid.val[2], grid.val[6], &onWhich[10]);
+      v = vertexInterp(grid.p[2], grid.p[6], grid.val[2], grid.val[6], onWhich[10]);
 	  vertlist[10].Set(v.x, v.y, v.z);
 	  vertIndex[10] = getVertIndex(vertlist[10]);
    }
    if (edgeTable[cubeindex] & 2048) {
-      v = vertexInterp(grid.p[3], grid.p[7], grid.val[3], grid.val[7], &onWhich[11]);
+      v = vertexInterp(grid.p[3], grid.p[7], grid.val[3], grid.val[7], onWhich[11]);
 	  vertlist[11].Set(v.x, v.y, v.z);
 	  vertIndex[11] = getVertIndex(vertlist[11]);
    }
@@ -207,78 +211,80 @@ void MCSimp::polygonise(const FLOAT4& gridIndex, const GRIDCELL& grid)
        face.j = vertIndex[triTable[cubeindex][i+1]];
        face.k = vertIndex[triTable[cubeindex][i+2]];
 	   pcol->addFace(face);
+	   genFaceCount ++;
+	   newFaceCount ++;
    }
 
    // finalize vertex
    if (edgeTable[cubeindex] & 1) {
-	   if (downMost(cubeindex) && (onWhich != Vert2 || rightMost(cubeindex))) {
+	   if (downMost(gridIndex) && (onWhich[0] != Vert2 || rightMost(gridIndex))) {
 	       // finalize it   
 		   finalizeVert(vertIndex[0], vertlist[0]);
 	   }
    }
    if (edgeTable[cubeindex] & 2) {
-	   if (rightDownMost(cubeindex) && (onWhich != Vert2 || backMost(cubeindex))) {
+	   if (rightDownMost(gridIndex) && (onWhich[1] != Vert2 || backMost(gridIndex))) {
 	       // finalize it
 		   finalizeVert(vertIndex[1], vertlist[1]);
 	   }
    }
    if (edgeTable[cubeindex] & 4) {
-	   if (backDownMost(cubeindex) && (onWhich != Vert1 || rightMost(cubeindex))) {
+	   if (backDownMost(gridIndex) && (onWhich[2] != Vert1 || rightMost(gridIndex))) {
 		   // finalize it
 		   finalizeVert(vertIndex[2], vertlist[2]);
 	   }
    }
    if (edgeTable[cubeindex] & 8) {
-	   if (downMost(cubeindex) && (onWhich != Vert1 || backMost(cubeindex))) {
+	   if (downMost(gridIndex) && (onWhich[3] != Vert1 || backMost(gridIndex))) {
 		   // finalize it
 		   finalizeVert(vertIndex[3], vertlist[3]);
 	   }
    }
    if (edgeTable[cubeindex] & 16) {
-	   if (onWhich != Vert2 || rightMost(cubeindex)) {
+	   if (onWhich[4] != Vert2 || rightMost(gridIndex)) {
 		   // finalize it
 		   finalizeVert(vertIndex[4], vertlist[4]);
 	   }
    }
    if (edgeTable[cubeindex] & 32) {
-	   if (rightMost(cubeindex) && (onWhich != Vert2 || backMost(cubeindex))) {
+	   if (rightMost(gridIndex) && (onWhich[5] != Vert2 || backMost(gridIndex))) {
 		   // finalize it
 		   finalizeVert(vertIndex[5], vertlist[5]);
 	   }
    }
    if (edgeTable[cubeindex] & 64) {
-	   if (backMost(cubeindex) && (onWhich != Vert1 || rightMost(cubeindex))) {
+	   if (backMost(gridIndex) && (onWhich[6] != Vert1 || rightMost(gridIndex))) {
 		   // finalize it
 		   finalizeVert(vertIndex[6], vertlist[6]);
 	   }
    }
    if (edgeTable[cubeindex] & 128) {
-	   if (onWhich != Vert1 || backMost(cubeindex)) {
+	   if (onWhich[7] != Vert1 || backMost(gridIndex)) {
 		   // finalize it
 		   finalizeVert(vertIndex[7], vertlist[7]);
 	   }
    }
    if (edgeTable[cubeindex] & 256) {
-	   if (onWhich != Vert1 || downMost(cubeindex)) {
+	   if (onWhich[8] != Vert1 || downMost(gridIndex)) {
 		   // finalize it
 		   finalizeVert(vertIndex[8], vertlist[8]);
 	   }
    }
    if (edgeTable[cubeindex] & 512) {
-	   if (rightMost(cubeindex) && (onWhich != Vert1 || downMost(cubeindex))) {
+	   if (rightMost(gridIndex) && (onWhich[9] != Vert1 || downMost(gridIndex))) {
 		   // finalize it
 		   finalizeVert(vertIndex[9], vertlist[9]);
 	   }
    }
    if (edgeTable[cubeindex] & 1024) {
-	   if (rightBackMost(cubeindex) && (onWhich != Vert1 || downMost(cubeindex))) {
+	   if (rightBackMost(gridIndex) && (onWhich[10] != Vert1 || downMost(gridIndex))) {
 		   // finalize it
 		   finalizeVert(vertIndex[10], vertlist[10]);
 	   }
    }
    if (edgeTable[cubeindex] & 2048) {
-	   if (backMost(cubeindex) && (onWhich != Vert1 || downMost(cubeindex))) {
-		   // finalize it
+	   if (backMost(gridIndex) && (onWhich[11] != Vert1 || downMost(gridIndex))) {
+		   // finalize it1
 		   finalizeVert(vertIndex[11], vertlist[11]);
 	   }
    }
@@ -310,10 +316,13 @@ void MCSimp::finalizeVert(const uint &index, const HVertex &v) {
 	cv.markv(FINAL);
 }
 
-bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate) {
-	isovalue = _isovalue;	
+bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate, unsigned int maxNewTri) {
 	if (decimateRate <= 0 || decimateRate >= 1)
 		return false;
+	isovalue = _isovalue;
+	genFaceCount = 0;
+	newFaceCount = 0;
+	genVertCount = 0;
 
 	if (!volSet.parseDataFile(filename))
 		return false;
@@ -321,19 +330,69 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate)
 	if (pcol)
 		delete pcol;
 	pcol = new QuadricEdgeCollapse();
-	int ncubetris, i;
-	FLOAT4 cubeIndex;
+	UINT4 cubeIndex;
 	GRIDCELL cube;
-	vertCount = 0;
+	bool init = true, first = true;
+
+	// init decimation
+	if (decimateRate < initDecimateRate) {
+		// first read in maxNewTri triangles and decimate based on initDecimateRate
+		while (volSet.hasNext()) {
+			cubeIndex = volSet.cursor;
+			if (!volSet.nextCube(cube))
+				return false;
+			polygonise(cubeIndex, cube);
+
+			if (newFaceCount >= maxNewTri - 2) {
+				pcol->targetFace(newFaceCount * initDecimateRate);
+				newFaceCount = 0;
+				break;
+			}
+		}
+
+		// than read in maxNewTri * (1 - initDecimateRate) triangles and decimate  
+		// til the triangles left equal to maxNewTri * initDecimateRate.
+		// The outer loop stops when the true decimate rate will be lower than
+		// the given decimate rate next time.
+		unsigned int initReadCount;
+		while (true) {
+			// approximated decimate rate of this iteration is
+			// lower than the given decimate rate
+			initReadCount = maxNewTri - pcol->validFaces();
+			if ((pcol->validFaces() + initReadCount * initDecimateRate) / 
+				(genFaceCount + initReadCount) > decimateRate)
+				break;
+
+			while (volSet.hasNext()) {
+				cubeIndex = volSet.cursor;
+				if (!volSet.nextCube(cube))
+					return false;
+				polygonise(cubeIndex, cube);
+
+				if (newFaceCount + pcol->validFaces() >= maxNewTri - 4) {
+					pcol->targetFace((newFaceCount + pcol->validFaces()) * initDecimateRate);
+					newFaceCount = 0;
+					break;
+				}
+			}
+		}
+	}
 
 	while (volSet.hasNext()) {
 		cubeIndex = volSet.cursor;
 		if (!volSet.nextCube(cube))
 			return false;
 		polygonise(cubeIndex, cube);
+
+		if (newFaceCount >= maxNewTri - 2) {
+			pcol->targetFace(pcol->validFaces() + newFaceCount * decimateRate);
+			newFaceCount = 0;
+			break;
+		}
 	}
 
-	delete pcol;
+	pcol->targetFace(genFaceCount * decimateRate);
+
 	pcol = NULL;
 	return true;
 }

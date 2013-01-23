@@ -41,10 +41,20 @@ private:
 	HVertex			vertlist[12];
 	InterpOnWhich	onWhich[12];
 	unsigned int	vertIndex[12];
-	unsigned int	vertCount;
+	
+	// used for decimation
+	unsigned int	genVertCount;
+	unsigned int	genFaceCount;
+	unsigned int	newFaceCount;
+	const double	initDecimateRate;
+
+	vector<HVertex>	verts;
+	vector<HFace>	faces;
+
+	int triangleCursor;
 
 public:
-	MCSimp(): pcol(NULL) { }
+	MCSimp(double _initDecimateRate = 0.25);
 	//MCSimp(
 	//	float _decimateRate, 
 	//	HTriple<uint> _sliceCount,
@@ -61,9 +71,13 @@ public:
 		uint vertCoordThirdDimOffSet,
 		DATA_TYPE coordDataType = DFLOAT);
 
-	bool genIsosurfaces(string filename, double isovalue, vector<TRIANGLE> &tris);
-	bool genCollapse(string filename, double _isovalue, double decimateRate);
-	void drawMesh();
+	VolumeSet* getVolSet() { return &volSet; }
+
+	bool genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> &tris);
+	bool genCollapse(string filename, double _isovalue, double decimateRate, unsigned int maxNewTri);
+	void startTriangle() { triangleCursor = 0; }
+	inline void nextTriangle(TRIANGLE &tri);
+	bool hasNextTriangle() { return triangleCursor < pcol->validFaces(); }
 
 private:
 	inline void getVert(
@@ -74,17 +88,17 @@ private:
 		uint vertCoordSecondDimOffSet, 
 		uint vertCoordThirdDimOffSet);
 	XYZ vertexInterp(XYZ p1, XYZ p2, double valp1, double valp2, InterpOnWhich& onWhich);
-	void polygonise(const FLOAT4& gridIndex, const GRIDCELL& grid);
+	void polygonise(const UINT4& gridIndex, const GRIDCELL& grid);
 	inline unsigned int getVertIndex(const HVertex &v);
 	void finalizeVert(const uint &index, const HVertex &v);
 
-	inline bool rightMost(FLOAT4 &cubeIndex);
-	inline bool backMost(FLOAT4 &cubeIndex);
-	inline bool downMost(FLOAT4 &cubeIndex);
-	inline bool rightBackMost(FLOAT4 &cubeIndex);
-	inline bool rightDownMost(FLOAT4 &cubeIndex);
-	inline bool backDownMost(FLOAT4 &cubeIndex);
-	inline bool rightBackDownMost(FLOAT4 &cubeIndex);
+	inline bool rightMost(const UINT4 &cubeIndex);
+	inline bool backMost(const UINT4 &cubeIndex);
+	inline bool downMost(const UINT4 &cubeIndex);
+	inline bool rightBackMost(const UINT4 &cubeIndex);
+	inline bool rightDownMost(const UINT4 &cubeIndex);
+	inline bool backDownMost(const UINT4 &cubeIndex);
+	inline bool rightBackDownMost(const UINT4 &cubeIndex);
 };
 
 void MCSimp::getVert(
@@ -102,40 +116,44 @@ void MCSimp::getVert(
 unsigned int MCSimp::getVertIndex(const HVertex &v) {
 	VertexIndexMap::iterator iter = vertexMap.find(v);
 	if (iter == vertexMap.end()) {
-		pcol->addVertex(vertCount, v, UNFINAL);
-		vertexMap[v] = vertCount ++;
-		return vertCount - 1;
+		pcol->addVertex(genVertCount, v, UNFINAL);
+		vertexMap[v] = genVertCount ++;
+		return genVertCount - 1;
 	} else {
 		return iter->second;
 	}
 }
 
-bool MCSimp::rightMost(FLOAT4 &cubeIndex) {
+bool MCSimp::rightMost(const UINT4 &cubeIndex) {
 	return cubeIndex.s[0] == volSet.volumeSize.s[0] - 2;
 }
 
-bool MCSimp::backMost(FLOAT4 &cubeIndex) {
+bool MCSimp::backMost(const UINT4 &cubeIndex) {
 	return cubeIndex.s[1] == volSet.volumeSize.s[1] - 2;
 }
 
-bool MCSimp::downMost(FLOAT4 &cubeIndex) {
+bool MCSimp::downMost(const UINT4 &cubeIndex) {
 	return cubeIndex.s[2] == volSet.volumeSize.s[2] - 2;
 }
 
-bool MCSimp::rightBackMost(FLOAT4 &cubeIndex) {
+bool MCSimp::rightBackMost(const UINT4 &cubeIndex) {
 	return rightMost(cubeIndex) && backMost(cubeIndex);
 }
 
-bool MCSimp::rightDownMost(FLOAT4 &cubeIndex) {
+bool MCSimp::rightDownMost(const UINT4 &cubeIndex) {
 	return rightMost(cubeIndex) && downMost(cubeIndex);
 }
 
-bool MCSimp::backDownMost(FLOAT4 &cubeIndex) {
+bool MCSimp::backDownMost(const UINT4 &cubeIndex) {
 	return backMost(cubeIndex) && downMost(cubeIndex);
 }
 
-bool MCSimp::rightBackDownMost(FLOAT4 &cubeIndex) {
+bool MCSimp::rightBackDownMost(const UINT4 &cubeIndex) {
 	return rightMost(cubeIndex) && backMost(cubeIndex) && downMost(cubeIndex);
+}
+
+void MCSimp::nextTriangle(TRIANGLE &tri) {
+
 }
 
 #endif
