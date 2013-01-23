@@ -74,7 +74,7 @@ private:
 		uint vertCoordSecondDimOffSet, 
 		uint vertCoordThirdDimOffSet);
 	XYZ vertexInterp(XYZ p1, XYZ p2, double valp1, double valp2, InterpOnWhich& onWhich);
-	int polygonise(FLOAT4 gridIndex, GRIDCELL grid, TRIANGLE *triangles);
+	void polygonise(const FLOAT4& gridIndex, const GRIDCELL& grid);
 	inline unsigned int getVertIndex(const HVertex &v);
 	void finalizeVert(const uint &index, const HVertex &v);
 

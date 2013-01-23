@@ -315,7 +315,6 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate)
 	if (decimateRate <= 0 || decimateRate >= 1)
 		return false;
 
-	FLOAT4 cubeIndex;
 	if (!volSet.parseDataFile(filename))
 		return false;
 
@@ -323,7 +322,7 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate)
 		delete pcol;
 	pcol = new QuadricEdgeCollapse();
 	int ncubetris, i;
-	TRIANGLE cubetris[5];
+	FLOAT4 cubeIndex;
 	GRIDCELL cube;
 	vertCount = 0;
 
@@ -331,9 +330,7 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate)
 		cubeIndex = volSet.cursor;
 		if (!volSet.nextCube(cube))
 			return false;
-		ncubetris = polygonise(cubeIndex, cube, cubetris);
-		for (i = 0; i < ncubetris; i ++)
-			cubetris[i];
+		polygonise(cubeIndex, cube);
 	}
 
 	delete pcol;
