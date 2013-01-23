@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'hmesh.h'
 **
-** Created: Thu Jan 10 20:49:07 2013
+** Created: Wed Jan 23 22:14:59 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_HMesh[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+      11,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -36,20 +36,21 @@ static const uint qt_meta_data_HMesh[] = {
       33,    6,    6,    6, 0x0a,
       44,    6,    6,    6, 0x0a,
       52,    6,    6,    6, 0x0a,
-      67,    6,    6,    6, 0x0a,
-      83,    6,    6,    6, 0x0a,
-      93,    6,    6,    6, 0x0a,
+      64,    6,    6,    6, 0x0a,
+      79,    6,    6,    6, 0x0a,
+      95,    6,    6,    6, 0x0a,
      105,    6,    6,    6, 0x0a,
-     121,    6,    6,    6, 0x0a,
+     117,    6,    6,    6, 0x0a,
+     133,    6,    6,    6, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_HMesh[] = {
     "HMesh\0\0on_open_file()\0on_qslim()\0"
-    "on_psimp()\0on_mc()\0on_wireframe()\0"
-    "on_flat_lines()\0on_flat()\0on_smooth()\0"
-    "on_vert_color()\0on_face_color()\0"
+    "on_psimp()\0on_mc()\0on_mcsimp()\0"
+    "on_wireframe()\0on_flat_lines()\0on_flat()\0"
+    "on_smooth()\0on_vert_color()\0on_face_color()\0"
 };
 
 const QMetaObject HMesh::staticMetaObject = {
@@ -85,15 +86,16 @@ int HMesh::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 1: on_qslim(); break;
         case 2: on_psimp(); break;
         case 3: on_mc(); break;
-        case 4: on_wireframe(); break;
-        case 5: on_flat_lines(); break;
-        case 6: on_flat(); break;
-        case 7: on_smooth(); break;
-        case 8: on_vert_color(); break;
-        case 9: on_face_color(); break;
+        case 4: on_mcsimp(); break;
+        case 5: on_wireframe(); break;
+        case 6: on_flat_lines(); break;
+        case 7: on_flat(); break;
+        case 8: on_smooth(); break;
+        case 9: on_vert_color(); break;
+        case 10: on_face_color(); break;
         default: ;
         }
-        _id -= 10;
+        _id -= 11;
     }
     return _id;
 }

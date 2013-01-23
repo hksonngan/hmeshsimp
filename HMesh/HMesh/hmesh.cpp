@@ -67,6 +67,8 @@ void HMesh::initMenus() {
 	_menu_surf_xtract = menu_bar->addMenu("Surface Xtract");	
 		_action_mc = _menu_surf_xtract->addAction("Marching Cubes");
 		connect(_action_mc, SIGNAL(triggered()), this, SLOT(on_mc()));
+		_action_mc_simp = _menu_surf_xtract->addAction("MC Simplification");
+		connect(_action_mc_simp, SIGNAL(triggered()), this, SLOT(on_mcsimp()));
 
 	// render menu
 	_menu_render = menu_bar->addMenu("Render");
@@ -194,6 +196,15 @@ void HMesh::on_psimp() {
 }
 
 void HMesh::on_mc() {
+	//"F:/raw/raw_sets/neghip/neghip.dat"
+	//"F:/raw/raw_sets/foot/foot.dat"
+	//"F:/raw/raw_sets/head/head.dat"
+	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
+
+	_hglwidget->setDrawMC("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100.5);
+}
+
+void HMesh::on_mcsimp() {
 	//"F:/raw/raw_sets/neghip/neghip.dat"
 	//"F:/raw/raw_sets/foot/foot.dat"
 	//"F:/raw/raw_sets/head/head.dat"

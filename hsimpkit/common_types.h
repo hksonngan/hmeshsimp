@@ -27,7 +27,6 @@ typedef HVector3f HNormal;
 
 template<class T1, class T2>
 inline void assign(TVec3<T1> &v1, const ChapillVec3<T2> &v2) {
-
 	v1[0] = v2.x;
 	v1[1] = v2.y;
 	v1[2] = v2.z;

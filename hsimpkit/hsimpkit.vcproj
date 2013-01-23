@@ -646,6 +646,14 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="trivial"
+			>
+			<File
+				RelativePath=".\fnv1_inc.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\esorttest.cpp"
 			>

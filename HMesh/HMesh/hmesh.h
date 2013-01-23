@@ -37,6 +37,7 @@ private:
 		QAction* _action_psimp;
 	QMenu* _menu_surf_xtract;	// surface extraction menu
 		QAction* _action_mc;
+		QAction* _action_mc_simp;
 	QMenu* _menu_render;		// render menu
 		QMenu* _menu_primitive;
 			QActionGroup* _primitive_group;
@@ -54,6 +55,7 @@ public slots:
 	void on_qslim();
 	void on_psimp();
 	void on_mc();
+	void on_mcsimp();
 
 	void on_wireframe() { _hglwidget->primitiveMode(WIREFRAME); _hglwidget->update(); }
 	void on_flat_lines() { _hglwidget->primitiveMode(FLAT_LINES); _hglwidget->update(); }

@@ -165,13 +165,13 @@ bool hGlWidget::setDrawMC(std::string filename, double isovalue) {
 	std::cout << "#iso surfaces gened, faces count: " << _mc_tris.size() << std::endl;
 
 	// bounding boxes
-	RawSet* rawSet = mcsimp.getRawSet();
-	_max_x = rawSet->thickness.s[0] * rawSet->volumeSize.s[0];
+	VolumeSet* volSet = mcsimp.getVolSet();
+	_max_x = volSet->thickness.s[0] * volSet->volumeSize.s[0];
 	_min_x = 0;
-	_max_y = rawSet->thickness.s[1] * rawSet->volumeSize.s[1];
+	_max_y = volSet->thickness.s[1] * volSet->volumeSize.s[1];
 	_min_y = 0;
 	_max_z = 0;
-	_min_z = -(rawSet->thickness.s[2] * rawSet->volumeSize.s[2]);
+	_min_z = -(volSet->thickness.s[2] * volSet->volumeSize.s[2]);
 
 	_center_x = (_max_x + _min_x) / 2;
 	_center_y = (_max_y + _min_y) / 2;

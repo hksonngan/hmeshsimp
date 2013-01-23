@@ -3,7 +3,8 @@
 
 #include <string>
 #include <boost/unordered_map.hpp>
-#include <libs/unordered/examples/fnv1.hpp>
+#include "fnv1_inc.h"
+#include "common_types.h"
 
 using std::string;
 
@@ -43,6 +44,7 @@ using std::string;
 //typedef unordered_map<MCVertexIndex, HVertex>
 
 class VertexHash {
+public:
 	std::size_t operator() (HVertex const& v) const {
 		char buf[sizeof(HVertex) + 1];
 		buf[sizeof(HVertex)] = '\0';
