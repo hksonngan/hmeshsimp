@@ -18,15 +18,13 @@ QuadricEdgeCollapse::~QuadricEdgeCollapse() {
 }
 
 void QuadricEdgeCollapse::allocVerts(uint _vert_count) {
-
 	PairCollapse::allocVerts(_vert_count);
 #if ARRAY_USE == ARRAY_NORMAL
 	quadrics.resize(_vert_count);
 #endif
 }
 
-bool QuadricEdgeCollapse::addFace(HFace face) {
-
+bool QuadricEdgeCollapse::addFace(const HFace& face) {
 	if (!PairCollapse::addFace(face))
 		return false;
 

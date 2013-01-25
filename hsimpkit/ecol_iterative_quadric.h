@@ -50,7 +50,7 @@ public:
 	QuadricEdgeCollapse();
 	~QuadricEdgeCollapse();
 	virtual void allocVerts(uint _vert_count);
-	virtual bool addFace(HFace face);
+	virtual bool addFace(const HFace& face);
 	virtual void addCollapsablePair(CollapsablePair *new_pair);
 	virtual void collectPairs();
 	// init after the vertices and faces are ready

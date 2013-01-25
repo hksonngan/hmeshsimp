@@ -25,7 +25,7 @@ using std::vector;
 
 enum PrimitiveMode { SMOOTH, FLAT, FLAT_LINES, WIREFRAME };
 enum ColorMode { VERT_COLOR, FACE_COLOR };
-enum DrawWhich { NONE, DRAW_PLY, DRAW_TRIS, DRAW_QSLIM, DRAW_MC_TRIS };
+enum DrawWhich { NONE, DRAW_PLY, DRAW_TRIS, DRAW_QSLIM, DRAW_MC_TRIS, DRAW_H_INDEXED_MESH };
 
 class hGlWidget : public QGLWidget
 {
@@ -44,20 +44,26 @@ protected:
 
 private:
 	void initTransform();
-	void computeNormals();
+	void computePlyNormals();
+	void computeIndexMeshNormals();
 	void calcBoundingBox();
 	void drawModel();
+	void drawTrisoup();
+	void drawMCTrisoup();
 	void drawPly();
+	void drawIndexedMesh();
 	void setLights();
 	void setMaterial();
 	void applyTransform();
 
 public:
 	hGlWidget();
+	~hGlWidget();
 	void setDrawQSlim();
 	void setDrawPly();
 	void setDrawTris();
 	bool setDrawMC(std::string filename, double isovalue);
+	bool setDrawMCSimp(std::string filename, double isovalue, double deimateRate);
 	void openFile(QString _file_name);
 
 	void primitiveMode(PrimitiveMode m) { _primitive_mode = m; }
@@ -70,8 +76,8 @@ private:
 	//bool _draw_tris;
 	DrawWhich _drawWhich;
 
-	PrimitiveMode _primitive_mode;
-	ColorMode _color_mode;
+	PrimitiveMode	_primitive_mode;
+	ColorMode		_color_mode;
 
 	// info about bounding box
 	float _max_x, _min_x;
@@ -80,19 +86,23 @@ private:
 	float _center_x, _center_y, _center_z;
 	float _range;
 
-	double _glmat[16];		// translation matrix
-	QPoint _lButtonPressPos;
-	QPoint _rButtonPressPos;
-	double _scale;
-	int _operateMode;
-	Vector3D _trans_point;
-	double _rotate_degree;
+	double		_glmat[16];		// translation matrix
+	QPoint		_lButtonPressPos;
+	QPoint		_rButtonPressPos;
+	double		_scale;
+	int			_operateMode;
+	Vector3D	_trans_point;
+	double		_rotate_degree;
 
-	HNormal *vnormals;
-	HNormal *fnormals;
+	vector<HNormal>	vnormals;
+	vector<HNormal>	fnormals;
 
-	TriangleSoupContainer _tris_container;
-	vector<TRIANGLE> _mc_tris;
+	TriangleSoupContainer	_tris_container;
+	vector<TRIANGLE>		_mc_tris;
+	vector<HVertex>			vertVec;
+	vector<HFace>			faceVec;
+	unsigned int			numvert;
+	unsigned int			numface;
 };
 
 #endif

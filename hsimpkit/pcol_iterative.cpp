@@ -10,6 +10,9 @@ using std::endl;
 PairCollapse::PairCollapse() {
 	faceIndexComp.setFaces(&faces);
 
+	valid_verts = 0;
+	valid_faces = 0;
+
 #ifdef _VERBOSE
 	merge_face_count = 1;
 	fverbose.open("verbose");
@@ -49,6 +52,8 @@ void PairCollapse::addVertex(const HVertex& vert) {
 	std::pair<ECVertexMap::iterator, bool> _pair = vertices.insert(ECVertexMap::value_type(id, cvert));
 	((_pair.first)->second).allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
 #endif
+
+	valid_verts ++;
 }
 
 void PairCollapse::addVertex(const uint& index, const HVertex& vert, uchar mark) {
@@ -66,6 +71,8 @@ void PairCollapse::addVertex(const uint& index, const HVertex& vert, uchar mark)
 	std::pair<ECVertexMap::iterator, bool> _pair = vertices.insert(ECVertexMap::value_type(index, cvert));
 	((_pair.first)->second).allocAdjacents(DFLT_STAR_FACES, DFLT_STAR_PAIRS);
 #endif
+
+	valid_verts ++;
 }
 
 bool PairCollapse::addFace(const HFace &face) {
@@ -102,6 +109,7 @@ bool PairCollapse::addFace(const HFace &face) {
 	v(face.j).markv(REFERRED);
 	v(face.k).markv(REFERRED);
 
+	valid_faces ++;
 	return true;
 }
 
@@ -327,6 +335,27 @@ bool PairCollapse::writePly(char* filename) {
 	addInfo(ostr.str());
 
 	return true;
+}
+
+void PairCollapse::toIndexedMesh(HVertex* vertArr, HFace *faceArr) {
+	uint valid_vert_count = 0;
+	_for_loop(vertices, ECVertexMap) {
+		CollapsableVertex& cvert = _retrieve_elem(vertices);	
+		if (cvert.valid(_retrieve_index()) && !cvert.unreferred()) {
+			vertArr[valid_vert_count].Set(cvert.x, cvert.y, cvert.z);
+			cvert.output_id = valid_vert_count;
+			valid_vert_count ++;
+		}
+	}
+
+	uint valid_face_count = 0;
+	_for_loop(faces, ECFaceMap) {
+		CollapsableFace& cface = _retrieve_elem(faces);
+		if (cface.valid()) {
+			faceArr[valid_face_count].set(v(cface.i).output_id, v(cface.j).output_id, v(cface.k).output_id);
+			valid_face_count ++;
+		}
+	}
 }
 
 void PairCollapse::outputIds(char* filename) {

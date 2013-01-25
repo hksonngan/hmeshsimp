@@ -210,5 +210,5 @@ void HMesh::on_mcsimp() {
 	//"F:/raw/raw_sets/head/head.dat"
 	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
 
-	_hglwidget->setDrawMC("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100.5);
+	_hglwidget->setDrawMCSimp("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100, 0.3);
 }

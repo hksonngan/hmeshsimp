@@ -51,10 +51,8 @@ private:
 	vector<HVertex>	verts;
 	vector<HFace>	faces;
 
-	int triangleCursor;
-
 public:
-	MCSimp(double _initDecimateRate = 0.25);
+	MCSimp(double _initDecimateRate = 0.5);
 	//MCSimp(
 	//	float _decimateRate, 
 	//	HTriple<uint> _sliceCount,
@@ -72,12 +70,13 @@ public:
 		DATA_TYPE coordDataType = DFLOAT);
 
 	VolumeSet* getVolSet() { return &volSet; }
+	unsigned int getGenFaceCount() { return genFaceCount; }
+	unsigned int getGenVertCount() { return genVertCount; }
 
 	bool genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> &tris);
-	bool genCollapse(string filename, double _isovalue, double decimateRate, unsigned int maxNewTri);
-	void startTriangle() { triangleCursor = 0; }
-	inline void nextTriangle(TRIANGLE &tri);
-	bool hasNextTriangle() { return triangleCursor < pcol->validFaces(); }
+	bool genCollapse(string filename, double _isovalue, double decimateRate, 
+		unsigned int maxNewTri, unsigned int &nvert, unsigned int &nface);
+	void toIndexedMesh(HVertex *vertArr, HFace *faceArr);
 
 private:
 	inline void getVert(
@@ -150,10 +149,6 @@ bool MCSimp::backDownMost(const UINT4 &cubeIndex) {
 
 bool MCSimp::rightBackDownMost(const UINT4 &cubeIndex) {
 	return rightMost(cubeIndex) && backMost(cubeIndex) && downMost(cubeIndex);
-}
-
-void MCSimp::nextTriangle(TRIANGLE &tri) {
-
 }
 
 #endif
