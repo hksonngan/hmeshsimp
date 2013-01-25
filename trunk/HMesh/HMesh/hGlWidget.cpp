@@ -7,6 +7,10 @@
 #include "tri_soup_stream.h"
 #include "h_math.h"
 
+using std::cout;
+using std::cerr;
+using std::endl;
+
 #define _max_of_three(a, b, c, _max)  _max = max(a, b); _max = max(c, _max);
 
 hGlWidget::hGlWidget()
@@ -16,8 +20,13 @@ hGlWidget::hGlWidget()
 	_primitive_mode = FLAT_LINES;
 	_color_mode = FACE_COLOR;
 
-	fnormals = NULL;
-	vnormals = NULL;
+	//fnormals = NULL;
+	//vnormals = NULL;
+
+	//phverts = NULL;
+	numvert = 0;
+	//phfaces = NULL;
+	numface = 0;
 
 	initTransform();
 	_max_x = 0;
@@ -29,6 +38,13 @@ hGlWidget::hGlWidget()
 	_center_x = 0;
 	_center_y = 0;
 	_center_z = 0;
+}
+
+hGlWidget::~hGlWidget() {
+	//if (phverts)
+	//	delete[] phverts;
+	//if (phfaces)
+	//	delete[] phfaces;
 }
 
 void hGlWidget::initializeGL()
@@ -53,7 +69,7 @@ void hGlWidget::initializeGL()
 	glGetIntegerv(GL_SAMPLE_BUFFERS, &buf);
 	cout << "Number of sample buffers: " << buf << endl;
 	glGetIntegerv(GL_SAMPLES, &sbuf);
-	cout << "Number of samples: " << sbuf << endl;
+	cout << "Number of samples: " << sbuf << endl << endl;
 	// antialiasing
 	glEnable(GL_MULTISAMPLE);
 
@@ -95,36 +111,11 @@ void hGlWidget::drawModel() {
 	if(_drawWhich == DRAW_PLY){
 		drawPly();
 	} else if (_drawWhich == DRAW_TRIS) {
-		glBegin(GL_TRIANGLES);
-
-		int i;
-		for (i = 0; i < _tris_container.count(); i ++)
-		{
-			glVertex3f(_tris_container(i).vert1.x, _tris_container(i).vert1.y, _tris_container(i).vert1.z);
-			glVertex3f(_tris_container(i).vert2.x, _tris_container(i).vert2.y, _tris_container(i).vert2.z);
-			glVertex3f(_tris_container(i).vert3.x, _tris_container(i).vert3.y, _tris_container(i).vert3.z);
-		}
-
-		glEnd();
+		drawTrisoup();
 	} else if (_drawWhich == DRAW_MC_TRIS) {
-		glBegin(GL_TRIANGLES);
-		HNormal nm;
-		HVertex v1, v2, v3;
-
-		int i;
-		for (i = 0; i < _mc_tris.size(); i ++) {
-			v1.Set(_mc_tris[i].p[0].x, _mc_tris[i].p[0].y, _mc_tris[i].p[0].z);
-			v2.Set(_mc_tris[i].p[1].x, _mc_tris[i].p[1].y, _mc_tris[i].p[1].z);
-			v3.Set(_mc_tris[i].p[2].x, _mc_tris[i].p[2].y, _mc_tris[i].p[2].z);
-			nm = triangleNormal(v1, v2, v3);
-
-			glNormal3f(nm.x, nm.y, nm.z);
-			glVertex3f(v1.x, v1.y, v1.z);
-			glVertex3f(v2.x, v2.y, v2.z);
-			glVertex3f(v3.x, v3.y, v3.z);
-		}
-
-		glEnd();	
+		drawMCTrisoup();
+	} else if (_drawWhich == DRAW_H_INDEXED_MESH) {
+		drawIndexedMesh();
 	}
 }
 
@@ -183,6 +174,44 @@ bool hGlWidget::setDrawMC(std::string filename, double isovalue) {
 	_drawWhich = DRAW_MC_TRIS;
 	update();
 	
+	return true;
+}
+
+bool hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deimateRate) {
+	MCSimp mcsimp;
+
+	if (!mcsimp.genCollapse(filename, isovalue, 0.25, 2000, numvert, numface)) {
+		cerr << "#error occurred during simplification" << endl << endl;
+		return false;
+	}
+
+	vertVec.resize(numvert);
+	faceVec.resize(numface);
+	mcsimp.toIndexedMesh(vertVec.data(), faceVec.data());
+
+	cout << "#iso-surfaces decimated" << endl
+		<< "#generated faces: " << mcsimp.getGenFaceCount() << ", vertices: " << mcsimp.getGenVertCount() << endl
+		<< "#simplified faces: " << numface << ", vertices: " << numvert << endl << endl;
+
+	// bounding boxes
+	VolumeSet* volSet = mcsimp.getVolSet();
+	_max_x = volSet->thickness.s[0] * volSet->volumeSize.s[0];
+	_min_x = 0;
+	_max_y = volSet->thickness.s[1] * volSet->volumeSize.s[1];
+	_min_y = 0;
+	_max_z = 0;
+	_min_z = -(volSet->thickness.s[2] * volSet->volumeSize.s[2]);
+
+	_center_x = (_max_x + _min_x) / 2;
+	_center_y = (_max_y + _min_y) / 2;
+	_center_z = (_max_z + _min_z) / 2;
+	_max_of_three(_max_x - _min_x, _max_y - _min_y, _max_z - _min_z, _range);
+
+	_scale = 3 / _range;
+
+	_drawWhich = DRAW_H_INDEXED_MESH;
+	update();
+
 	return true;
 }
 
@@ -329,12 +358,11 @@ void hGlWidget::openFile(QString _file_name)
 {
 	QString _file_ext = _file_name.mid(_file_name.lastIndexOf(".") + 1);
 
-	if (_file_ext.toLower() == "ply")
-	{
+	if (_file_ext.toLower() == "ply") {
 		clean_ply();
 		_tris_container.clear();
 		ply_read_file(_file_name.toLocal8Bit().data());
-		computeNormals();
+		computePlyNormals();
 
 		int vert_size = sizeof(Vertex) +  3 * sizeof(float); 
 		int vertices_mem = vert_size * nverts;
@@ -350,8 +378,7 @@ void hGlWidget::openFile(QString _file_name)
 		setDrawPly();
 		calcBoundingBox();
 	}
-	else if (_file_ext.toLower() == "tris")
-	{
+	else if (_file_ext.toLower() == "tris") {
 		clean_ply();
 		_tris_container.init();
 		if (_tris_container.read(_file_name.toLocal8Bit().data()) == false)
@@ -381,8 +408,41 @@ void hGlWidget::openFile(QString _file_name)
 	initTransform();
 }
 
-void hGlWidget::drawPly() {
+void hGlWidget::drawTrisoup() {
+	glBegin(GL_TRIANGLES);
 
+	int i;
+	for (i = 0; i < _tris_container.count(); i ++) {
+		glVertex3f(_tris_container(i).vert1.x, _tris_container(i).vert1.y, _tris_container(i).vert1.z);
+		glVertex3f(_tris_container(i).vert2.x, _tris_container(i).vert2.y, _tris_container(i).vert2.z);
+		glVertex3f(_tris_container(i).vert3.x, _tris_container(i).vert3.y, _tris_container(i).vert3.z);
+	}
+
+	glEnd();
+}
+
+void hGlWidget::drawMCTrisoup() {
+	glBegin(GL_TRIANGLES);
+	HNormal nm;
+	HVertex v1, v2, v3;
+
+	int i;
+	for (i = 0; i < _mc_tris.size(); i ++) {
+		v1.Set(_mc_tris[i].p[0].x, _mc_tris[i].p[0].y, _mc_tris[i].p[0].z);
+		v2.Set(_mc_tris[i].p[1].x, _mc_tris[i].p[1].y, _mc_tris[i].p[1].z);
+		v3.Set(_mc_tris[i].p[2].x, _mc_tris[i].p[2].y, _mc_tris[i].p[2].z);
+		nm = triangleNormal(v1, v2, v3);
+
+		glNormal3f(nm.x, nm.y, nm.z);
+		glVertex3f(v1.x, v1.y, v1.z);
+		glVertex3f(v2.x, v2.y, v2.z);
+		glVertex3f(v3.x, v3.y, v3.z);
+	}
+
+	glEnd();
+}
+
+void hGlWidget::drawPly() {
 	Vertex v;
 	Face f;
 
@@ -446,6 +506,65 @@ void hGlWidget::drawPly() {
 		else {
 			cerr << "#error! non-triangle while drawing ply models" << endl;
 		}
+	}
+
+	glEnd();
+}
+
+void hGlWidget::drawIndexedMesh() {
+	glBegin(GL_TRIANGLES);
+	for(int i = 0; i < numface; i ++) {
+		HFace &f = faceVec[i];
+
+		// draw front face
+		if (_primitive_mode == FLAT || _primitive_mode == FLAT_LINES)
+			glNormal3f(fnormals[i].x, fnormals[i].y, fnormals[i].z);
+
+		if (_primitive_mode == SMOOTH) {
+			HNormal &nm = vnormals[f.i];
+			glNormal3f(nm.x, nm.y, nm.z);
+		}
+		HVertex &v1 = vertVec[f.i];
+		glVertex3f(v1.x, v1.y, v1.z);
+
+		if (_primitive_mode == SMOOTH) {
+			HNormal &nm = vnormals[f.j];
+			glNormal3f(nm.x, nm.y, nm.z);
+		}
+		HVertex &v2 = vertVec[f.j];
+		glVertex3f(v2.x, v2.y, v2.z);
+
+		if (_primitive_mode == SMOOTH) {
+			HNormal &nm = vnormals[f.k];
+			glNormal3f(nm.x, nm.y, nm.z);
+		}
+		HVertex &v3 = vertVec[f.k];
+		glVertex3f(v3.x, v3.y, v3.z);
+
+		// draw front face
+		if (_primitive_mode == FLAT || _primitive_mode == FLAT_LINES)
+			glNormal3f(fnormals[i].x, fnormals[i].y, fnormals[i].z);
+
+		if (_primitive_mode == SMOOTH) {
+			HNormal &nm = vnormals[f.i];
+			glNormal3f(nm.x, nm.y, nm.z);
+		}
+		HVertex &v4 = vertVec[f.i];
+		glVertex3f(v4.x, v4.y, v4.z);
+
+		if (_primitive_mode == SMOOTH) {
+			HNormal &nm = vnormals[f.k];
+			glNormal3f(nm.x, nm.y, nm.z);
+		}
+		HVertex &v5 = vertVec[f.k];
+		glVertex3f(v5.x, v5.y, v5.z);
+
+		if (_primitive_mode == SMOOTH) {
+			HNormal &nm = vnormals[f.j];
+			glNormal3f(nm.x, nm.y, nm.z);
+		}
+		HVertex &v6 = vertVec[f.j];
+		glVertex3f(v6.x, v6.y, v6.z);
 	}
 
 	glEnd();
@@ -515,20 +634,13 @@ void hGlWidget::setMaterial() {
 	glMaterialfv(GL_FRONT, GL_EMISSION, MatEmission);
 }
  
-void hGlWidget::computeNormals() {
-
+void hGlWidget::computePlyNormals() {
 	int i = 0;
 	HVertex v1, v2, v3;
 	HNormal e1, e2, nm;
 
-	if (vnormals)
-		delete[] vnormals;
-	if (fnormals)
-		delete[] fnormals;
-
-	fnormals = new HNormal[nfaces];
-
-	vnormals = new HNormal[nverts];
+	fnormals.resize(nfaces);
+	vnormals.resize(nverts);
 	for (i = 0; i < nverts; i ++)
 		vnormals[i].Set(0, 0, 0);
 
@@ -551,6 +663,36 @@ void hGlWidget::computeNormals() {
 
 	for (i = 0; i < nverts; i ++)
 		vnormals[i].Normalize();
+}
+
+void hGlWidget::computeIndexMeshNormals() {
+	int i = 0;
+	HNormal e1, e2, nm;
+
+	fnormals.resize(numface);
+	vnormals.resize(numvert);
+	for (i = 0; i < numvert; i ++)
+		vnormals[i].Set(0, 0, 0);
+
+	for (i = 0; i < numface; i ++) {
+		HVertex &v1 = vertVec[faceVec[i].i];
+		HVertex &v2 = vertVec[faceVec[i].j];
+		HVertex &v3 = vertVec[faceVec[i].k];
+
+		e1 = v3 - v1;
+		e2 = v2 - v1;
+		nm = e1 ^ e2;
+
+		vnormals[flist[i].verts[0]] += nm;
+		vnormals[flist[i].verts[1]] += nm;
+		vnormals[flist[i].verts[2]] += nm;
+
+		nm.Normalize();
+		fnormals[i] = nm;
+	}
+
+	for (i = 0; i < numvert; i ++)
+		vnormals[i].Normalize();	
 }
 
 void hGlWidget::calcBoundingBox()

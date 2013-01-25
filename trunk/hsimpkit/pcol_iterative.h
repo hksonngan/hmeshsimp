@@ -220,6 +220,7 @@ public:
 	void generateOutputId();
 	// for debug
 	void outputIds(char* filename);
+	void toIndexedMesh(HVertex* vertArr, HFace *faceArr);
 
 
 	///////////////////////////////////////
@@ -299,14 +300,15 @@ void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) 
 	CollapsableVertex& cvert = v(vert_index);
 
 	for (int i = 0; i < cvert.adjacent_faces.count(); i ++) {
-		CollapsableFace& cface = f(cvert.adjacent_faces[i]);
-		
-		if (cface.i != vert_index && !starVertices->exist(cface.i))
-			starVertices->push_back(cface.i);
-		if (cface.j != vert_index && !starVertices->exist(cface.j))
-			starVertices->push_back(cface.j);
-		if (cface.k != vert_index && !starVertices->exist(cface.k))
-			starVertices->push_back(cface.k);
+		if (face_is_valid(cvert.adjacent_faces[i])) {
+			CollapsableFace& cface = f(cvert.adjacent_faces[i]);
+			if (cface.i != vert_index && !starVertices->exist(cface.i))
+				starVertices->push_back(cface.i);
+			if (cface.j != vert_index && !starVertices->exist(cface.j))
+				starVertices->push_back(cface.j);
+			if (cface.k != vert_index && !starVertices->exist(cface.k))
+				starVertices->push_back(cface.k);
+		}
 	}
 }
 
@@ -561,7 +563,8 @@ void PairCollapse::collectEdgeFaces(uint vert1, uint vert2, face_arr &_faces) {
 
 void PairCollapse::markFaces(face_arr &_faces, unsigned char m) {
 	for (int i = 0; i < _faces.count(); i ++)
-		f(_faces[i]).markFace(m);
+		if (face_is_valid(_faces[i]))
+			f(_faces[i]).markFace(m);
 }
 
 void PairCollapse::collectMarkFaces(face_arr &faces_in, face_arr &faces_out, unsigned char m) {
@@ -569,7 +572,7 @@ void PairCollapse::collectMarkFaces(face_arr &faces_in, face_arr &faces_out, uns
 	faces_out.resize(faces_in.count() / 2);
 
 	for (int i = 0; i < faces_in.count(); i ++) 
-		if (f(faces_in[i]).markIs(m))
+		if (face_is_valid(faces_in[i]) && f(faces_in[i]).markIs(m))
 			faces_out.push_back(faces_in[i]);
 }
 

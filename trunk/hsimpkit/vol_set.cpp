@@ -29,8 +29,7 @@ void VolumeSet::trim(std::string &s)
 }
 
 // parse .dat file
-bool VolumeSet::parseDataFile(const std::string &name)
-{
+bool VolumeSet::parseDataFile(const std::string &name) {
 	clear();
 	fileEndian = systemEndian;
 
@@ -185,6 +184,8 @@ bool VolumeSet::parseDataFile(const std::string &name)
 	lower = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
 	//_data = new Byte[volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize];
 	//readData(_data, volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize);
+
+	std::cerr << std::endl;
 
 	return true;
 }

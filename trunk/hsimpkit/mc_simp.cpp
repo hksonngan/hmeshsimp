@@ -316,7 +316,8 @@ void MCSimp::finalizeVert(const uint &index, const HVertex &v) {
 	cv.markv(FINAL);
 }
 
-bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate, unsigned int maxNewTri) {
+bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate, 
+				unsigned int maxNewTri, unsigned int &nvert, unsigned int &nface) {
 	if (decimateRate <= 0 || decimateRate >= 1)
 		return false;
 	isovalue = _isovalue;
@@ -339,6 +340,13 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 		// first read in maxNewTri triangles and decimate based on initDecimateRate
 		while (volSet.hasNext()) {
 			cubeIndex = volSet.cursor;
+
+			// FOR DEBUG
+			if (cubeIndex.s[0] == 59 && cubeIndex.s[1] == 34 && cubeIndex.s[2] == 0) {
+				int k = 0;
+				k ++;
+			}
+
 			if (!volSet.nextCube(cube))
 				return false;
 			polygonise(cubeIndex, cube);
@@ -392,7 +400,13 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 	}
 
 	pcol->targetFace(genFaceCount * decimateRate);
+	
+	nvert = pcol->validVerts();
+	nface = pcol->validFaces();
 
-	pcol = NULL;
 	return true;
+}
+
+void MCSimp::toIndexedMesh(HVertex *vertArr, HFace *faceArr) {
+	pcol->toIndexedMesh(vertArr, faceArr);
 }
