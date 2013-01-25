@@ -50,7 +50,9 @@ public:
 	QuadricEdgeCollapse();
 	~QuadricEdgeCollapse();
 	virtual void allocVerts(uint _vert_count);
+	inline void addFaceQuadric(const HFace& face);
 	virtual bool addFace(const HFace& face);
+	virtual bool addFace(const uint & index, const HFace& face);
 	virtual void addCollapsablePair(CollapsablePair *new_pair);
 	virtual void collectPairs();
 	// init after the vertices and faces are ready
@@ -87,6 +89,50 @@ public:
 	int placement_policy;
 	double boundary_weight;
 };
+
+void QuadricEdgeCollapse::addFaceQuadric(const HFace& face) {
+	// add the quadric matrix
+	float area = HFaceFormula::calcTriangleFaceArea(v(face.i), v(face.j), v(face.k));
+
+	// below altered from _QSLIM_2.1_
+	Vec3 v1(v(face.i).x, v(face.i).y, v(face.i).z);
+	Vec3 v2(v(face.j).x, v(face.j).y, v(face.j).z);
+	Vec3 v3(v(face.k).x, v(face.k).y, v(face.k).z);
+
+	// calculating triangle plane formula
+	Vec4 p = (weighting_policy == MX_WEIGHT_RAWNORMALS) ?
+		triangle_raw_plane<Vec3,Vec4>(v1, v2, v3):
+	triangle_plane<Vec3,Vec4>(v1, v2, v3);
+	// retrieve the quadric matrix
+	Quadric Q(p[X], p[Y], p[Z], p[W], area);
+
+	Q *= Q.area();
+	quadrics[face.i] += Q;
+	quadrics[face.j] += Q;
+	quadrics[face.k] += Q;
+
+	//switch( weighting_policy )
+	//{
+	//case MX_WEIGHT_ANGLE:
+	//	for(uint i = 0; i < 3; i ++)
+	//	{
+	//		Quadric Q_j = Q;
+	//		// by ht
+	//		//Q_j *= m->compute_corner_angle(i, j);
+	//		//quadrics(face[i]) += Q_j;
+	//	}
+	//	break;
+	//case MX_WEIGHT_AREA:
+	//case MX_WEIGHT_AREA_AVG:
+	//	Q *= Q.area();
+	//	// no break: fall through
+	//default:
+	//	quadrics[face.i] += Q;
+	//	quadrics[face.j] += Q;
+	//	quadrics[face.k] += Q;
+	//	break;
+	//}
+}
 
 void QuadricEdgeCollapse::addDiscontinuityConstraint(uint vert1, uint vert2, uint face_id) {
 

@@ -157,23 +157,13 @@ bool hGlWidget::setDrawMC(std::string filename, double isovalue) {
 
 	// bounding boxes
 	VolumeSet* volSet = mcsimp.getVolSet();
-	_max_x = volSet->thickness.s[0] * volSet->volumeSize.s[0];
-	_min_x = 0;
-	_max_y = volSet->thickness.s[1] * volSet->volumeSize.s[1];
-	_min_y = 0;
-	_max_z = 0;
-	_min_z = -(volSet->thickness.s[2] * volSet->volumeSize.s[2]);
-
-	_center_x = (_max_x + _min_x) / 2;
-	_center_y = (_max_y + _min_y) / 2;
-	_center_z = (_max_z + _min_z) / 2;
-	_max_of_three(_max_x - _min_x, _max_y - _min_y, _max_z - _min_z, _range);
-
-	_scale = 3 / _range;
+	_max_x = volSet->thickness.s[0] * volSet->volumeSize.s[0]; _min_x = 0;
+	_max_y = volSet->thickness.s[1] * volSet->volumeSize.s[1]; _min_y = 0;
+	_max_z = 0; _min_z = -(volSet->thickness.s[2] * volSet->volumeSize.s[2]);
+	setBoundingBox();
 
 	_drawWhich = DRAW_MC_TRIS;
 	update();
-	
 	return true;
 }
 
@@ -188,6 +178,7 @@ bool hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deim
 	vertVec.resize(numvert);
 	faceVec.resize(numface);
 	mcsimp.toIndexedMesh(vertVec.data(), faceVec.data());
+	computeIndexMeshNormals();
 
 	cout << "#iso-surfaces decimated" << endl
 		<< "#generated faces: " << mcsimp.getGenFaceCount() << ", vertices: " << mcsimp.getGenVertCount() << endl
@@ -195,23 +186,13 @@ bool hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deim
 
 	// bounding boxes
 	VolumeSet* volSet = mcsimp.getVolSet();
-	_max_x = volSet->thickness.s[0] * volSet->volumeSize.s[0];
-	_min_x = 0;
-	_max_y = volSet->thickness.s[1] * volSet->volumeSize.s[1];
-	_min_y = 0;
-	_max_z = 0;
-	_min_z = -(volSet->thickness.s[2] * volSet->volumeSize.s[2]);
-
-	_center_x = (_max_x + _min_x) / 2;
-	_center_y = (_max_y + _min_y) / 2;
-	_center_z = (_max_z + _min_z) / 2;
-	_max_of_three(_max_x - _min_x, _max_y - _min_y, _max_z - _min_z, _range);
-
-	_scale = 3 / _range;
+	_max_x = volSet->thickness.s[0] * volSet->volumeSize.s[0]; _min_x = 0;
+	_max_y = volSet->thickness.s[1] * volSet->volumeSize.s[1]; _min_y = 0;
+	_max_z = 0; _min_z = -(volSet->thickness.s[2] * volSet->volumeSize.s[2]);
+	setBoundingBox();
 
 	_drawWhich = DRAW_H_INDEXED_MESH;
 	update();
-
 	return true;
 }
 
@@ -376,7 +357,7 @@ void hGlWidget::openFile(QString _file_name)
 		cerr << "\tfaces bytes : " << faces_mem << endl;
 		cerr << "\ttotal : " << faces_mem + vertices_mem << endl;
 		setDrawPly();
-		calcBoundingBox();
+		calcPlyBoundingBox();
 	}
 	else if (_file_ext.toLower() == "tris") {
 		clean_ply();
@@ -542,29 +523,29 @@ void hGlWidget::drawIndexedMesh() {
 		glVertex3f(v3.x, v3.y, v3.z);
 
 		// draw front face
-		if (_primitive_mode == FLAT || _primitive_mode == FLAT_LINES)
-			glNormal3f(fnormals[i].x, fnormals[i].y, fnormals[i].z);
+		//if (_primitive_mode == FLAT || _primitive_mode == FLAT_LINES)
+		//	glNormal3f(fnormals[i].x, fnormals[i].y, fnormals[i].z);
 
-		if (_primitive_mode == SMOOTH) {
-			HNormal &nm = vnormals[f.i];
-			glNormal3f(nm.x, nm.y, nm.z);
-		}
-		HVertex &v4 = vertVec[f.i];
-		glVertex3f(v4.x, v4.y, v4.z);
+		//if (_primitive_mode == SMOOTH) {
+		//	HNormal &nm = vnormals[f.i];
+		//	glNormal3f(nm.x, nm.y, nm.z);
+		//}
+		//HVertex &v4 = vertVec[f.i];
+		//glVertex3f(v4.x, v4.y, v4.z);
 
-		if (_primitive_mode == SMOOTH) {
-			HNormal &nm = vnormals[f.k];
-			glNormal3f(nm.x, nm.y, nm.z);
-		}
-		HVertex &v5 = vertVec[f.k];
-		glVertex3f(v5.x, v5.y, v5.z);
+		//if (_primitive_mode == SMOOTH) {
+		//	HNormal &nm = vnormals[f.k];
+		//	glNormal3f(nm.x, nm.y, nm.z);
+		//}
+		//HVertex &v5 = vertVec[f.k];
+		//glVertex3f(v5.x, v5.y, v5.z);
 
-		if (_primitive_mode == SMOOTH) {
-			HNormal &nm = vnormals[f.j];
-			glNormal3f(nm.x, nm.y, nm.z);
-		}
-		HVertex &v6 = vertVec[f.j];
-		glVertex3f(v6.x, v6.y, v6.z);
+		//if (_primitive_mode == SMOOTH) {
+		//	HNormal &nm = vnormals[f.j];
+		//	glNormal3f(nm.x, nm.y, nm.z);
+		//}
+		//HVertex &v6 = vertVec[f.j];
+		//glVertex3f(v6.x, v6.y, v6.z);
 	}
 
 	glEnd();
@@ -604,7 +585,7 @@ void hGlWidget::setLights() {
 	float specularProperties[]	= {1.0f, 1.0f, 1.0f, 1.0f};
 	float lightPosition[]		= {0.1f, 0.3f, -0.3f, 0.0f};
 
-	//glLightfv(GL_LIGHT0, GL_AMBIENT, ambientProperties);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientProperties);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseProperties);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularProperties);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
@@ -620,8 +601,13 @@ void hGlWidget::setMaterial() {
 
 	// material
 	//float	MatAmbient[]  = {0.0f, 0.5f, 0.75f, 1.0f};
-	float	MatAmbient[]  = {0.1f, 0.15f, 0.35f, 1.0f};
-	float	MatDiffuse[]  = {0.1f, 0.3f, 0.35f, 1.0f};
+
+	//float	MatAmbient[]  = {0.2f, 0.65f, 0.85f, 1.0f};
+	//float	MatDiffuse[]  = {0.2f, 0.65f, 0.85f, 1.0f};
+
+	float	MatAmbient[]  = {0.6f, 0.6f, 0.6f, 1.0f};
+	float	MatDiffuse[]  = {0.6f, 0.6f, 0.6f, 1.0f};
+
 	//float	MatSpecular[]  = {0.75f, 0.75f, 0.75f, 1.0f};
 	float	MatSpecular[]  = {0.8f, 0.8f, 0.8, 1.0f};
 	float	MatShininess[]  = { 64 };
@@ -675,17 +661,18 @@ void hGlWidget::computeIndexMeshNormals() {
 		vnormals[i].Set(0, 0, 0);
 
 	for (i = 0; i < numface; i ++) {
-		HVertex &v1 = vertVec[faceVec[i].i];
-		HVertex &v2 = vertVec[faceVec[i].j];
-		HVertex &v3 = vertVec[faceVec[i].k];
+		HFace &f = faceVec[i];
+		HVertex &v1 = vertVec[f.i];
+		HVertex &v2 = vertVec[f.j];
+		HVertex &v3 = vertVec[f.k];
 
 		e1 = v3 - v1;
 		e2 = v2 - v1;
 		nm = e1 ^ e2;
 
-		vnormals[flist[i].verts[0]] += nm;
-		vnormals[flist[i].verts[1]] += nm;
-		vnormals[flist[i].verts[2]] += nm;
+		vnormals[f.i] += nm;
+		vnormals[f.j] += nm;
+		vnormals[f.k] += nm;
 
 		nm.Normalize();
 		fnormals[i] = nm;
@@ -695,8 +682,16 @@ void hGlWidget::computeIndexMeshNormals() {
 		vnormals[i].Normalize();	
 }
 
-void hGlWidget::calcBoundingBox()
-{
+void hGlWidget::setBoundingBox() {
+	_center_x = (_max_x + _min_x) / 2;
+	_center_y = (_max_y + _min_y) / 2;
+	_center_z = (_max_z + _min_z) / 2;
+	_max_of_three(_max_x - _min_x, _max_y - _min_y, _max_z - _min_z, _range);
+
+	_scale = 3 / _range;
+}
+
+void hGlWidget::calcPlyBoundingBox() {
 	if (nverts <= 0)
 		return;
 
@@ -731,10 +726,5 @@ void hGlWidget::calcBoundingBox()
 		}
 	}
 
-	_center_x = (_max_x + _min_x) / 2;
-	_center_y = (_max_y + _min_y) / 2;
-	_center_z = (_max_z + _min_z) / 2;
-	_max_of_three(_max_x - _min_x, _max_y - _min_y, _max_z - _min_z, _range);
-
-	_scale = 3 / _range;
+	setBoundingBox();
 }

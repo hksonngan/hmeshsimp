@@ -28,55 +28,15 @@ bool QuadricEdgeCollapse::addFace(const HFace& face) {
 	if (!PairCollapse::addFace(face))
 		return false;
 
-	// add the quadric matrix
-	//qMatrix.calcQem(vertices[face.i], vertices[face.j], vertices[face.k]);
-	float area = HFaceFormula::calcTriangleFaceArea(v(face.i), v(face.j), v(face.k));
-	//qMatrix *= area;
+	addFaceQuadric(face);
+	return true;
+}
 
-	//quadrics[face.i] += qMatrix;
-	//quadrics[face.j] += qMatrix;
-	//quadrics[face.k] += qMatrix;
+bool QuadricEdgeCollapse::addFace(const uint & index, const HFace& face) {
+	if (!PairCollapse::addFace(index, face))
+		return false;
 
-	/// below altered from _QSLIM_2.1_
-	uint i;
-
-	//Vec3 v1(m->vertex(f(0)));
-	//Vec3 v2(m->vertex(f(1)));
-	//Vec3 v3(m->vertex(f(2)));
-
-	Vec3 v1(v(face.i).x, v(face.i).y, v(face.i).z);
-	Vec3 v2(v(face.j).x, v(face.j).y, v(face.j).z);
-	Vec3 v3(v(face.k).x, v(face.k).y, v(face.k).z);
-
-	// calculating triangle plane formula
-	Vec4 p = (weighting_policy == MX_WEIGHT_RAWNORMALS) ?
-		triangle_raw_plane<Vec3,Vec4>(v1, v2, v3):
-	triangle_plane<Vec3,Vec4>(v1, v2, v3);
-	// retrieve the quadric matrix
-	Quadric Q(p[X], p[Y], p[Z], p[W], area);
-
-	switch( weighting_policy )
-	{
-	case MX_WEIGHT_ANGLE:
-		for(i = 0; i < 3; i ++)
-		{
-			Quadric Q_j = Q;
-			// by ht
-			//Q_j *= m->compute_corner_angle(i, j);
-			//quadrics(face[i]) += Q_j;
-		}
-		break;
-	case MX_WEIGHT_AREA:
-	case MX_WEIGHT_AREA_AVG:
-		Q *= Q.area();
-		// no break: fall through
-	default:
-		quadrics[face.i] += Q;
-		quadrics[face.j] += Q;
-		quadrics[face.k] += Q;
-		break;
-	}
-
+	addFaceQuadric(face);
 	return true;
 }
 
