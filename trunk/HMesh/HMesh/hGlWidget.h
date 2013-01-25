@@ -46,7 +46,8 @@ private:
 	void initTransform();
 	void computePlyNormals();
 	void computeIndexMeshNormals();
-	void calcBoundingBox();
+	void setBoundingBox();
+	void calcPlyBoundingBox();
 	void drawModel();
 	void drawTrisoup();
 	void drawMCTrisoup();

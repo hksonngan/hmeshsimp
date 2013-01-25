@@ -128,6 +128,7 @@ public:
 	virtual void addVertex(const HVertex& vert);
 	virtual void addVertex(const uint& index, const HVertex& vert, uchar mark);
 	virtual bool addFace(const HFace& face);
+	virtual bool addFace(const uint &index, const HFace &face);
 	// collect all valid pairs based on
 	// specific measurement after the 
 	// vertices and faces are ready

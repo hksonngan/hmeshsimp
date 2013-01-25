@@ -210,9 +210,10 @@ void MCSimp::polygonise(const UINT4& gridIndex, const GRIDCELL& grid)
        face.i = vertIndex[triTable[cubeindex][i]];
        face.j = vertIndex[triTable[cubeindex][i+1]];
        face.k = vertIndex[triTable[cubeindex][i+2]];
-	   pcol->addFace(face);
-	   genFaceCount ++;
-	   newFaceCount ++;
+	   if (pcol->addFace(genFaceCount, face)) {
+		   genFaceCount ++;
+		   newFaceCount ++;
+	   }
    }
 
    // finalize vertex
@@ -333,7 +334,6 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 	pcol = new QuadricEdgeCollapse();
 	UINT4 cubeIndex;
 	GRIDCELL cube;
-	bool init = true, first = true;
 
 	// init decimation
 	if (decimateRate < initDecimateRate) {
@@ -342,17 +342,17 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 			cubeIndex = volSet.cursor;
 
 			// FOR DEBUG
-			if (cubeIndex.s[0] == 59 && cubeIndex.s[1] == 34 && cubeIndex.s[2] == 0) {
-				int k = 0;
-				k ++;
-			}
+			//if (cubeIndex.s[0] == 67 && cubeIndex.s[1] == 55 && cubeIndex.s[2] == 0) {
+			//	int k = 0;
+			//	k ++;
+			//}
 
 			if (!volSet.nextCube(cube))
 				return false;
 			polygonise(cubeIndex, cube);
 
 			if (newFaceCount >= maxNewTri - 2) {
-				pcol->targetFace(newFaceCount * initDecimateRate);
+				pcol->targetFace(pcol->validFaces() * initDecimateRate);
 				newFaceCount = 0;
 				break;
 			}
@@ -367,8 +367,7 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 			// approximated decimate rate of this iteration is
 			// lower than the given decimate rate
 			initReadCount = maxNewTri - pcol->validFaces();
-			if ((pcol->validFaces() + initReadCount * initDecimateRate) / 
-				(genFaceCount + initReadCount) > decimateRate)
+			if (maxNewTri * initDecimateRate / (genFaceCount + initReadCount) < decimateRate)
 				break;
 
 			while (volSet.hasNext()) {
@@ -377,8 +376,8 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 					return false;
 				polygonise(cubeIndex, cube);
 
-				if (newFaceCount + pcol->validFaces() >= maxNewTri - 4) {
-					pcol->targetFace((newFaceCount + pcol->validFaces()) * initDecimateRate);
+				if (pcol->validFaces() >= maxNewTri - 4) {
+					pcol->targetFace(pcol->validFaces() * initDecimateRate);
 					newFaceCount = 0;
 					break;
 				}
@@ -393,9 +392,8 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 		polygonise(cubeIndex, cube);
 
 		if (newFaceCount >= maxNewTri - 2) {
-			pcol->targetFace(pcol->validFaces() + newFaceCount * decimateRate);
+			pcol->targetFace(pcol->validFaces() - newFaceCount + newFaceCount * decimateRate);
 			newFaceCount = 0;
-			break;
 		}
 	}
 

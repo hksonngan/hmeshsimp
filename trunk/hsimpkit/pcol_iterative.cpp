@@ -113,6 +113,43 @@ bool PairCollapse::addFace(const HFace &face) {
 	return true;
 }
 
+bool PairCollapse::addFace(const uint &index, const HFace &face) {
+	//face.sortIndex();
+	cface.set(face.i, face.j, face.k);
+
+	if (!cface.valid()) {
+		addInfo("#ERROR: duplicate verts in input face\n");
+		return false;
+	}
+#if ARRAY_USE == ARRAY_NORMAL
+	if (!cface.indicesInRange(0, vertices.count() - 1)) {
+		addInfo("#ERROR: vertex out of range in input face\n");
+		return false;
+	}
+#endif
+
+	uint id = index;
+#if ARRAY_USE == ARRAY_NORMAL
+	id = faces.count();
+	faces.push_back(cface);
+#else
+	faces.insert(ECFaceMap::value_type(id, cface));
+#endif
+
+	// add the face index to the vertices
+	v(face.i).adjacent_faces.push_back(id);
+	v(face.j).adjacent_faces.push_back(id);
+	v(face.k).adjacent_faces.push_back(id);
+
+	// set the new_id field
+	v(face.i).markv(REFERRED);
+	v(face.j).markv(REFERRED);
+	v(face.k).markv(REFERRED);
+
+	valid_faces ++;
+	return true;
+}
+
 void PairCollapse::addCollapsablePair(CollapsablePair *new_pair) {
 	v(new_pair->vert1).adjacent_col_pairs.push_back(new_pair);
 	v(new_pair->vert2).adjacent_col_pairs.push_back(new_pair);
