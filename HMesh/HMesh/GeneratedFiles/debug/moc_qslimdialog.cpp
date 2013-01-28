@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'qslimdialog.h'
 **
-** Created: Fri Jan 25 11:13:08 2013
+** Created: Mon Jan 28 00:33:10 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -12,6 +12,8 @@
 
 #include "ply/ply_inc.h"
 #include "mc.h"
+#include "dialog/mcsimpdialog.h"
+//#include "dialog/mcsimpdialog2.ui"
 
 using std::cout;
 using std::endl;
@@ -210,5 +212,11 @@ void HMesh::on_mcsimp() {
 	//"F:/raw/raw_sets/head/head.dat"
 	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
 
-	_hglwidget->setDrawMCSimp("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100, 0.3);
+	QMCSimpDialog mcsimpDialog;
+	int return_code = mcsimpDialog.exec();
+	if(return_code == QDialog::Rejected) {
+		return;
+	}
+
+	//_hglwidget->setDrawMCSimp("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100, 0.05, 5000);
 }
