@@ -212,7 +212,9 @@ void HMesh::on_mcsimp() {
 	//"F:/raw/raw_sets/head/head.dat"
 	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
 
-	QMCSimpDialog mcsimpDialog;
+	QMCSimpDialog mcsimpDialog(this);
+	connect(&mcsimpDialog, SIGNAL(mcsimpParams(string, double, double, unsigned int)), 
+			_hglwidget, SLOT(setDrawMCSimp(string, double, double, unsigned int)));
 	int return_code = mcsimpDialog.exec();
 	if(return_code == QDialog::Rejected) {
 		return;

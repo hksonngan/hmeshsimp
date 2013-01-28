@@ -29,7 +29,7 @@ void VolumeSet::trim(std::string &s)
 }
 
 // parse .dat file
-bool VolumeSet::parseDataFile(const std::string &name) {
+bool VolumeSet::parseDataFile(const std::string &name, bool allocMem) {
 	clear();
 	fileEndian = systemEndian;
 
@@ -45,12 +45,10 @@ bool VolumeSet::parseDataFile(const std::string &name) {
 	std::stringstream data(dataFileContent, std::stringstream::in);
 	bool error = false;
 	position = std::string::npos;
-	while (!data.eof())
-	{
+	while (!data.eof()) {
 		getline(data, line);
 		std::stringstream buffer(std::stringstream::in | std::stringstream::out);
-		if ((position = line.find("ObjectFileName")) != std::string::npos)
-		{
+		if ((position = line.find("ObjectFileName")) != std::string::npos) {
 			if ((position = line.find(':')) == std::string::npos)
 			{
 				error = true;
@@ -59,8 +57,7 @@ bool VolumeSet::parseDataFile(const std::string &name) {
 			objectFileName = line.substr(position + 1);
 			trim(objectFileName);
 		}
-		else if ((position = line.find("Resolution")) != std::string::npos)
-		{
+		else if ((position = line.find("Resolution")) != std::string::npos) {
 			if ((position = line.find(':')) == std::string::npos)
 			{
 				error = true;
@@ -78,8 +75,7 @@ bool VolumeSet::parseDataFile(const std::string &name) {
 			volumeSize.s[1] = y;
 			volumeSize.s[2] = z;
 		}
-		else if ((position = line.find("SliceThickness")) != std::string::npos)
-		{
+		else if ((position = line.find("SliceThickness")) != std::string::npos) {
 			if ((position = line.find(':')) == std::string::npos)
 			{
 				error = true;
@@ -97,8 +93,7 @@ bool VolumeSet::parseDataFile(const std::string &name) {
 			thickness.s[1] = y;
 			thickness.s[2] = z;
 		}
-		else if ((position = line.find("Format")) != std::string::npos)
-		{
+		else if ((position = line.find("Format")) != std::string::npos) {
 			if ((position = line.find(':')) == std::string::npos)
 			{
 				error = true;
@@ -140,8 +135,7 @@ bool VolumeSet::parseDataFile(const std::string &name) {
 		//		break;
 		//	}
 		//}
-		else if ((position = line.find("Endian")) != std::string::npos)
-		{
+		else if ((position = line.find("Endian")) != std::string::npos) {
 			if ((position = line.find(':')) == std::string::npos)
 			{
 				error = true;
@@ -161,14 +155,12 @@ bool VolumeSet::parseDataFile(const std::string &name) {
 				error = true;
 			}
 		}
-		else
-		{
+		else {
 			std::cerr << " > WARNING: skipping line \"" << line << "\"." << std::endl;
 		}
 	}
 
-	if (error)
-	{
+	if (error) {
 		std::cerr << " > ERROR: parsing \"" << line << "\"." << std::endl;
 		return false;
 	}
@@ -180,10 +172,13 @@ bool VolumeSet::parseDataFile(const std::string &name) {
 	}
 
 	cursor.s[0] = cursor.s[1] = cursor.s[2] = 0;
-	upper = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
-	lower = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
-	//_data = new Byte[volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize];
-	//readData(_data, volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize);
+
+	if (allocMem) {
+		upper = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
+		lower = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
+		//_data = new Byte[volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize];
+		//readData(_data, volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize);
+	}
 
 	std::cerr << std::endl;
 

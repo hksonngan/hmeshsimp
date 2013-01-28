@@ -51,7 +51,7 @@ public:
 public:
 	VolumeSet();
 	~VolumeSet();
-	bool parseDataFile(const std::string &name);
+	bool parseDataFile(const std::string &name, bool allocMem = true);
 	bool nextCube(GRIDCELL &cube);
 	bool hasNext();
 	void clear();

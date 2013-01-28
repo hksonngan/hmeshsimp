@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'hGlWidget.h'
 **
-** Created: Mon Jan 28 00:33:20 2013
+** Created: Mon Jan 28 22:14:54 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,18 +23,22 @@ static const uint qt_meta_data_hGlWidget[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       0,    0, // methods
+       1,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
 
+ // slots: signature, parameters, type, tag, flags
+      51,   11,   10,   10, 0x0a,
+
        0        // eod
 };
 
 static const char qt_meta_stringdata_hGlWidget[] = {
-    "hGlWidget\0"
+    "hGlWidget\0\0filename,isovalue,deimateRate,maxNewTri\0"
+    "setDrawMCSimp(string,double,double,uint)\0"
 };
 
 const QMetaObject hGlWidget::staticMetaObject = {
@@ -64,6 +68,13 @@ int hGlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     _id = QGLWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: setDrawMCSimp((*reinterpret_cast< string(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3])),(*reinterpret_cast< uint(*)>(_a[4]))); break;
+        default: ;
+        }
+        _id -= 1;
+    }
     return _id;
 }
 QT_END_MOC_NAMESPACE
