@@ -22,6 +22,7 @@
 using namespace icesop;
 
 using std::vector;
+using std::string;
 
 enum PrimitiveMode { SMOOTH, FLAT, FLAT_LINES, WIREFRAME };
 enum ColorMode { VERT_COLOR, FACE_COLOR };
@@ -57,6 +58,9 @@ private:
 	void setMaterial();
 	void applyTransform();
 
+public slots:
+	void setDrawMCSimp(string filename, double isovalue, double deimateRate, unsigned int maxNewTri);
+
 public:
 	hGlWidget();
 	~hGlWidget();
@@ -64,7 +68,6 @@ public:
 	void setDrawPly();
 	void setDrawTris();
 	bool setDrawMC(std::string filename, double isovalue);
-	bool setDrawMCSimp(std::string filename, double isovalue, double deimateRate, unsigned int maxNewTri);
 	void openFile(QString _file_name);
 
 	void primitiveMode(PrimitiveMode m) { _primitive_mode = m; }

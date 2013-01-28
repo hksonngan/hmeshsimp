@@ -167,12 +167,12 @@ bool hGlWidget::setDrawMC(std::string filename, double isovalue) {
 	return true;
 }
 
-bool hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deimateRate, unsigned int maxNewTri) {
+void hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deimateRate, unsigned int maxNewTri) {
 	MCSimp mcsimp;
 
 	if (!mcsimp.genCollapse(filename, isovalue, deimateRate, maxNewTri, numvert, numface)) {
 		cerr << "#error occurred during simplification" << endl << endl;
-		return false;
+		return;
 	}
 
 	vertVec.resize(numvert);
@@ -193,7 +193,6 @@ bool hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deim
 
 	_drawWhich = DRAW_H_INDEXED_MESH;
 	update();
-	return true;
 }
 
 void hGlWidget::mousePressEvent(QMouseEvent * event)
