@@ -167,10 +167,10 @@ bool hGlWidget::setDrawMC(std::string filename, double isovalue) {
 	return true;
 }
 
-bool hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deimateRate) {
+bool hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deimateRate, unsigned int maxNewTri) {
 	MCSimp mcsimp;
 
-	if (!mcsimp.genCollapse(filename, isovalue, 0.25, 2000, numvert, numface)) {
+	if (!mcsimp.genCollapse(filename, isovalue, deimateRate, maxNewTri, numvert, numface)) {
 		cerr << "#error occurred during simplification" << endl << endl;
 		return false;
 	}

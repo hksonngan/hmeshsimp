@@ -64,7 +64,7 @@ public:
 	void setDrawPly();
 	void setDrawTris();
 	bool setDrawMC(std::string filename, double isovalue);
-	bool setDrawMCSimp(std::string filename, double isovalue, double deimateRate);
+	bool setDrawMCSimp(std::string filename, double isovalue, double deimateRate, unsigned int maxNewTri);
 	void openFile(QString _file_name);
 
 	void primitiveMode(PrimitiveMode m) { _primitive_mode = m; }
