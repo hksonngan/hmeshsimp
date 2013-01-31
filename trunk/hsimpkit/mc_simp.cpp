@@ -260,28 +260,12 @@ void MCSimp::polygonise(const UINT4& gridIndex, const GRIDCELL& grid)
 
 void MCSimp::finalizeVert(const uint &index, const HVertex &v) {
 	CollapsableVertex &cv = pcol->v(index);
-	if (cv.mark == FINAL)
+	if (cv.finalized())
 		return;
 
 	// first erase from the vertex map
 	vertexMap.erase(v);
-
-	// add pairs
-	vert_arr starVertices;
-	face_arr _faces;
-	pcol->collectStarVertices(index, &starVertices);
-	for (int j = 0; j < starVertices.count(); j ++) {
-		CollapsableVertex &cv2 = pcol->v(starVertices[j]);
-		// add specific edge only once
-		// never collapse the exterior vertices
-		if (cv2.mark == FINAL) {
-			CollapsablePair *new_pair = new CollapsablePair(index, starVertices[j]);
-			new_pair->keepOrder();
-			pcol->addCollapsablePair(new_pair);
-		}
-	}
-
-	cv.markv(FINAL);
+	pcol->finalizeVert(index);
 }
 
 bool MCSimp::genCollapse(
@@ -312,30 +296,22 @@ bool MCSimp::genCollapse(
 		// first read in maxNewTri triangles and decimate based on initDecimateRate
 		while (volSet.hasNext()) {
 			cubeIndex = volSet.cursor;
-
 			if (!volSet.nextCube(cube))
 				return false;
 			polygonise(cubeIndex, cube);
 
 			if (newFaceCount >= maxNewTri - 2) {
-				pcol->targetFace(pcol->validFaces() * initDecimateRate);
+				pcol->targetFace(pcol->collapsableFaces() * initDecimateRate + pcol->uncollapsableFaces());
 				newFaceCount = 0;
 				break;
 			}
 		}
 
-		// than read in maxNewTri * (1 - initDecimateRate) triangles and decimate  
-		// til the triangles left equal to maxNewTri * initDecimateRate.
-		// The outer loop stops when the true decimate rate will be lower than
-		// the given decimate rate next time.
+		// in each loop read till there are maxNewTri triangles in the buffer
+		// the loop stops when the true decimate rate will be lower than the 
+		// given decimate rate next time.
 		unsigned int initReadCount;
-		while (true) {
-			// approximated decimate rate of this iteration is
-			// lower than the given decimate rate
-			initReadCount = maxNewTri - pcol->validFaces();
-			if (maxNewTri * initDecimateRate / (genFaceCount + initReadCount) < decimateRate)
-				break;
-
+		while (volSet.hasNext()) {
 			while (volSet.hasNext()) {
 				cubeIndex = volSet.cursor;
 				if (!volSet.nextCube(cube))
@@ -343,7 +319,14 @@ bool MCSimp::genCollapse(
 				polygonise(cubeIndex, cube);
 
 				if (pcol->validFaces() >= maxNewTri - 4) {
-					pcol->targetFace(pcol->validFaces() * initDecimateRate);
+					// approximated decimate rate of this iteration is
+					// lower than the given decimate rate
+					if (pcol->collapsableFaces() * initDecimateRate /
+						(genFaceCount - pcol->uncollapsableFaces()) < decimateRate) {
+						newFaceCount = 0;
+						break;
+					} else
+						pcol->targetFace(pcol->collapsableFaces() * initDecimateRate + pcol->uncollapsableFaces());
 					newFaceCount = 0;
 					break;
 				}
@@ -351,6 +334,7 @@ bool MCSimp::genCollapse(
 		}
 	}
 
+	unsigned int lastCollapsableFaces = pcol->collapsableFaces();
 	while (volSet.hasNext()) {
 		cubeIndex = volSet.cursor;
 		if (!volSet.nextCube(cube))
@@ -358,7 +342,10 @@ bool MCSimp::genCollapse(
 		polygonise(cubeIndex, cube);
 
 		if (newFaceCount >= maxNewTri - 2) {
-			pcol->targetFace(pcol->validFaces() - newFaceCount + newFaceCount * decimateRate);
+			pcol->targetFace(
+				lastCollapsableFaces + (pcol->collapsableFaces() - lastCollapsableFaces) * decimateRate 
+				+ pcol->uncollapsableFaces());
+			lastCollapsableFaces = pcol->collapsableFaces();
 			newFaceCount = 0;
 		}
 	}

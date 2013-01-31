@@ -52,19 +52,16 @@ public:
 	CollapsedVertex() { markv(UNREFER); };
 	void setNewId(uint _id) { new_id = _id; }
 	void setOutId(uint _id) { output_id = _id; }
-	void markv(uchar m) { 
-		if (m == REFERRED) {
-			if (mark == UNREFER)
-				mark = REFERRED;
-		}
-		else
-			mark = m;
- 	}
+	void markv(uchar m) { mark = m; }
+	void unfinal() { mark = UNFINAL; }
+	void finalize() { mark = FINAL; }
+
 	bool valid(uint v_index) const { return v_index == new_id; } /* valid referred to uncollapsed */
-	bool unreferred() { return mark == UNREFER; }
-	bool interior() { return mark != EXTERIOR; }
-	bool interior_bound() { return mark == INTERIOR_BOUND; }
-	bool exterior() { return mark == EXTERIOR; }
+	bool unreferred() const { return mark == UNREFER; }
+	bool interior() const { return mark != EXTERIOR; }
+	bool interior_bound() const { return mark == INTERIOR_BOUND; }
+	bool exterior() const { return mark == EXTERIOR; }
+	bool finalized() const { return mark == FINAL; }
 };
 
 /* in-core version */

@@ -258,15 +258,6 @@ bool VolumeSet::nextCube(GRIDCELL &cube) {
 	cube.val[6] = getDense(upper, cursor.s[0]+1, cursor.s[1]+1);
 	cube.val[7] = getDense(upper, cursor.s[0],   cursor.s[1]+1);
 
-	//cube.val[0] = getDense2(cursor.s[0],   cursor.s[1],   cursor.s[2]+1);
-	//cube.val[1] = getDense2(cursor.s[0]+1, cursor.s[1],   cursor.s[2]+1);
-	//cube.val[2] = getDense2(cursor.s[0]+1, cursor.s[1]+1, cursor.s[2]+1);
-	//cube.val[3] = getDense2(cursor.s[0],   cursor.s[1]+1, cursor.s[2]+1);
-	//cube.val[4] = getDense2(cursor.s[0],   cursor.s[1],   cursor.s[2]);
-	//cube.val[5] = getDense2(cursor.s[0]+1, cursor.s[1],   cursor.s[2]);
-	//cube.val[6] = getDense2(cursor.s[0]+1, cursor.s[1]+1, cursor.s[2]);
-	//cube.val[7] = getDense2(cursor.s[0],   cursor.s[1]+1, cursor.s[2]);
-
 	cursor.s[0] ++;
 	// max cube index is one less than max slice index
 	if (cursor.s[0] == volumeSize.s[0] - 1) {

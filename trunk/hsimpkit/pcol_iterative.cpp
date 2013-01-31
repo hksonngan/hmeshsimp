@@ -12,6 +12,7 @@ PairCollapse::PairCollapse() {
 
 	valid_verts = 0;
 	valid_faces = 0;
+	uncollpasble_face_count = 0;
 
 #ifdef _VERBOSE
 	merge_face_count = 1;
@@ -56,9 +57,8 @@ void PairCollapse::addVertex(const HVertex& vert) {
 	valid_verts ++;
 }
 
-void PairCollapse::addVertex(const uint& index, const HVertex& vert, uchar mark) {
+void PairCollapse::addVertex(const uint& index, const HVertex& vert, CollapsableVertex *&rcolvert) {
 	cvert.Set(vert.x, vert.y, vert.z);
-	cvert.markv(mark);
 
 #if ARRAY_USE == ARRAY_NORMAL
 	cvert.setNewId(index);
@@ -73,6 +73,7 @@ void PairCollapse::addVertex(const uint& index, const HVertex& vert, uchar mark)
 #endif
 
 	valid_verts ++;
+	rcolvert = &(v(index));
 }
 
 bool PairCollapse::addFace(const HFace &face) {
@@ -104,7 +105,6 @@ bool PairCollapse::addFace(const HFace &face) {
 	v(face.j).adjacent_faces.push_back(id);
 	v(face.k).adjacent_faces.push_back(id);
 
-	// set the new_id field
 	v(face.i).markv(REFERRED);
 	v(face.j).markv(REFERRED);
 	v(face.k).markv(REFERRED);
@@ -141,12 +141,8 @@ bool PairCollapse::addFace(const uint &index, const HFace &face) {
 	v(face.j).adjacent_faces.push_back(id);
 	v(face.k).adjacent_faces.push_back(id);
 
-	// set the new_id field
-	v(face.i).markv(REFERRED);
-	v(face.j).markv(REFERRED);
-	v(face.k).markv(REFERRED);
-
 	valid_faces ++;
+	uncollpasble_face_count ++;
 	return true;
 }
 
@@ -323,12 +319,6 @@ bool PairCollapse::writePly(char* filename) {
 	fout << "end_header" << endl;
 
 	uint valid_vert_count = 0;
-	//for (i = 0; i < vertices.count(); i ++)
-	//	if (vertices[i].valid(i) && !vertices[i].unreferred()) {
-	//		fout << vertices[i].x << " " << vertices[i].y << " " << vertices[i].z << endl;
-	//		vertices[i].output_id = valid_vert_count;
-	//		valid_vert_count ++;
-	//	}
 	_for_loop(vertices, ECVertexMap) {
 		CollapsableVertex& cvert = _retrieve_elem(vertices);	
 		if (cvert.valid(_retrieve_index()) && !cvert.unreferred()) {
@@ -339,13 +329,6 @@ bool PairCollapse::writePly(char* filename) {
 	}
 
 	uint valid_face_count = 0;
-	//for (i = 0; i < faces.count(); i ++) 
-	//	if (faces[i].valid()) {
-	//		fout << "3 " << vertices[faces[i].i].output_id << " "
-	//			<< vertices[faces[i].j].output_id << " "
-	//			<< vertices[faces[i].k].output_id << endl;
-	//		valid_face_count ++;
-	//	}
 	_for_loop(faces, ECFaceMap) {
 		CollapsableFace& cface = _retrieve_elem(faces);
 		if (cface.valid()) {

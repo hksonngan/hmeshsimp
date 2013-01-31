@@ -85,7 +85,9 @@ private:
 unsigned int MCSimp::getVertIndex(const HVertex &v) {
 	VertexIndexMap::iterator iter = vertexMap.find(v);
 	if (iter == vertexMap.end()) {
-		pcol->addVertex(genVertCount, v, UNFINAL);
+		CollapsableVertex *pcv;
+		pcol->addVertex(genVertCount, v, pcv);
+		pcv->unfinal();
 		vertexMap[v] = genVertCount ++;
 		return genVertCount - 1;
 	} else {
