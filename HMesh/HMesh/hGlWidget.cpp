@@ -1,6 +1,8 @@
 #include "hGlWidget.h"
 
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 #include "common.h"
 #include "icesop_common.h"
 #include "ply/ply_inc.h"
@@ -10,6 +12,7 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::ostringstream;
 
 #define _max_of_three(a, b, c, _max)  _max = max(a, b); _max = max(c, _max);
 
@@ -146,14 +149,16 @@ void hGlWidget::setDrawTris()
 	update();
 }
 
-bool hGlWidget::setDrawMC(std::string filename, double isovalue) {
+bool hGlWidget::setDrawMC(string filename, double isovalue) {
 	_mc_tris.clear();
 	MCSimp mcsimp;
 
 	if (!mcsimp.genIsosurfaces(filename, isovalue, _mc_tris))
 		return false;
 
-	std::cout << "#iso surfaces gened, faces count: " << _mc_tris.size() << std::endl;
+	ofstream fout("gensimp.log", ofstream::app | ofstream::out);
+	cout << mcsimp.info();
+	fout << mcsimp.info();
 
 	// bounding boxes
 	VolumeSet* volSet = mcsimp.getVolSet();
@@ -178,12 +183,12 @@ void hGlWidget::setDrawMCSimp(std::string filename, double isovalue, double deim
 	vertVec.resize(numvert);
 	faceVec.resize(numface);
 	mcsimp.toIndexedMesh(vertVec.data(), faceVec.data());
+
+	ofstream fout("gensimp.log", ofstream::app | ofstream::out);
+	fout << mcsimp.info();
+	cout << mcsimp.info();
+
 	computeIndexMeshNormals();
-
-	cout << "#iso-surfaces decimated" << endl
-		<< "#generated faces: " << mcsimp.getGenFaceCount() << ", vertices: " << mcsimp.getGenVertCount() << endl
-		<< "#simplified faces: " << numface << ", vertices: " << numvert << endl << endl;
-
 	// bounding boxes
 	VolumeSet* volSet = mcsimp.getVolSet();
 	_max_x = volSet->thickness.s[0] * volSet->volumeSize.s[0]; _min_x = 0;
@@ -551,7 +556,6 @@ void hGlWidget::drawIndexedMesh() {
 }
 
 void hGlWidget::initTransform() {
-
 	memset (_glmat, 0, sizeof (_glmat));
 	_glmat[0] = _glmat[5] = _glmat[10] = _glmat[15] = 1;
 	_scale = 10.0;
@@ -561,7 +565,6 @@ void hGlWidget::initTransform() {
 }
 
 void hGlWidget::applyTransform() {
-
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(0.0, 0.0, -5.0);

@@ -60,6 +60,7 @@ private:
 
 public slots:
 	void setDrawMCSimp(string filename, double isovalue, double deimateRate, unsigned int maxNewTri);
+	bool setDrawMC(string filename, double isovalue);
 
 public:
 	hGlWidget();
@@ -67,7 +68,6 @@ public:
 	void setDrawQSlim();
 	void setDrawPly();
 	void setDrawTris();
-	bool setDrawMC(std::string filename, double isovalue);
 	void openFile(QString _file_name);
 
 	void primitiveMode(PrimitiveMode m) { _primitive_mode = m; }

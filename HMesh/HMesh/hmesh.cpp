@@ -13,12 +13,10 @@
 #include "ply/ply_inc.h"
 #include "mc.h"
 #include "dialog/mcsimpdialog.h"
-//#include "dialog/mcsimpdialog2.ui"
+#include "dialog/mcdialog.h"
 
 using std::cout;
 using std::endl;
-
-//using namespace std;
 
 HMesh::HMesh(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
@@ -203,7 +201,12 @@ void HMesh::on_mc() {
 	//"F:/raw/raw_sets/head/head.dat"
 	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
 
-	_hglwidget->setDrawMC("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100.5);
+	QMCDialog mcDialog(this);
+	connect(&mcDialog, SIGNAL(mcParams(string, double)), 
+			_hglwidget, SLOT(setDrawMC(string, double)));
+	mcDialog.exec();
+
+	//_hglwidget->setDrawMC("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100.5);
 }
 
 void HMesh::on_mcsimp() {
@@ -219,6 +222,4 @@ void HMesh::on_mcsimp() {
 	if(return_code == QDialog::Rejected) {
 		return;
 	}
-
-	//_hglwidget->setDrawMCSimp("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100, 0.05, 5000);
 }
