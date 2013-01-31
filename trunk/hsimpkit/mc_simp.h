@@ -28,11 +28,7 @@ typedef Byte *pByte;
 
 class MCSimp {
 private:
-	PairCollapse	*pcol;
-	//float			decimateRate;
-	//HVertex		MCCoordStart;	// the top-left coordinate of all cubes
-	//HVertex		cubeLen;		// the length of each edge of the cube in three dimensions
-	//HTriple<uint>	sliceCount;
+	PairCollapse*	pcol;
 	double			isovalue;
 	VolumeSet		volSet;
 	VertexIndexMap	vertexMap;
@@ -51,41 +47,27 @@ private:
 	vector<HVertex>	verts;
 	vector<HFace>	faces;
 
+	string			INFO;
+
 public:
 	MCSimp(double _initDecimateRate = 0.5);
-	//MCSimp(
-	//	float _decimateRate, 
-	//	HTriple<uint> _sliceCount,
-	//	HVertex _cubeLen, 
-	//	HVertex *_pMCCoordStart = NULL);
 	~MCSimp();
-
-	bool addTriangles(
-		Byte *data, 
-		uint nTri, 
-		uint triSize,  
-		uint vertCoordFirstDimOffSet, 
-		uint vertCoordSecondDimOffSet, 
-		uint vertCoordThirdDimOffSet,
-		DATA_TYPE coordDataType = DFLOAT);
 
 	VolumeSet* getVolSet() { return &volSet; }
 	unsigned int getGenFaceCount() { return genFaceCount; }
 	unsigned int getGenVertCount() { return genVertCount; }
 
 	bool genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> &tris);
-	bool genCollapse(string filename, double _isovalue, double decimateRate, 
-		unsigned int maxNewTri, unsigned int &nvert, unsigned int &nface);
+	bool genCollapse(
+			string filename, double _isovalue, double decimateRate, 
+			unsigned int maxNewTri, unsigned int &nvert, unsigned int &nface);
 	void toIndexedMesh(HVertex *vertArr, HFace *faceArr);
 
+	string& info() { return INFO; }
+	void addInfo(const string &str) { INFO += str; }
+	void clearInfo() { INFO = ""; }
+
 private:
-	inline void getVert(
-		HVertex &vert, 
-		DataType dataType, 
-		pByte data,
-		uint vertCoordFirstDimOffSet, 
-		uint vertCoordSecondDimOffSet, 
-		uint vertCoordThirdDimOffSet);
 	XYZ vertexInterp(XYZ p1, XYZ p2, double valp1, double valp2, InterpOnWhich& onWhich);
 	void polygonise(const UINT4& gridIndex, const GRIDCELL& grid);
 	inline unsigned int getVertIndex(const HVertex &v);
@@ -99,18 +81,6 @@ private:
 	inline bool backDownMost(const UINT4 &cubeIndex);
 	inline bool rightBackDownMost(const UINT4 &cubeIndex);
 };
-
-void MCSimp::getVert(
-	HVertex &vert, 
-	DataType dataType, 
-	pByte data,
-	uint vertCoordFirstDimOffSet, 
-	uint vertCoordSecondDimOffSet, 
-	uint vertCoordThirdDimOffSet) {
-	vert.x = dataType.getValue<float>(data + vertCoordFirstDimOffSet);
-	vert.y = dataType.getValue<float>(data + vertCoordSecondDimOffSet);
-	vert.z = dataType.getValue<float>(data + vertCoordThirdDimOffSet);
-}
 
 unsigned int MCSimp::getVertIndex(const HVertex &v) {
 	VertexIndexMap::iterator iter = vertexMap.find(v);

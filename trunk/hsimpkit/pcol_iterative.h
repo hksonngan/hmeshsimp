@@ -29,7 +29,7 @@
 #endif
 
 #include <algorithm>
-#include <string.h>
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <boost/unordered_map.hpp>
@@ -201,15 +201,10 @@ public:
 	inline uint faceCount() const;
 	uint validVerts() const { return valid_verts; }
 	uint validFaces() const { return valid_faces; }
-	// these accessors will not add any element if no such
-	// element exists, otherwise it will return a random
-	// new created element which are usually invalid one
-	// not residing in the container, modifying this object
-	// is meaningless
 	inline CollapsableVertex& v(uint i);
 	inline CollapsableFace& f(uint i);
 	inline bool f_interior (int i);
-	// !! test if a face is valid should always use this
+	// testing if a face is valid should always use this
 	inline bool face_is_valid(uint i) const;
 
 

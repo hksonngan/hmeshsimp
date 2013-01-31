@@ -1,23 +1,9 @@
 #include "mc_simp.h"
 
-//MCSimp::MCSimp(
-//	float _decimateRate, 
-//	HTriple<uint> _sliceCount,
-//	HVertex _cubeLen, 
-//	HVertex *_pMCCoordStart):
-// decimateRate(_decimateRate),
-// sliceCount(_sliceCount),
-// cubeLen(_cubeLen) {
-//	pcol = new QuadricEdgeCollapse();
-//	if (_pMCCoordStart) 
-//		MCCoordStart = *_pMCCoordStart;
-//	else
-//		MCCoordStart.Set(0, 0, 0);
-//}
-
 MCSimp::MCSimp(double _initDecimateRate): 
 	initDecimateRate(_initDecimateRate),
-	pcol(NULL) {
+	pcol(NULL),
+	INFO("") {
 }
 
 MCSimp::~MCSimp() {
@@ -25,36 +11,10 @@ MCSimp::~MCSimp() {
 		delete pcol;
 }
 
-bool MCSimp::addTriangles(
-	  Byte *data, 
-	  uint nTri, 
-	  uint vertSize,  
-	  uint vertCoordFirstDimOffSet, 
-	  uint vertCoordSecondDimOffSet, 
-	  uint vertCoordThirdDimOffSet,
-	  DATA_TYPE coordDataType) {
-
-	HVertex vert1, vert2, vert3;
-	DataType dataType(coordDataType);
-
-	for (int i = 0; i < nTri; i ++) {
-		getVert(vert1, dataType, data, vertCoordFirstDimOffSet, 
-			vertCoordSecondDimOffSet, vertCoordThirdDimOffSet);
-		data += vertSize;
-		getVert(vert1, dataType, data, vertCoordFirstDimOffSet, 
-			vertCoordSecondDimOffSet, vertCoordThirdDimOffSet);
-		data += vertSize;
-		getVert(vert1, dataType, data, vertCoordFirstDimOffSet, 
-			vertCoordSecondDimOffSet, vertCoordThirdDimOffSet);
-		data += vertSize;
-		
-		
-	}
-
-	return true;
-}
-
 bool MCSimp::genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> &tris) { 
+	HAugTime htime;
+	clearInfo();
+
 	if (!volSet.parseDataFile(filename))
 		return false;
 
@@ -70,6 +30,13 @@ bool MCSimp::genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> 
 		for (i = 0; i < ncubetris; i ++)
 			tris.push_back(cubetris[i]);
 	}
+
+	ostringstream oss;
+	oss << "#iso surfaces generated" << endl
+		<< "#volume set resolution: " << volSet.volumeSize.s[0] << "x" << volSet.volumeSize.s[1] << "x" << volSet.volumeSize.s[2] << endl
+		<< "#generated faces: " << tris.size() << endl 
+		<< "#time consuming: " << htime.printElapseSec() << endl << endl;
+	addInfo(oss.str());
 
 	return true;
 }
@@ -317,8 +284,13 @@ void MCSimp::finalizeVert(const uint &index, const HVertex &v) {
 	cv.markv(FINAL);
 }
 
-bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate, 
-				unsigned int maxNewTri, unsigned int &nvert, unsigned int &nface) {
+bool MCSimp::genCollapse(
+		string filename, double _isovalue, double decimateRate, 
+		unsigned int maxNewTri, unsigned int &nvert, unsigned int &nface) 
+{
+	HAugTime htime;
+	clearInfo();
+
 	if (decimateRate <= 0 || decimateRate >= 1)
 		return false;
 	isovalue = _isovalue;
@@ -340,12 +312,6 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 		// first read in maxNewTri triangles and decimate based on initDecimateRate
 		while (volSet.hasNext()) {
 			cubeIndex = volSet.cursor;
-
-			// FOR DEBUG
-			//if (cubeIndex.s[0] == 67 && cubeIndex.s[1] == 55 && cubeIndex.s[2] == 0) {
-			//	int k = 0;
-			//	k ++;
-			//}
 
 			if (!volSet.nextCube(cube))
 				return false;
@@ -401,6 +367,14 @@ bool MCSimp::genCollapse(string filename, double _isovalue, double decimateRate,
 	
 	nvert = pcol->validVerts();
 	nface = pcol->validFaces();
+
+	ostringstream oss;
+	oss << "#iso surfaces decimated" << endl
+		<< "#volume set resolution: " << volSet.volumeSize.s[0] << "x" << volSet.volumeSize.s[1] << "x" << volSet.volumeSize.s[2] << endl
+		<< "#generated faces: " << genFaceCount << ", vertices: " << genVertCount << endl
+		<< "#simplified faces: " << nface << ", vertices: " << nvert << endl 
+		<< "#time consuming: " << htime.printElapseSec() << endl << endl;
+	addInfo(oss.str());
 
 	return true;
 }
