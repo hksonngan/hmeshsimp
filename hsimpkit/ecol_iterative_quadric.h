@@ -52,6 +52,7 @@ public:
 	virtual void allocVerts(uint _vert_count);
 	inline void addFaceQuadric(const HFace& face);
 	virtual bool addFace(const HFace& face);
+	// used for incremental simplification
 	virtual bool addFace(const uint & index, const HFace& face);
 	virtual void addCollapsablePair(CollapsablePair *new_pair);
 	virtual void collectPairs();

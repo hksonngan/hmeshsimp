@@ -112,7 +112,8 @@ private:
 #endif
 };
 
-class PairCollapse {
+class PairCollapse 
+{
 public:
 
 	/////////////////////////////////////
@@ -126,8 +127,9 @@ public:
 	virtual void allocFaces(uint _face_count);
 	// DO add vertices first and completely
 	virtual void addVertex(const HVertex& vert);
-	virtual void addVertex(const uint& index, const HVertex& vert, uchar mark);
+	virtual void addVertex(const uint& index, const HVertex& vert, CollapsableVertex *&rcolvert);
 	virtual bool addFace(const HFace& face);
+	// used for incremental simplification
 	virtual bool addFace(const uint &index, const HFace &face);
 	// collect all valid pairs based on
 	// specific measurement after the 
@@ -170,7 +172,7 @@ public:
 	// this function should be overrided
 	// in specific derivative class
 	virtual HVertex evaluatePair(CollapsablePair *pair) = 0;
-	// !!an important function
+	// an important function
 	virtual void collapsePair(pCollapsablePair pair);
 
 	// guarantee vert1 < vert2 for all pairs in the arr
@@ -194,6 +196,9 @@ public:
 	inline void collectMarkFaces(face_arr &faces_in, face_arr &faces_out, unsigned char m);
 	inline void removeFace(uint i);
 
+	// used for incremental simplification
+	inline void finalizeVert(const uint &index);
+
 	///////////////////////////////////////
 	// Accessors
 
@@ -201,6 +206,8 @@ public:
 	inline uint faceCount() const;
 	uint validVerts() const { return valid_verts; }
 	uint validFaces() const { return valid_faces; }
+	uint uncollapsableFaces() const { return uncollpasble_face_count; }
+	uint collapsableFaces() const { return valid_faces - uncollpasble_face_count; }
 	inline CollapsableVertex& v(uint i);
 	inline CollapsableFace& f(uint i);
 	inline bool f_interior (int i);
@@ -246,21 +253,22 @@ protected:
 	ECVertexMap	vertices;
 	ECFaceMap	faces;
 #endif
-	uint	valid_verts;
-	uint	valid_faces;
-	MxHeap	pair_heap;
+	uint		valid_verts;
+	uint		valid_faces;
+	uint		uncollpasble_face_count;
 
-	FaceIndexComp	faceIndexComp;
+	MxHeap		pair_heap;
 
-	string info;
-
-	HAugTime read_time, run_time, write_time;
+	string		info;
+	HAugTime	read_time, run_time, write_time;
 
 	/////////////////////////////////////
 	// assisting temporal variables
 	CollapsableVertex	cvert;
-	CollapsableFace	cface;
-	vert_arr	starVerts1, starVerts2;
+	CollapsableFace		cface;
+	vert_arr			starVerts1, starVerts2;
+
+	FaceIndexComp		faceIndexComp;
 
 #ifdef _VERBOSE
 	int merge_face_count;
@@ -624,6 +632,46 @@ void PairCollapse::removeFace(uint i) {
 	//cface = f(i);
 #endif
 	valid_faces --;
+}
+
+void PairCollapse::finalizeVert(const uint &index) {
+	CollapsableVertex &cv = v(index);
+
+	int i, j;
+	bool addable;
+	// add collapsible faces
+	face_arr &faceIndices = cv.adjacent_faces;
+	for (i = 0; i < faceIndices.count(); i ++) {
+		if (face_is_valid(faceIndices[i])) {
+			addable = true;
+			CollapsableFace& face = f(faceIndices[i]);
+			if (face.i != index && !v(face.i).finalized())
+				addable = false;
+			if (face.j != index && !v(face.j).finalized())
+				addable = false;
+			if (face.k != index && !v(face.k).finalized())
+				addable = false;
+			if (addable)
+				uncollpasble_face_count --;
+		}
+	}
+
+	// add pairs
+	vert_arr starVertices;
+	face_arr _faces;
+	collectStarVertices(index, &starVertices);
+	for (i = 0; i < starVertices.count(); i ++) {
+		CollapsableVertex &cv2 = v(starVertices[i]);
+		// add specific edge only once
+		// never collapse the exterior vertices
+		if (cv2.mark == FINAL) {
+			CollapsablePair *new_pair = new CollapsablePair(index, starVertices[i]);
+			new_pair->keepOrder();
+			addCollapsablePair(new_pair);
+		}
+	}
+
+	cv.finalize();
 }
 
 bool PairCollapse::face_is_valid(uint i) const {

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'hGlWidget.h'
 **
-** Created: Mon Jan 28 22:14:54 2013
+** Created: Thu Jan 31 12:19:31 2013
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_hGlWidget[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -32,6 +32,7 @@ static const uint qt_meta_data_hGlWidget[] = {
 
  // slots: signature, parameters, type, tag, flags
       51,   11,   10,   10, 0x0a,
+     115,   97,   92,   10, 0x0a,
 
        0        // eod
 };
@@ -39,6 +40,7 @@ static const uint qt_meta_data_hGlWidget[] = {
 static const char qt_meta_stringdata_hGlWidget[] = {
     "hGlWidget\0\0filename,isovalue,deimateRate,maxNewTri\0"
     "setDrawMCSimp(string,double,double,uint)\0"
+    "bool\0filename,isovalue\0setDrawMC(string,double)\0"
 };
 
 const QMetaObject hGlWidget::staticMetaObject = {
@@ -71,9 +73,11 @@ int hGlWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: setDrawMCSimp((*reinterpret_cast< string(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3])),(*reinterpret_cast< uint(*)>(_a[4]))); break;
+        case 1: { bool _r = setDrawMC((*reinterpret_cast< string(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
         default: ;
         }
-        _id -= 1;
+        _id -= 2;
     }
     return _id;
 }
