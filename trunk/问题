@@ -1,3 +1,7 @@
 2013.1.25
 1 读进一部分进行简化的时候，虽然genFacesCount为指定数目，而其中有一些是不能被collapse的，是否应该在指定简化数量的时候做考虑
 2 边界保持貌似这里依然有效
+
+2013.2.8
+1 finalize vertex的同时vertex decimation，可能会加快速度
+2 用multiple random choice可能提高速度
