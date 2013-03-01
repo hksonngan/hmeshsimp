@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pAdapIsoLib.lib"
+				AdditionalDependencies="pAdapIsoLib.lib cudart.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(OutDir)/"
 				GenerateDebugInformation="true"

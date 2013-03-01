@@ -1,32 +1,30 @@
 /*
- * Copyright 1993-2010 NVIDIA Corporation.  All rights reserved.
+ *  Adaptively Generate the Iso-surfaces in Parallel
+ *  Run On the Host Invoking the Cuda Kernel
  *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
  *
+ *  Copyright (C) Ht. All rights reserved.
  */
-
-/* Template project which demonstrates the basics on how to setup a project 
-* example application.
-* Host code.
-*/
 
 // includes, system
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <string>
 
 // includes CUDA
 #include <cuda_runtime.h>
 
-// includes, project
-//#include <sdkHelper.h>  // helper for shared that are common to CUDA SDK samples
-//#include <shrQATest.h>  // This is for automated testing output (--qatest)
-//#include <shrUtils.h>
+// projcet includes
+#include "nvtimer.h"
+#include "vol_set.h"
+
+#define ___OUT
+
+using std::string;
 
 #ifndef MIN
 #define MIN(a,b) ((a < b) ? a : b)
@@ -35,30 +33,29 @@
 #define MAX(a,b) ((a > b) ? a : b)
 #endif
 
-// includes, kernels
-//#include <template_kernel.cu>
 __global__ void testKernel( float* g_idata, float* g_odata);
 
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
 void runTest( int argc, char** argv);
 
-//extern "C"
-//void computeGold( float* reference, float* idata, const unsigned int len);
-
 ////////////////////////////////////////////////////////////////////////////////
 // These are CUDA Helper functions
 
 // This will output the proper CUDA error strings in the event that a CUDA host call returns an error
-#define checkCudaErrors(err)  __checkCudaErrors (err, __FILE__, __LINE__)
+#define checkCudaErrors(err, errstr)  __checkCudaErrors (err, errstr, __FILE__, __LINE__)
 
-inline void __checkCudaErrors(cudaError err, const char *file, const int line )
+inline bool __checkCudaErrors(cudaError err, string &errStr const char *file, const int line )
 {
     if(cudaSuccess != err)
     {
-        fprintf(stderr, "%s(%i) : CUDA Runtime API error %d: %s.\n",file, line, (int)err, cudaGetErrorString( err ) );
-        exit(-1);        
+        fprintf(stderr, "%s(%i) : CUDA Runtime API error %d: %s.\n", file, line, (int)err, cudaGetErrorString( err ) );
+		errStr = cudaGetErrorString(err);
+        //exit(-1);
+		return false;
     }
+
+	return true;
 }
 
 // This will output the proper error string when calling cudaGetLastError
@@ -242,20 +239,17 @@ int findCudaDevice(/*int argc, const char **argv*/)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//! Run a simple test for CUDA
+// Adaptively Generate the Iso-surfaces in Parallel
+// Invoking Cuda Kernel
 ////////////////////////////////////////////////////////////////////////////////
-void pAdaptiveIso() 
+bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___OUT string& errorStr) 
 {
-    bool bTestResult = true;
+	// use device with highest Gflops/s
+	int devID = findCudaDevice();
 
-    //shrQAStart(argc, argv);
-
-	// use command-line specified CUDA device, otherwise use device with highest Gflops/s
-	int devID = findCudaDevice(/*argc, (const char**)argv*/);
-
-    //StopWatchInterface *timer = 0;
-    //sdkCreateTimer( &timer );
-    //sdkStartTimer( &timer );
+    StopWatchInterface *timer = 0;
+    sdkCreateTimer( &timer );
+    sdkStartTimer( &timer );
 
     unsigned int num_threads = 32;
     unsigned int mem_size = sizeof( float) * num_threads;
@@ -270,14 +264,14 @@ void pAdaptiveIso()
 
     // allocate device memory
     float* d_idata;
-    checkCudaErrors( cudaMalloc( (void**) &d_idata, mem_size) );
+    checkCudaErrors( cudaMalloc( (void**) &d_idata, mem_size), errorStr );
     // copy host memory to device
     checkCudaErrors( cudaMemcpy( d_idata, h_idata, mem_size,
-                                cudaMemcpyHostToDevice) );
+                                cudaMemcpyHostToDevice) , errorStr );
 
     // allocate device memory for result
     float* d_odata;
-    checkCudaErrors( cudaMalloc( (void**) &d_odata, mem_size));
+    checkCudaErrors( cudaMalloc( (void**) &d_odata, mem_size), errorStr );
 
     // setup execution parameters
     dim3  grid( 1, 1, 1);
@@ -293,36 +287,17 @@ void pAdaptiveIso()
     float* h_odata = (float*) malloc( mem_size);
     // copy result from device to host
     checkCudaErrors( cudaMemcpy( h_odata, d_odata, sizeof( float) * num_threads,
-                                cudaMemcpyDeviceToHost) );
+                                cudaMemcpyDeviceToHost), errorStr );
 
-    //sdkStopTimer( &timer );
-    //printf( "Processing time: %f (ms)\n", sdkGetTimerValue( &timer ) );
-    //sdkDeleteTimer( &timer );
-
-    // compute reference solution
-    //float* reference = (float*) malloc( mem_size);
-    //computeGold( reference, h_idata, num_threads);
-
-    //// check result
-    //if( checkCmdLineFlag( argc, (const char**) argv, "regression") ) 
-    //{
-    //    // write file for regression test
-    //    sdkWriteFile( "./data/regression.dat", h_odata, num_threads, 0.0f, false );
-    //}
-    //else 
-    //{
-    //    // custom output handling when no regression test running
-    //    // in this case check if the result is equivalent to the expected soluion
-    //    bTestResult = compareData( reference, h_odata, num_threads, 0.0f, 0.0f );
-    //}
+    sdkStopTimer( &timer );
+    printf( "Processing time: %f (ms)\n", sdkGetTimerValue( &timer ) );
+    sdkDeleteTimer( &timer );
 
     // cleanup memory
     free( h_idata );
     free( h_odata );
-    //free( reference );
-    checkCudaErrors(cudaFree(d_idata));
-    checkCudaErrors(cudaFree(d_odata));
+    checkCudaErrors(cudaFree(d_idata), errorStr);
+    checkCudaErrors(cudaFree(d_odata), errorStr);
 
     cudaDeviceReset();
-    //shrQAFinishExit(argc, (const char **)argv, (bTestResult ? QA_PASSED : QA_FAILED) );
 }
