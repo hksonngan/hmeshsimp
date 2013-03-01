@@ -153,6 +153,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\nvtimer.h"
+			>
+		</File>
+		<File
 			RelativePath=".\octree.cu"
 			>
 		</File>
