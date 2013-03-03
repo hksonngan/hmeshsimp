@@ -47,14 +47,17 @@ public:
 	UINT4 cursor; // cube index
 	Byte *upper, *lower;
 	Byte *_data;
+	bool layeredRead;
 
 public:
 	VolumeSet();
 	~VolumeSet();
-	bool parseDataFile(const std::string &name, bool allocMem = true);
+	bool parseDataFile(const std::string &name, bool allocMem = true, bool layeredRead = true);
 	bool nextCube(GRIDCELL &cube);
 	bool hasNext();
 	void clear();
+	Byte* getData() { return _data; }
+	int memSize() { return volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize; }
 
 private:
 	void trim(std::string &s);

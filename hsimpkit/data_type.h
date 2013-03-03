@@ -10,7 +10,12 @@
 #define _H_DATA_TYPE_INC_
 
 enum DATA_TYPE { 
-	DCHAR, DSHORT, DINTEGER, DFLOAT, DDOUBLE}; // memory/language data type
+	DCHAR		= 0, 
+	DSHORT		= 1, 
+	DINTEGER	= 2, 
+	DFLOAT		= 3, 
+	DDOUBLE		= 5
+}; // memory/language data type
 
 typedef char Byte;
 

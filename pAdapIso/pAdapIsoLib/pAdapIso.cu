@@ -14,6 +14,8 @@
 #include <string.h>
 #include <math.h>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 // includes CUDA
 #include <cuda_runtime.h>
@@ -21,16 +23,15 @@
 // projcet includes
 #include "nvtimer.h"
 #include "vol_set.h"
-
-#define ___OUT
+#include "pAdapIso.h"
 
 using std::string;
 
 #ifndef MIN
-#define MIN(a,b) ((a < b) ? a : b)
+#define MIN(a,b) (a) < (b) ? (a) : (b)
 #endif
 #ifndef MAX
-#define MAX(a,b) ((a > b) ? a : b)
+#define MAX(a,b) (a) > (b) ? (a) : (b)
 #endif
 
 __global__ void testKernel( float* g_idata, float* g_odata);
@@ -43,19 +44,22 @@ void runTest( int argc, char** argv);
 // These are CUDA Helper functions
 
 // This will output the proper CUDA error strings in the event that a CUDA host call returns an error
-#define checkCudaErrors(err, errstr)  __checkCudaErrors (err, errstr, __FILE__, __LINE__)
-
-inline bool __checkCudaErrors(cudaError err, string &errStr const char *file, const int line )
+inline void __checkCudaErrors(cudaError err, const char *file, const int line )
 {
     if(cudaSuccess != err)
     {
-        fprintf(stderr, "%s(%i) : CUDA Runtime API error %d: %s.\n", file, line, (int)err, cudaGetErrorString( err ) );
-		errStr = cudaGetErrorString(err);
-        //exit(-1);
-		return false;
+		std::ostringstream stringStream;
+		stringStream << file << "(line " << line << ") : CUDA Runtime API error " 
+			<< (int)err << ": " << cudaGetErrorString(err) << ".\n";
+		std::cerr << stringStream.str();
+		throw stringStream.str();
     }
 
-	return true;
+	return;
+}
+
+inline void checkCudaErrors(cudaError err)  {
+	__checkCudaErrors (err, __FILE__, __LINE__);
 }
 
 // This will output the proper error string when calling cudaGetLastError
@@ -242,62 +246,141 @@ int findCudaDevice(/*int argc, const char **argv*/)
 // Adaptively Generate the Iso-surfaces in Parallel
 // Invoking Cuda Kernel
 ////////////////////////////////////////////////////////////////////////////////
-bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___OUT string& errorStr) 
+bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___OUT string& errorStr)
 {
-	// use device with highest Gflops/s
-	int devID = findCudaDevice();
+	try {
+		// use device with highest Gflops/s
+		int devID = findCudaDevice();
 
-    StopWatchInterface *timer = 0;
-    sdkCreateTimer( &timer );
-    sdkStartTimer( &timer );
+		StopWatchInterface *timer = 0;
+		sdkCreateTimer( &timer );
+		sdkStartTimer( &timer );
 
-    unsigned int num_threads = 32;
-    unsigned int mem_size = sizeof( float) * num_threads;
+		// read volume file on host
+		VolumeSet volSet;
+		if (!volSet.parseDataFile(filename, true, false)) {
+			errorStr = "cannot open file";
+			return false;
+		}
+		// allocate volume set memory on device
+		char* d_volData;
+		checkCudaErrors( cudaMalloc( (void**) &d_volData, volSet.memSize() ) );
+		// copy host volume data to device
+		checkCudaErrors( cudaMemcpy( d_volData, volSet.getData(), volSet.memSize(),
+							cudaMemcpyHostToDevice) );
+		// clear host volume memory
+		volSet.clear();
 
-    // allocate host memory
-    float* h_idata = (float*) malloc( mem_size);
-    // initalize the memory
-    for( unsigned int i = 0; i < num_threads; ++i) 
-    {
-        h_idata[i] = (float) i;
-    }
+		// compute the cube size, depth, start cordinate for the octree in each depth
+		typedef struct {
+			unsigned int x, y, z;
+		} UINT3;
+		const unsigned int MAX_DEPTH_COUNT = 11;
+		unsigned int maxVolLen, maxLenPow2, maxDepth, cubeSize[MAX_DEPTH_COUNT];
+		UINT3 cubeStart[MAX_DEPTH_COUNT], cubeCount[MAX_DEPTH_COUNT], volSize;
+		int i;
+		
+		volSize.x = volSet.volumeSize.[0] - 1;
+		volSize.y = volSet.volumeSize.[1] - 1;
+		volSize.z = volSet.volumeSize.[2] - 1;
 
-    // allocate device memory
-    float* d_idata;
-    checkCudaErrors( cudaMalloc( (void**) &d_idata, mem_size), errorStr );
-    // copy host memory to device
-    checkCudaErrors( cudaMemcpy( d_idata, h_idata, mem_size,
-                                cudaMemcpyHostToDevice) , errorStr );
+		maxVolLen = MAX(volSize.x, volSize.y);
+		maxVolLen = MAX(volSize.z, maxVolLen);
+		for (maxDepth = 0, maxLenPow2 = 1; maxLenPow2 < maxVolLen; maxDepth ++, maxLenPow2 *= 2);
+		if (maxDepth >= MAX_DEPTH_COUNT) {
+			errorStr = "volume size too large";
+			return false;
+		}
 
-    // allocate device memory for result
-    float* d_odata;
-    checkCudaErrors( cudaMalloc( (void**) &d_odata, mem_size), errorStr );
+		cubeSize[maxDepth] = 1;
+		for (i = maxDepth - 1; i >= 0; i --) 
+			cubeSize[i] = cubeSize[i + 1] * 2;
 
-    // setup execution parameters
-    dim3  grid( 1, 1, 1);
-    dim3  threads( num_threads, 1, 1);
+		cubeStart[maxDepth].x = (maxLenPow2 - volSize.x) / 2;
+		cubeStart[maxDepth].y = (maxLenPow2 - volSize.y) / 2;
+		cubeStart[maxDepth].z = (maxLenPow2 - volSize.z) / 2;
 
-    // execute the kernel
-    testKernel<<< grid, threads, mem_size >>>( d_idata, d_odata);
+		cubeCount[maxDepth].x = volSize.x;
+		cubeCount[maxDepth].y = volSize.y;
+		cubeCount[maxDepth].z = volSize.z;
 
-    // check if kernel execution generated and error
-    getLastCudaError("Kernel execution failed");
+		for (i = maxDepth - 1; i >= 0; i --) {
+			cubeStart[i].x = cubeStart[i + 1].x / 2;
+			cubeStart[i].y = cubeStart[i + 1].y / 2;
+			cubeStart[i].z = cubeStart[i + 1].z / 2;
 
-    // allocate mem for the result on host side
-    float* h_odata = (float*) malloc( mem_size);
-    // copy result from device to host
-    checkCudaErrors( cudaMemcpy( h_odata, d_odata, sizeof( float) * num_threads,
-                                cudaMemcpyDeviceToHost), errorStr );
+			if (cubeStart[i + 1].x % 2 == 0) 
+				cubeCount[i].x = cubeCount[i + 1].x / 2;
+			else
+				cubeCount[i].x = (cubeCount[i + 1].x - 1) / 2 + 1;
+			
+			if (cubeStart[i + 1].y % 2 == 0) 
+				cubeCount[i].y = cubeCount[i + 1].y / 2;
+			else
+				cubeCount[i].y = (cubeCount[i + 1].y - 1) / 2 + 1;
+			
+			if (cubeStart[i + 1].z % 2 == 0) 
+				cubeCount[i].z = cubeCount[i + 1].z / 2;
+			else
+				cubeCount[i].z = (cubeCount[i + 1].z - 1) / 2 + 1;
+		}
 
-    sdkStopTimer( &timer );
-    printf( "Processing time: %f (ms)\n", sdkGetTimerValue( &timer ) );
-    sdkDeleteTimer( &timer );
 
-    // cleanup memory
-    free( h_idata );
-    free( h_odata );
-    checkCudaErrors(cudaFree(d_idata), errorStr);
-    checkCudaErrors(cudaFree(d_odata), errorStr);
+		////////////////////////////////////////////////////////
+		unsigned int num_threads = 32;
+		unsigned int mem_size = sizeof( float) * num_threads;
 
-    cudaDeviceReset();
+		// allocate host memory
+		float* h_idata = (float*) malloc( mem_size);
+		// initalize the memory
+		for( unsigned int i = 0; i < num_threads; ++i) 
+		{
+			h_idata[i] = (float) i;
+		}
+
+		// allocate device memory
+		float* d_idata;
+		checkCudaErrors( cudaMalloc( (void**) &d_idata, mem_size) );
+		// copy host memory to device
+		checkCudaErrors( cudaMemcpy( d_idata, h_idata, mem_size,
+									cudaMemcpyHostToDevice) );
+
+		// allocate device memory for result
+		float* d_odata;
+		checkCudaErrors( cudaMalloc( (void**) &d_odata, mem_size) );
+
+		// setup execution parameters
+		dim3  grid( 1, 1, 1);
+		dim3  threads( num_threads, 1, 1);
+
+		// execute the kernel
+		testKernel<<< grid, threads, mem_size >>>( d_idata, d_odata);
+
+		// check if kernel execution generated and error
+		getLastCudaError("Kernel execution failed");
+
+		// allocate mem for the result on host side
+		float* h_odata = (float*) malloc( mem_size);
+		// copy result from device to host
+		checkCudaErrors( cudaMemcpy( h_odata, d_odata, sizeof( float) * num_threads,
+									cudaMemcpyDeviceToHost) );
+
+		sdkStopTimer( &timer );
+		printf( "Processing time: %f (ms)\n", sdkGetTimerValue( &timer ) );
+		sdkDeleteTimer( &timer );
+
+		// cleanup memory
+		free( h_idata );
+		free( h_odata );
+		checkCudaErrors(cudaFree(d_idata));
+		checkCudaErrors(cudaFree(d_odata));
+
+		/// annote it off for v4.0 above!!!
+		//cudaDeviceReset();
+	} catch (string& expErrStr) {
+		errorStr = expErrStr;
+		return false;
+	}
+
+	return true;
 }
