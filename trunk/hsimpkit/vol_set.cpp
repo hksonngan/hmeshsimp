@@ -29,7 +29,7 @@ void VolumeSet::trim(std::string &s)
 }
 
 // parse .dat file
-bool VolumeSet::parseDataFile(const std::string &name, bool allocMem) {
+bool VolumeSet::parseDataFile(const std::string &name, bool allocMem, bool layeredRead) {
 	clear();
 	fileEndian = systemEndian;
 
@@ -174,10 +174,13 @@ bool VolumeSet::parseDataFile(const std::string &name, bool allocMem) {
 	cursor.s[0] = cursor.s[1] = cursor.s[2] = 0;
 
 	if (allocMem) {
-		upper = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
-		lower = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
-		//_data = new Byte[volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize];
-		//readData(_data, volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize);
+		if (layeredRead) {
+			upper = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
+			lower = new Byte[volumeSize.s[0] * volumeSize.s[1] * formatSize];
+		} else {
+			_data = new Byte[volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize];
+			readData(_data, volumeSize.s[0] * volumeSize.s[1] * volumeSize.s[2] * formatSize);
+		}
 	}
 
 	std::cerr << std::endl;

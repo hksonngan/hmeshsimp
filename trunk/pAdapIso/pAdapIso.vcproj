@@ -44,7 +44,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pAdapIsoLib.lib cudart.lib"
+				AdditionalDependencies="pAdapIsoLib.lib cudart.lib hsimpkit.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(OutDir)/"
 				GenerateDebugInformation="true"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pAdapIsoLib.lib"
+				AdditionalDependencies="pAdapIsoLib.lib cudart.lib hsimpkit.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(OutDir)/"
 				GenerateDebugInformation="true"
