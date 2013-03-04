@@ -23,7 +23,7 @@
 // projcet includes
 #include "nvtimer.h"
 #include "vol_set.h"
-#include "pAdapIso.h"
+#include "p_adap_iso.h"
 
 using std::string;
 
@@ -241,6 +241,12 @@ int findCudaDevice(/*int argc, const char **argv*/)
 }
 // end of CUDA Helper Functions
 
+unsigned int getCubeCount(unsigned int lowerLayerStart, unsigned int lowerLayerCount) {
+	if (lowerLayerStart % 2 == 0) 
+		return lowerLayerCount / 2;
+	else
+		return (lowerLayerCount - 1) / 2 + 1;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Adaptively Generate the Iso-surfaces in Parallel
@@ -280,9 +286,9 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 		UINT3 cubeStart[MAX_DEPTH_COUNT], cubeCount[MAX_DEPTH_COUNT], volSize;
 		int i;
 		
-		volSize.x = volSet.volumeSize.[0] - 1;
-		volSize.y = volSet.volumeSize.[1] - 1;
-		volSize.z = volSet.volumeSize.[2] - 1;
+		volSize.x = volSet.volumeSize.s[0] - 1;
+		volSize.y = volSet.volumeSize.s[1] - 1;
+		volSize.z = volSet.volumeSize.s[2] - 1;
 
 		maxVolLen = MAX(volSize.x, volSize.y);
 		maxVolLen = MAX(volSize.z, maxVolLen);
@@ -293,8 +299,6 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 		}
 
 		cubeSize[maxDepth] = 1;
-		for (i = maxDepth - 1; i >= 0; i --) 
-			cubeSize[i] = cubeSize[i + 1] * 2;
 
 		cubeStart[maxDepth].x = (maxLenPow2 - volSize.x) / 2;
 		cubeStart[maxDepth].y = (maxLenPow2 - volSize.y) / 2;
@@ -305,24 +309,15 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 		cubeCount[maxDepth].z = volSize.z;
 
 		for (i = maxDepth - 1; i >= 0; i --) {
+			cubeSize[i] = cubeSize[i + 1] * 2;
+
 			cubeStart[i].x = cubeStart[i + 1].x / 2;
 			cubeStart[i].y = cubeStart[i + 1].y / 2;
 			cubeStart[i].z = cubeStart[i + 1].z / 2;
 
-			if (cubeStart[i + 1].x % 2 == 0) 
-				cubeCount[i].x = cubeCount[i + 1].x / 2;
-			else
-				cubeCount[i].x = (cubeCount[i + 1].x - 1) / 2 + 1;
-			
-			if (cubeStart[i + 1].y % 2 == 0) 
-				cubeCount[i].y = cubeCount[i + 1].y / 2;
-			else
-				cubeCount[i].y = (cubeCount[i + 1].y - 1) / 2 + 1;
-			
-			if (cubeStart[i + 1].z % 2 == 0) 
-				cubeCount[i].z = cubeCount[i + 1].z / 2;
-			else
-				cubeCount[i].z = (cubeCount[i + 1].z - 1) / 2 + 1;
+			cubeCount[i].x = getCubeCount(cubeStart[i + 1].x, cubeCount[i + 1].x);
+			cubeCount[i].y = getCubeCount(cubeStart[i + 1].y, cubeCount[i + 1].y);
+			cubeCount[i].z = getCubeCount(cubeStart[i + 1].z, cubeCount[i + 1].z);
 		}
 
 

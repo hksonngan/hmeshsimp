@@ -33,6 +33,7 @@
 			/>
 			<Tool
 				Name="Cudart Build Rule"
+				Include="../../hsimpkit"
 				Arch2="0"
 				Runtime="3"
 			/>
@@ -101,6 +102,7 @@
 			/>
 			<Tool
 				Name="Cudart Build Rule"
+				Include="../../hsimpkit"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
