@@ -155,19 +155,31 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\cuda_helper.cu"
+			>
+		</File>
+		<File
 			RelativePath=".\nvtimer.h"
 			>
 		</File>
 		<File
 			RelativePath=".\octree.cu"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="Cudart Build Rule"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\pAdapIso.cu"
+			RelativePath=".\p_adap_iso..h"
 			>
 		</File>
 		<File
-			RelativePath=".\pAdapIso.h"
+			RelativePath=".\p_adap_iso.cu"
 			>
 		</File>
 	</Files>
