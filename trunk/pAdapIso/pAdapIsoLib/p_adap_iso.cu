@@ -28,7 +28,7 @@ const unsigned int MAX_DEPTH_COUNT = 11;
 
 // global cuda variables decalaration
 __constant__ short d_cube_count[MAX_DEPTH_COUNT * 3], d_cube_start[MAX_DEPTH_COUNT * 3];
-__constant__ int d_data_format, d_max_depth;
+__constant__ unsigned int d_data_format, d_max_depth;
 
 // cuda type decalaration
 typedef struct _OctNode {
@@ -42,14 +42,8 @@ typedef struct _OctNode {
 
 using std::string;
 
-#ifndef MIN
-#define MIN(a,b) (a) < (b) ? (a) : (b)
-#endif
-#ifndef MAX
-#define MAX(a,b) (a) > (b) ? (a) : (b)
-#endif
-
-unsigned int getCubeCount(unsigned int lowerLayerStart, unsigned int lowerLayerCount) {
+unsigned int getCubeCount(unsigned int lowerLayerStart, 
+						  unsigned int lowerLayerCount) {
 	if (lowerLayerStart % 2 == 0) 
 		return lowerLayerCount / 2;
 	else
@@ -57,17 +51,15 @@ unsigned int getCubeCount(unsigned int lowerLayerStart, unsigned int lowerLayerC
 }
 
 unsigned int getGridDim(unsigned int validThreadCount, unsigned int blockDim) {
-	if (validthreadCount % blockDim == 0)
-		return validThreadCount / blockDim;
-	else
-		return validThreadCount / blockDim + 1;
+	return (validThreadCount + blockDim - 1) / blockDim;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Adaptively Generate the Iso-surfaces in Parallel
 // Invoking Cuda Kernel
 ////////////////////////////////////////////////////////////////////////////////
-bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___OUT string& errorStr)
+bool pAdaptiveIso(const string& filename, float isoValue, int startDepth, 
+				  float errorThresh, ___OUT string& errorStr)
 {
 	try {
 		// use device with highest Gflops/s
@@ -103,9 +95,10 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 		volSize[1] = volSet.volumeSize.s[1] - 1;
 		volSize[2] = volSet.volumeSize.s[2] - 1;
 
-		maxVolLen = MAX(volSize.x, volSize.y);
-		maxVolLen = MAX(volSize.z, maxVolLen);
-		for (maxDepth = 0, maxLenPow2 = 1; maxLenPow2 < maxVolLen; maxDepth ++, maxLenPow2 *= 2);
+		maxVolLen = MAX(volSize[0], volSize[1]);
+		maxVolLen = MAX(volSize[2], maxVolLen);
+		for (maxDepth = 0, maxLenPow2 = 1; maxLenPow2 < maxVolLen; 
+			maxDepth ++, maxLenPow2 *= 2);
 		if (maxDepth >= MAX_DEPTH_COUNT) {
 			errorStr = "volume size too large";
 			return false;
@@ -136,6 +129,22 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 				getCubeCount(cubeStart[(i + 1) * 3 + 2], cubeCount[(i + 1) * 3 + 2]);
 		}
 
+		unsigned int dataFormat;
+		if (volSet.format == DATA_UCHAR) 
+			dataFormat = 0;
+		else if (volSet.format == DATA_USHORT)
+			dataFormat = 1;
+		else {
+			errorStr = "volume data format unsupported";
+			return false;
+		}
+
+		// set the device constant memory
+		cudaMemcpyToSymbol(d_cube_count, cubeCount, sizeof(cubeCount) * sizeof(short));
+		cudaMemcpyToSymbol(d_cube_start, cubeStart, sizeof(cubeStart) * sizeof(short));
+		cudaMemcpyToSymbol(&d_data_format, &dataFormat, sizeof(dataFormat));
+		cudaMemcpyToSymbol(&d_max_depth, &maxDepth, sizeof(maxDepth));
+
 		// traverse the first level of the octree
 		checkCudaErrors( cudaMalloc( (void**) &d_octLvlPtr[startDepth], 
 			cubeCount[startDepth * 3] * cubeCount[startDepth * 3 + 1] * 
@@ -143,11 +152,16 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 		checkCudaErrors( cudaMalloc( (void**) &d_childAddr, 
 			cubeCount[startDepth * 3] * cubeCount[startDepth * 3 + 1] * 
 			cubeCount[startDepth * 3 + 2] ) );
-		dim3  blockDim( 32, 8, 1);
-		dim3  gridDim( getGridDim(cubeCount[startDepth * 3], blockDim.x), 
-				getGridDim(cubeCount[startDepth * 3 + 1], blockDim.y), 
-				getGridDim(cubeCount[startDepth * 3 + 2], blockDim.z) );
-		travFirstOctLvlKn<<< gridDim, blockDim >>>( d_octLvlPtr[startDepth], startDepth, d_childAddr, errorThresh );
+		dim3 blockDim(1, 1, 1);
+		dim3 gridDim(1, 1, 1);
+		unsigned int linearCubeCount = cubeCount[startDepth * 3] *
+					cubeCount[startDepth * 3 + 1] * cubeCount[startDepth * 3 + 2];
+		for (blockDim.x = 256; blockDim.x > 64; blockDim.x /= 2)
+			if (getGridDim(linearCubeCount, blockDim.x) >= 4)
+				break;
+		gridDim.x = getGridDim(linearCubeCount, blockDim.x);
+		travFirstOctLvlKn<<< gridDim, blockDim >>>( 
+			d_octLvlPtr[startDepth], startDepth, d_childAddr, d_volData, isoValue, errorThresh );
 		
 
 
