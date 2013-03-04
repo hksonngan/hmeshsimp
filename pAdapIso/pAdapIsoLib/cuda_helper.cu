@@ -14,6 +14,13 @@
 
 using std::string;
 
+#ifndef MIN
+#define MIN(a,b) (a) < (b) ? (a) : (b)
+#endif
+#ifndef MAX
+#define MAX(a,b) (a) > (b) ? (a) : (b)
+#endif
+
 // This will output the proper CUDA error strings in the event that a CUDA host call returns an error
 inline void __checkCudaErrors(cudaError err, const char *file, const int line )
 {

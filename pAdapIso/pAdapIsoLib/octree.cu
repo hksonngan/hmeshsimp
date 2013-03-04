@@ -34,8 +34,13 @@ testKernel( float* g_idata, float* g_odata)
 
 // kernel for traversing first octree level
 __global__ void
-travFirstOctLvlKn( OctNode* level_pointer, int depth, int* child_count, char* vol_data, float error_thresh ) {
-	
+travFirstOctLvlKn( OctNode* level_ptr, int depth, unsigned int* child_count, 
+				   char* vol_data, float iso_value, float error_thresh ) {
+	const unsigned int tid = threadIdx.x + blockIdx.x * blockDim.x;
+	if (tid < d_cube_count[depth * 3] * d_cube_count[depth * 3 + 1] * 
+		d_cube_count[depth * 3 + 2]) {
+		OctNode node = level_ptr[tid];
+	}
 }
 
 #endif // #ifndef _OCTREE_KERNEL_H_
