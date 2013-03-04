@@ -32,4 +32,10 @@ testKernel( float* g_idata, float* g_odata)
   g_odata[tid] = sdata[tid];
 }
 
-#endif // #ifndef _TEMPLATE_KERNEL_H_
+// kernel for traversing first octree level
+__global__ void
+travFirstOctLvlKn( OctNode* level_pointer, int depth, int* child_count, char* vol_data, float error_thresh ) {
+	
+}
+
+#endif // #ifndef _OCTREE_KERNEL_H_

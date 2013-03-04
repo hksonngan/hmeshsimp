@@ -15,7 +15,6 @@
 #include <math.h>
 #include <string>
 #include <iostream>
-#include <sstream>
 
 // includes CUDA
 #include <cuda_runtime.h>
@@ -24,6 +23,22 @@
 #include "nvtimer.h"
 #include "vol_set.h"
 #include "p_adap_iso.h"
+
+const unsigned int MAX_DEPTH_COUNT = 11;
+
+// global cuda variables decalaration
+__constant__ short d_cube_count[MAX_DEPTH_COUNT * 3], d_cube_start[MAX_DEPTH_COUNT * 3];
+__constant__ int d_data_format, d_max_depth;
+
+// cuda type decalaration
+typedef struct _OctNode {
+	short cube_index[3];
+	(struct _OctNode*) children[8];
+} OctNode;
+
+// other cuda files
+#include "cuda_helper.cu"
+#include "octree.cu"
 
 using std::string;
 
@@ -34,218 +49,18 @@ using std::string;
 #define MAX(a,b) (a) > (b) ? (a) : (b)
 #endif
 
-__global__ void testKernel( float* g_idata, float* g_odata);
-
-////////////////////////////////////////////////////////////////////////////////
-// declaration, forward
-void runTest( int argc, char** argv);
-
-////////////////////////////////////////////////////////////////////////////////
-// These are CUDA Helper functions
-
-// This will output the proper CUDA error strings in the event that a CUDA host call returns an error
-inline void __checkCudaErrors(cudaError err, const char *file, const int line )
-{
-    if(cudaSuccess != err)
-    {
-		std::ostringstream stringStream;
-		stringStream << file << "(line " << line << ") : CUDA Runtime API error " 
-			<< (int)err << ": " << cudaGetErrorString(err) << ".\n";
-		std::cerr << stringStream.str();
-		throw stringStream.str();
-    }
-
-	return;
-}
-
-inline void checkCudaErrors(cudaError err)  {
-	__checkCudaErrors (err, __FILE__, __LINE__);
-}
-
-// This will output the proper error string when calling cudaGetLastError
-#define getLastCudaError(msg)      __getLastCudaError (msg, __FILE__, __LINE__)
-
-inline void __getLastCudaError(const char *errorMessage, const char *file, const int line )
-{
-    cudaError_t err = cudaGetLastError();
-    if (cudaSuccess != err)
-    {
-        fprintf(stderr, "%s(%i) : getLastCudaError() CUDA error : %s : (%d) %s.\n",
-        file, line, errorMessage, (int)err, cudaGetErrorString( err ) );
-        exit(-1);
-    }
-}
-
-inline int _ConvertSMVer2Cores(int major, int minor)
-{
-    // Defines for GPU Architecture types (using the SM version to determine the # of cores per SM
-    typedef struct {
-       int SM; // 0xMm (hexidecimal notation), M = SM Major version, and m = SM minor version
-       int Cores;
-    } sSMtoCores;
-
-    sSMtoCores nGpuArchCoresPerSM[] = 
-    { { 0x10,  8 }, // Tesla Generation (SM 1.0) G80 class
-      { 0x11,  8 }, // Tesla Generation (SM 1.1) G8x class
-      { 0x12,  8 }, // Tesla Generation (SM 1.2) G9x class
-      { 0x13,  8 }, // Tesla Generation (SM 1.3) GT200 class
-      { 0x20, 32 }, // Fermi Generation (SM 2.0) GF100 class
-      { 0x21, 48 }, // Fermi Generation (SM 2.1) GF10x class
-      {   -1, -1 }
-    };
-
-    int index = 0;
-    while (nGpuArchCoresPerSM[index].SM != -1) {
-       if (nGpuArchCoresPerSM[index].SM == ((major << 4) + minor) ) {
-          return nGpuArchCoresPerSM[index].Cores;
-       }	
-       index++;
-    }
-    printf("MapSMtoCores undefined SM %d.%d is undefined (please update to the latest SDK)!\n", major, minor);
-    return -1;
-}
-
-// General GPU Device CUDA Initialization
-int gpuDeviceInit(int devID)
-{
-    int deviceCount;
-    checkCudaErrors(cudaGetDeviceCount(&deviceCount));
-
-    if (deviceCount == 0)
-    {
-        fprintf(stderr, "gpuDeviceInit() CUDA error: no devices supporting CUDA.\n");
-        exit(-1);
-    }
-
-    if (devID < 0)
-       devID = 0;
-        
-    if (devID > deviceCount-1)
-    {
-        fprintf(stderr, "\n");
-        fprintf(stderr, ">> %d CUDA capable GPU device(s) detected. <<\n", deviceCount);
-        fprintf(stderr, ">> gpuDeviceInit (-device=%d) is not a valid GPU device. <<\n", devID);
-        fprintf(stderr, "\n");
-        return -devID;
-    }
-
-    cudaDeviceProp deviceProp;
-    checkCudaErrors( cudaGetDeviceProperties(&deviceProp, devID) );
-
-    if (deviceProp.major < 1)
-    {
-        fprintf(stderr, "gpuDeviceInit(): GPU device does not support CUDA.\n");
-        exit(-1);                                                  
-    }
-    
-    checkCudaErrors( cudaSetDevice(devID) );
-    printf("gpuDeviceInit() CUDA Device [%d]: \"%s\n", devID, deviceProp.name);
-
-    return devID;
-}
-
-// This function returns the best GPU (with maximum GFLOPS)
-int gpuGetMaxGflopsDeviceId()
-{
-    int current_device     = 0, sm_per_multiproc  = 0;
-    int max_compute_perf   = 0, max_perf_device   = 0;
-    int device_count       = 0, best_SM_arch      = 0;
-    cudaDeviceProp deviceProp;
-    cudaGetDeviceCount( &device_count );
-    
-    // Find the best major SM Architecture GPU device
-    while (current_device < device_count)
-    {
-        cudaGetDeviceProperties( &deviceProp, current_device );
-        if (deviceProp.major > 0 && deviceProp.major < 9999)
-        {
-            best_SM_arch = MAX(best_SM_arch, deviceProp.major);
-        }
-        current_device++;
-    }
-
-    // Find the best CUDA capable GPU device
-    current_device = 0;
-    while( current_device < device_count )
-    {
-        cudaGetDeviceProperties( &deviceProp, current_device );
-        if (deviceProp.major == 9999 && deviceProp.minor == 9999)
-        {
-            sm_per_multiproc = 1;
-        }
-        else
-        {
-            sm_per_multiproc = _ConvertSMVer2Cores(deviceProp.major, deviceProp.minor);
-        }
-        
-        int compute_perf  = deviceProp.multiProcessorCount * sm_per_multiproc * deviceProp.clockRate;
-        
-    if( compute_perf  > max_compute_perf )
-    {
-            // If we find GPU with SM major > 2, search only these
-            if ( best_SM_arch > 2 )
-            {
-                // If our device==dest_SM_arch, choose this, or else pass
-                if (deviceProp.major == best_SM_arch)
-                {
-                    max_compute_perf  = compute_perf;
-                    max_perf_device   = current_device;
-                 }
-            }
-            else
-            {
-                max_compute_perf  = compute_perf;
-                max_perf_device   = current_device;
-             }
-        }
-        ++current_device;
-    }
-    return max_perf_device;
-}
-
-
-// Initialization code to find the best CUDA Device
-int findCudaDevice(/*int argc, const char **argv*/)
-{
-    cudaDeviceProp deviceProp;
-    int devID = 0;
-    // If the command-line has a device number specified, use it
-    //if (checkCmdLineFlag(argc, argv, "device"))
-    //{
-    //    devID = getCmdLineArgumentInt(argc, argv, "device=");
-    //    if (devID < 0)
-    //    {
-    //        printf("Invalid command line parameter\n ");
-    //        exit(-1);
-    //    }
-    //    else
-    //    {
-    //        devID = gpuDeviceInit(devID);
-    //        if (devID < 0)
-    //        {
-    //            printf("exiting...\n");
-    //            shrQAFinishExit(argc, (const char **)argv, QA_FAILED);
-    //            exit(-1);
-    //        }
-    //    }
-    //}
-    //else
-    //{
-        // Otherwise pick the device with highest Gflops/s
-        devID = gpuGetMaxGflopsDeviceId();
-        checkCudaErrors( cudaSetDevice( devID ) );
-        checkCudaErrors( cudaGetDeviceProperties(&deviceProp, devID) );
-        printf("GPU Device %d: \"%s\" with compute capability %d.%d\n\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
-    //}
-    return devID;
-}
-// end of CUDA Helper Functions
-
 unsigned int getCubeCount(unsigned int lowerLayerStart, unsigned int lowerLayerCount) {
 	if (lowerLayerStart % 2 == 0) 
 		return lowerLayerCount / 2;
 	else
 		return (lowerLayerCount - 1) / 2 + 1;
+}
+
+unsigned int getGridDim(unsigned int validThreadCount, unsigned int blockDim) {
+	if (validthreadCount % blockDim == 0)
+		return validThreadCount / blockDim;
+	else
+		return validThreadCount / blockDim + 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -278,17 +93,15 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 		volSet.clear();
 
 		// compute the cube size, depth, start cordinate for the octree in each depth
-		typedef struct {
-			unsigned int x, y, z;
-		} UINT3;
-		const unsigned int MAX_DEPTH_COUNT = 11;
 		unsigned int maxVolLen, maxLenPow2, maxDepth, cubeSize[MAX_DEPTH_COUNT];
-		UINT3 cubeStart[MAX_DEPTH_COUNT], cubeCount[MAX_DEPTH_COUNT], volSize;
+		short cubeStart[MAX_DEPTH_COUNT * 3], cubeCount[MAX_DEPTH_COUNT * 3], volSize[3];
+		(OctNode*) d_octLvlPtr[MAX_DEPTH_COUNT];
+		unsigned int *d_childAddr;
 		int i;
 		
-		volSize.x = volSet.volumeSize.s[0] - 1;
-		volSize.y = volSet.volumeSize.s[1] - 1;
-		volSize.z = volSet.volumeSize.s[2] - 1;
+		volSize[0] = volSet.volumeSize.s[0] - 1;
+		volSize[1] = volSet.volumeSize.s[1] - 1;
+		volSize[2] = volSet.volumeSize.s[2] - 1;
 
 		maxVolLen = MAX(volSize.x, volSize.y);
 		maxVolLen = MAX(volSize.z, maxVolLen);
@@ -300,25 +113,42 @@ bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___
 
 		cubeSize[maxDepth] = 1;
 
-		cubeStart[maxDepth].x = (maxLenPow2 - volSize.x) / 2;
-		cubeStart[maxDepth].y = (maxLenPow2 - volSize.y) / 2;
-		cubeStart[maxDepth].z = (maxLenPow2 - volSize.z) / 2;
+		cubeStart[maxDepth * 3]     = (maxLenPow2 - volSize[0]) / 2;
+		cubeStart[maxDepth * 3 + 1] = (maxLenPow2 - volSize[1]) / 2;
+		cubeStart[maxDepth * 3 + 2] = (maxLenPow2 - volSize[2]) / 2;
 
-		cubeCount[maxDepth].x = volSize.x;
-		cubeCount[maxDepth].y = volSize.y;
-		cubeCount[maxDepth].z = volSize.z;
+		cubeCount[maxDepth * 3]     = volSize[0];
+		cubeCount[maxDepth * 3 + 1] = volSize[1];
+		cubeCount[maxDepth * 3 + 2] = volSize[2];
 
-		for (i = maxDepth - 1; i >= 0; i --) {
+		for (i = maxDepth - 1; i >= startDepth; i --) {
 			cubeSize[i] = cubeSize[i + 1] * 2;
 
-			cubeStart[i].x = cubeStart[i + 1].x / 2;
-			cubeStart[i].y = cubeStart[i + 1].y / 2;
-			cubeStart[i].z = cubeStart[i + 1].z / 2;
+			cubeStart[i * 3]     = cubeStart[(i + 1) * 3] / 2;
+			cubeStart[i * 3 + 1] = cubeStart[(i + 1) * 3 + 1] / 2;
+			cubeStart[i * 3 + 2] = cubeStart[(i + 1) * 3 + 2] / 2;
 
-			cubeCount[i].x = getCubeCount(cubeStart[i + 1].x, cubeCount[i + 1].x);
-			cubeCount[i].y = getCubeCount(cubeStart[i + 1].y, cubeCount[i + 1].y);
-			cubeCount[i].z = getCubeCount(cubeStart[i + 1].z, cubeCount[i + 1].z);
+			cubeCount[i * 3]     = 
+				getCubeCount(cubeStart[(i + 1) * 3],     cubeCount[(i + 1) * 3]);
+			cubeCount[i * 3 + 1] = 
+				getCubeCount(cubeStart[(i + 1) * 3 + 1], cubeCount[(i + 1) * 3 + 1]);
+			cubeCount[i * 3 + 2] = 
+				getCubeCount(cubeStart[(i + 1) * 3 + 2], cubeCount[(i + 1) * 3 + 2]);
 		}
+
+		// traverse the first level of the octree
+		checkCudaErrors( cudaMalloc( (void**) &d_octLvlPtr[startDepth], 
+			cubeCount[startDepth * 3] * cubeCount[startDepth * 3 + 1] * 
+			cubeCount[startDepth * 3 + 2] ) );
+		checkCudaErrors( cudaMalloc( (void**) &d_childAddr, 
+			cubeCount[startDepth * 3] * cubeCount[startDepth * 3 + 1] * 
+			cubeCount[startDepth * 3 + 2] ) );
+		dim3  blockDim( 32, 8, 1);
+		dim3  gridDim( getGridDim(cubeCount[startDepth * 3], blockDim.x), 
+				getGridDim(cubeCount[startDepth * 3 + 1], blockDim.y), 
+				getGridDim(cubeCount[startDepth * 3 + 2], blockDim.z) );
+		travFirstOctLvlKn<<< gridDim, blockDim >>>( d_octLvlPtr[startDepth], startDepth, d_childAddr, errorThresh );
+		
 
 
 		////////////////////////////////////////////////////////
