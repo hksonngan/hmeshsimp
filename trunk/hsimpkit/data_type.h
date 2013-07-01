@@ -1,4 +1,6 @@
 /*
+ *  A Class That Returns the Value the Given Pointer Points to
+ *  Based on the Given Value Type
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
@@ -19,6 +21,8 @@ enum DATA_TYPE {
 
 typedef char Byte;
 
+// A Class That Returns the Value the Given Pointer Points to
+// Based on the Given Value Type
 class DataType {
 private:
 	DATA_TYPE _type;
@@ -30,13 +34,10 @@ public:
 		switch (_type) {
 		case DINTEGER:
 			return sizeof(int);
-			break;
 		case DFLOAT:
 			return sizeof(float);
-			break;
 		case DDOUBLE:
 			return sizeof(double);
-			break;
 		default:
 			return 0;
 		}
@@ -48,13 +49,10 @@ public:
 		switch (_type) {
 		case DINTEGER:
 			return *((int*)p);
-			break;
 		case DFLOAT:
 			return *((float*)p);
-			break;
 		case DDOUBLE:
 			return *((double*)p);
-			break;
 		default:
 			return 0;
 		}

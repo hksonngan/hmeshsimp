@@ -4,7 +4,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __H_ITERATIVE_PAIR_COLLAPSE__
@@ -13,12 +13,13 @@
 // for MxBlock
 #define HAVE_CASTING_LIMITS
 
+//#define _VERBOSE
+
 #define ARRAY_NORMAL	0
 #define ARRAY_USE_HASH	1
 
-//#define _VERBOSE
-
 #define ARRAY_USE	ARRAY_USE_HASH
+//#define ARRAY_USE	ARRAY_NORMAL
 
 #ifdef ARRAY_USE
 	#if ARRAY_USE < 0 || ARRAY_USE > 1
@@ -32,8 +33,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <boost/unordered_map.hpp>
-#include "fnv1_inc.h"
+#include "fnv1_modified.hpp"
 #include "pcol_vertex.h"
 #include "pcol_other_structures.h"
 #include "common_types.h"
@@ -45,11 +47,12 @@ using std::ofstream;
 using std::cout;
 using std::endl;
 using std::ostringstream;
+using std::vector;
 
 inline std::size_t hash_value(uint i) {
 	ostringstream oss;
 	oss << i;
-	hash::fnv_1a fnv;
+	hash_nm::fnv_1a fnv;
 	return fnv(oss.str());
 }
 
@@ -80,6 +83,7 @@ static inline bool pair_comp(const pCollapsablePair &pair1, const pCollapsablePa
 	return (*pair1) < (*pair2);
 };
 
+// class that compares two faces specified by the face index in the array 
 class FaceIndexComp {
 public:
 	bool operator() (const uint &face_index1, const uint &face_index2) {
@@ -112,6 +116,8 @@ private:
 #endif
 };
 
+// A virtual base class that iteratively perform the vertex pair collapse without defining any
+// error metrics or representing vertex calculating methods
 class PairCollapse 
 {
 public:
@@ -212,7 +218,7 @@ public:
 	inline CollapsableFace& f(uint i);
 	inline bool f_interior (int i);
 	// testing if a face is valid should always use this
-	inline bool face_is_valid(uint i) const;
+	inline bool face_is_valid(uint i);
 
 
 	///////////////////////////////////////
@@ -224,6 +230,7 @@ public:
 	// for debug
 	void outputIds(char* filename);
 	void toIndexedMesh(HVertex* vertArr, HFace *faceArr);
+	void toIndexedMesh(vector<float> &vertArr, vector<int> &faceArr);
 
 
 	///////////////////////////////////////
@@ -317,8 +324,6 @@ void PairCollapse::collectStarVertices(uint vert_index, vert_arr *starVertices) 
 }
 
 void PairCollapse::changePairsOneVert(pair_arr &pairs, uint orig, uint dst) {
-	
-
 	for (int i = 0; i < pairs.count(); i ++) 
 		if (pairs[i]) {
 			pairs[i]->changeOneVert(orig, dst);
@@ -674,7 +679,7 @@ void PairCollapse::finalizeVert(const uint &index) {
 	cv.finalize();
 }
 
-bool PairCollapse::face_is_valid(uint i) const {
+bool PairCollapse::face_is_valid(uint i) {
 #if ARRAY_USE == ARRAY_NORMAL
 	return f(i).valid();
 #else

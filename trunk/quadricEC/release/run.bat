@@ -9,5 +9,5 @@
 ::d:/bunny/bun_zipper.ply
 ::d:/Armadillo_ascii.ply
 
-quadricEC.exe -t 5000 d:/Armadillo_ascii.ply
+quadricEC.exe -t 9000 d:/bunny/bun_zipper.ply
 pause

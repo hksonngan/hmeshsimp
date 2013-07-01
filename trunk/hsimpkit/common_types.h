@@ -4,9 +4,8 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __UTIL_COMMON__
 #define __UTIL_COMMON__
@@ -17,14 +16,13 @@
 #include "gfx/vec3.h"
 #include "lru_cache.h"
 #include "common_def.h"
-#include "io_common.h"
 #include "h_algorithm.h"
-
 
 typedef ChapillVec3<float> HVector3f;
 typedef HVector3f HVertex;
 typedef HVector3f HNormal;
 
+// assign a ChapillVec3 to a TVec3
 template<class T1, class T2>
 inline void assign(TVec3<T1> &v1, const ChapillVec3<T2> &v2) {
 	v1[0] = v2.x;
@@ -32,6 +30,7 @@ inline void assign(TVec3<T1> &v1, const ChapillVec3<T2> &v2) {
 	v1[2] = v2.z;
 }
 
+// assign a TVec3 to a ChapillVec3
 template<class T1, class T2>
 inline void assign(ChapillVec3<T1> &v1, const TVec3<T2> &v2) {
 
@@ -40,7 +39,7 @@ inline void assign(ChapillVec3<T1> &v1, const TVec3<T2> &v2) {
 	v1.z = v2[2];
 }
 
-/* triangle in a triangle soup */
+// class that defines a triangle in a triangle soup
 class HSoupTriangle
 {
 public:
@@ -51,8 +50,7 @@ public:
 	HVertex v1, v2, v3;
 };
 
-
-/* triple index */
+// class that contains three elements of any type
 template<class ElemType>
 class HTriple
 {
@@ -139,47 +137,17 @@ public:
 	ElemType i, j, k;
 };
 
+// this is the face/triangle type in an indexed mesh
 typedef HTriple<uint> HFace;
+// the cluster index type in vertex clustering algorithm
 typedef HTriple<uint> HClusterIndex;
 
-inline void write_face_txt(ostream &out, const HTriple<uint> &f) {
-
-	out << "3 " << f.i << " " << f.j << " " << f.k << endl;
-}
-
-inline void write_vert_txt(ostream &out, const HVertex &v) {
-
-	out << v.x << " " << v.y << " " << v.z << endl;
-}
-
-inline void write_face(ostream &out, const HTriple<uint> &f) {
-	uchar n = 3;
-
-	WRITE_BLOCK(out, n, sizeof(uchar));
-	WRITE_UINT(out, f.i);
-	WRITE_UINT(out, f.j);
-	WRITE_UINT(out, f.k);
-#ifndef WRITE_PATCH_BINARY
-	out << endl;
-#endif
-}
-
-inline void write_vert(ostream &out, const HVertex &v) {
-
-	WRITE_BLOCK(out, v.x, VERT_ITEM_SIZE);
-	WRITE_BLOCK(out, v.y, VERT_ITEM_SIZE);
-	WRITE_BLOCK(out, v.z, VERT_ITEM_SIZE);
-#ifndef WRITE_PATCH_BINARY
-	out << endl;
-#endif
-}
-
 inline bool face_comp(const HTriple<uint> &f1, const HTriple<uint> &f2) {
-
 	return f1.unsequencedLessThan(f2);
 }
 
-/* face index: three HTriple as cluster index */
+// face index: three HTriple<uint> as cluster index
+// this is used in vertex clustering for defining degenerated faces
 class HFaceIndex
 {
 public:
@@ -217,55 +185,5 @@ public:
 public:
 	HTriple<uint> v1CIndex, v2CIndex, v3CIndex;
 };
-
-class LRUVertex {
-public:
-	// binary(!) read
-	bool read(ifstream& fin) {
-
-		READ_BLOCK_BIN(fin, v.x, VERT_ITEM_SIZE);
-		READ_BLOCK_BIN(fin, v.y, VERT_ITEM_SIZE);
-		READ_BLOCK_BIN(fin, v.z, VERT_ITEM_SIZE);
-
-		if (fin.good())
-			return true;
-		return false; 
-	}
-
-	bool read(FILE *fp) { 
-
-		if (C_READ_BLOCK(fp, v.x, VERT_ITEM_SIZE, 1) != 1)
-			return false;
-		if (C_READ_BLOCK(fp, v.x, VERT_ITEM_SIZE, 1) != 1)
-			return false;
-		if (C_READ_BLOCK(fp, v.x, VERT_ITEM_SIZE, 1) != 1)
-			return false;
-
-		return true; 
-	}
-
-	// binary(!) write
-	bool write(ofstream& fout) { 
-
-		WRITE_BLOCK_BIN(fout, v.x, VERT_ITEM_SIZE);
-		WRITE_BLOCK_BIN(fout, v.y, VERT_ITEM_SIZE);
-		WRITE_BLOCK_BIN(fout, v.z, VERT_ITEM_SIZE);
-
-		if (fout.good())
-			return true;
-		return false; 
-	}
-
-	// hash the index
-	static unsigned int hash(unsigned int index) { return index; }
-	
-	// the size of the 
-	static size_t size() { return sizeof(HVertex); }
-
-public:
-	HVertex v;
-};
-
-typedef LRUCache<LRUVertex> VertexBinary;
 
 #endif //__UTIL_COMMON__

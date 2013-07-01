@@ -4,7 +4,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __OOCSIMP__
@@ -21,6 +21,7 @@ typedef struct BoundBox
 	float range;
 } BoundBox;
 
+// Out-of-core vertex clustering 
 class HOOCSimp
 {
 public:

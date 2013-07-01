@@ -1,3 +1,12 @@
+/*
+ *  Qt Dialog for Marching Cubes
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
+
 #ifndef QMCDialog_H
 #define QMCDialog_H
 
@@ -9,6 +18,7 @@
 class QString;
 using std::string;
 
+// Qt Dialog for Marching Cubes
 class QMCDialog : public QDialog, public Ui::MCDialog 
 {
 	Q_OBJECT
@@ -21,7 +31,7 @@ private:
 	void validateInput();
 
 signals:
-	void mcParams(string filename, double isovalue);	
+	void mcParams(string filename, double isovalue, int* sampleStride);	
 
 public slots:
 	void onAccept();
@@ -29,10 +39,13 @@ public slots:
 	void onIsoValueChanged(int value);
 
 private:
+    QRegExpValidator *floatValidator;
+    QRegExpValidator *uintValidator;
 	static const int sliderMax = 2000;
 	QString fileName;
 	QDataFormat dataFormat;
 	double isoValue;
+    int sampleStride[3];
 };
 
 #endif

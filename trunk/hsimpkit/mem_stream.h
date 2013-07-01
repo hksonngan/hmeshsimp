@@ -5,7 +5,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __H_MEM_STREAM__
@@ -13,6 +13,8 @@
 
 #include "h_dynamarray.h"
 
+// A stream class similar to fstream except it is 
+// in-core and only handles T type data
 template<class T>
 class mstream: public HDynamArray<T> {
 public:

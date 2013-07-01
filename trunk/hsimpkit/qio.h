@@ -20,17 +20,17 @@
 #include <string>
 //#include "../infrastructures/QStructure.h"
 
-enum QDataFormat
-{
-	DATA_UNKNOWN    = 0,
-	DATA_UCHAR      = 1,
-	DATA_USHORT     = 2,
-	DATA_FLOAT      = 3,
-	DATA_DOUBLE     = 4
+enum QDataFormat {
+	DATA_UNKNOWN = 0,
+	DATA_CHAR,
+	DATA_UCHAR,	
+	DATA_SHORT,
+	DATA_USHORT,
+	DATA_FLOAT,
+	DATA_DOUBLE
 };
 
-enum QEndianness
-{
+enum QEndianness {
 	ENDIAN_BIG      = 0,
 	ENDIAN_LITTLE   = 1
 };
@@ -46,20 +46,21 @@ public:
 	// -ht
 	static int getOffset(int layer, int x, int y, QDataFormat format) {
 		int offset = 0;
-		switch (format)
-		{
-		case DATA_UCHAR:
-			offset = 1;
-			break;
-		case DATA_USHORT:
-			offset = 2;
-			break;
-		case DATA_FLOAT:
-			offset = 4;
-			break;
-		case DATA_DOUBLE:
-			offset = 8;
-			break;
+		switch (format) {
+			case DATA_CHAR:
+			case DATA_UCHAR:
+				offset = 1;
+				break;
+			case DATA_SHORT:
+			case DATA_USHORT:
+				offset = 2;
+				break;
+			case DATA_FLOAT:
+				offset = 4;
+				break;
+			case DATA_DOUBLE:
+				offset = 8;
+				break;
 		}
 
 		offset *= x * y * (layer - 1);

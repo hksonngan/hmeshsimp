@@ -1,5 +1,6 @@
 #include "MeshDrawer.h"
 
+#include "GL/GLU.h"
 #include <cmath>
 #include <fstream>
 

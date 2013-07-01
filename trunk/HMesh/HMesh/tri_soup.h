@@ -1,18 +1,24 @@
 /*
-	triangle soup container
-	author: ht
-*/
+ *  Triangle Soup Container
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
 
 #ifndef __TRI_SOUP_CONTAINER__
 #define __TRI_SOUP_CONTAINER__
 
 #include "tri_soup_stream.h"
 
+// A vertex
 typedef struct
 {
 	float x, y, z;
 } TripleFloat;
 
+// Struct that holds the a triangle
 typedef struct
 {
 	TripleFloat vert1;
@@ -20,6 +26,10 @@ typedef struct
 	TripleFloat vert3;
 } SoupTriangle;
 
+// Triangle Soup Container
+// A dynamic array containing 'SoupTriangle' type elements
+// A better way is to simply wrap 'vector' or even 'HDynamArray'
+// However, it is an early version
 class TriangleSoupContainer
 {
 private:

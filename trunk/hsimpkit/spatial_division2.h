@@ -1,4 +1,5 @@
 /*
+ *  !!DEPRECATED
  *  the vertices and faces division algorithm is based on indices array.
  *  for the reason of running time, most of the routines called in the 
  *  main loop 'bool divide(int target)' is made inline.

@@ -1,8 +1,7 @@
 #include "trivial.h"
 #include <limits>
 
-void trimExtAndAppend(char *src, char *dst, char *app)
-{
+void trimExtAndAppend(char *src, char *dst, char *app) {
 	string s(src);
 	s = s.substr(0, s.find_last_of("."));
 	s += app;
@@ -11,8 +10,7 @@ void trimExtAndAppend(char *src, char *dst, char *app)
 	dst[s.size()] = '\0';
 }
 
-string getFilename(const char *filepath)
-{
+string getFilename(const char *filepath) {
 	string filename = getExtFilename(filepath);
 
 	int end;
@@ -54,6 +52,19 @@ string getFileExtension(const char *filepath) {
 	return filename.substr(i + 1);
 }
 
+string getNextWordBetweenSpace(const int pos, const string& str) {
+    int start, end;
+    for (start = pos; start < str.length(); start ++) 
+        if (str[start] != ' ' && str[start] != '\t' && str[start] != '\n')
+            break;
+
+    for (end = start; end < str.length(); end ++)
+        if (str[end] == ' ' || str[end] == '\t' || str[end] == '\n')
+            break;
+
+    return str.substr(start, end - start);
+}
+
 EndianOrder getSystemEndianMode() {
 	unsigned short test = 0x1122;
 
@@ -72,14 +83,12 @@ char* getTime() {
 	return asctime(timeinfo);
 }
 
-void stringToCstr(string &str, char* cstr)
-{
+void stringToCstr(string &str, char* cstr) {
 	memcpy(cstr, str.c_str(), str.size() * sizeof(char));
 	cstr[str.size()] = '\0';
 }
 
 char* getPlyBinaryFormat() {
-
 	EndianOrder e = getSystemEndianMode();
 	if (H_BIG_ENDIAN)
 		return "binary_big_endian 1.0";

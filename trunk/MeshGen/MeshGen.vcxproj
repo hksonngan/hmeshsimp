@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CFB5FD7A-8E53-4FC5-A369-6688C0699BAF}</ProjectGuid>
+    <RootNamespace>MeshGen2</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(BOOST_DIR);./;./ply;../libgfx/include;../hsimpkit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MESHGEN2_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(BOOST_DIR);./;./ply;../libgfx/include;../hsimpkit;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MESHGEN2_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\hsimpkit\common_def.h" />
+    <ClInclude Include="..\hsimpkit\common_types.h" />
+    <ClInclude Include="..\hsimpkit\data_type.h" />
+    <ClInclude Include="..\hsimpkit\h_algorithm.h" />
+    <ClInclude Include="..\hsimpkit\h_aug_time.h" />
+    <ClInclude Include="..\hsimpkit\h_dynamarray.h" />
+    <ClInclude Include="..\hsimpkit\h_math.h" />
+    <ClInclude Include="..\hsimpkit\io_common.h" />
+    <ClInclude Include="..\hsimpkit\lru_cache.h" />
+    <ClInclude Include="..\hsimpkit\ply_stream.h" />
+    <ClInclude Include="..\hsimpkit\qio.h" />
+    <ClInclude Include="..\hsimpkit\random.h" />
+    <ClInclude Include="..\hsimpkit\trivial.h" />
+    <ClInclude Include="..\hsimpkit\ecol_iterative_quadric.h" />
+    <ClInclude Include="..\hsimpkit\fnv1_inc.h" />
+    <ClInclude Include="..\hsimpkit\pcol_iterative.h" />
+    <ClInclude Include="..\hsimpkit\pcol_other_structures.h" />
+    <ClInclude Include="..\hsimpkit\pcol_vertex.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\mixmsg.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\MxBlock.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\MxDynBlock.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\MxHeap.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\MxMat3.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\MxMat4.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\MxQMetric3.h" />
+    <ClInclude Include="..\hsimpkit\MixKit\stdmix.h" />
+    <ClInclude Include="..\hsimpkit\mc.h" />
+    <ClInclude Include="..\hsimpkit\mc_simp.h" />
+    <ClInclude Include="..\hsimpkit\mcsimp_types.h" />
+    <ClInclude Include="..\hsimpkit\mt.h" />
+    <ClInclude Include="..\hsimpkit\vol_set.h" />
+    <ClInclude Include="..\hsimpkit\ply\ply.h" />
+    <ClInclude Include="..\hsimpkit\ply\ply_inc.h" />
+    <ClInclude Include="mesh_generator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\hsimpkit\h_math.cpp" />
+    <ClCompile Include="..\hsimpkit\ply_stream.cpp" />
+    <ClCompile Include="..\hsimpkit\qio.cpp" />
+    <ClCompile Include="..\hsimpkit\random.c" />
+    <ClCompile Include="..\hsimpkit\trivial.cpp" />
+    <ClCompile Include="..\hsimpkit\ecol_iterative_quadric.cpp" />
+    <ClCompile Include="..\hsimpkit\pcol_iterative.cpp" />
+    <ClCompile Include="..\hsimpkit\MixKit\mixmsg.cxx" />
+    <ClCompile Include="..\hsimpkit\MixKit\MxHeap.cxx" />
+    <ClCompile Include="..\hsimpkit\MixKit\MxMat3-jacobi.cxx" />
+    <ClCompile Include="..\hsimpkit\MixKit\MxMat4-jacobi.cxx" />
+    <ClCompile Include="..\hsimpkit\MixKit\MxQMetric3.cxx" />
+    <ClCompile Include="..\libgfx\src\geom3d.cxx" />
+    <ClCompile Include="..\libgfx\src\geom4d.cxx" />
+    <ClCompile Include="..\libgfx\src\mat2.cxx" />
+    <ClCompile Include="..\libgfx\src\mat3.cxx" />
+    <ClCompile Include="..\libgfx\src\mat4.cxx" />
+    <ClCompile Include="..\libgfx\src\quat.cxx" />
+    <ClCompile Include="..\libgfx\src\script.cxx" />
+    <ClCompile Include="..\libgfx\src\symmat3.cxx" />
+    <ClCompile Include="..\libgfx\src\symmat4.cxx" />
+    <ClCompile Include="..\libgfx\src\time.cxx" />
+    <ClCompile Include="..\hsimpkit\mc.cpp" />
+    <ClCompile Include="..\hsimpkit\mc_simp.cpp" />
+    <ClCompile Include="..\hsimpkit\mc_table.cpp" />
+    <ClCompile Include="..\hsimpkit\mcsimp_types.cpp" />
+    <ClCompile Include="..\hsimpkit\mt.cpp" />
+    <ClCompile Include="..\hsimpkit\vol_set.cpp" />
+    <ClCompile Include="..\hsimpkit\ply\ply_additional.cpp" />
+    <ClCompile Include="..\hsimpkit\ply\ply_read.cpp" />
+    <ClCompile Include="..\hsimpkit\ply\plyfile.cpp" />
+    <ClCompile Include="mesh_generator.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -4,9 +4,8 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __H_PATCHING_SIMP__
 #define __H_PATCHING_SIMP__
@@ -21,6 +20,7 @@
 #include <boost/unordered_map.hpp>
 
 #include "lru_cache.h"
+#include "lru_vertex.h"
 #include "ply_stream.h"
 
 #include "mesh_patch.h"
@@ -60,7 +60,7 @@ unordered_map<
 	HTripleHash, HTripleSequencedEqual> 
 HIndexPatchMap;
 
-/* out-of-core mesh divide base on the uniform grid */
+/* The Cutting Based Out-of-core Mesh Simplification Class */
 class PatchingSimp {
 
 	/////////////////////////////////////
@@ -101,6 +101,7 @@ public:
 
 	/////////////////////////////////////
 	// SIMPLIFY
+
 	bool simplfiyPatchesToPly(uint target_vert);
 	template<class VOutType, class FOutType, class IdMapStreamType>
 	bool mergeSimp(uint target_vert, VOutType &vout, FOutType &fout, 
@@ -369,8 +370,9 @@ HGridPatch* PatchingSimp::getPatch(const HPatchIndex &pi) {
 	return pPatch;
 }
 
-bool PatchingSimp::addFaceToPatch(const HTriple<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3) {
-
+bool PatchingSimp::addFaceToPatch(
+	const HTriple<uint> &face, const HVertex v1, const HVertex v2, const HVertex v3
+){
 	HTriple<uint> v1pindex, v2pindex, v3pindex;
 	HGridPatch *pPatch1, *pPatch2, *pPatch3;
 
@@ -466,8 +468,9 @@ bool PatchingSimp::addFaceToPatch(const HTriple<uint> &face, const HVertex v1, c
 }
 
 template<class VOutType, class FOutType, class IdMapStreamType>
-bool PatchingSimp::mergeSimp(uint target_vert, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_map) {
-
+bool PatchingSimp::mergeSimp(
+	uint target_vert, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_map
+){
 	int i;
 	HGridPatch patch;
 	uint verts_gen;

@@ -106,13 +106,23 @@ void HMesh::initMenus() {
 				_color_group->addAction(_action_face_color);
 				connect(_action_face_color, SIGNAL(triggered()), this, SLOT(on_face_color()));
 				_action_face_color->setChecked(true);
+
+		_action_draw_tri_index = _menu_render->addAction("Draw Tri Index");
+		_action_draw_tri_index->setCheckable(true);
+		_action_draw_tri_index->setChecked(false);
+		connect(_action_draw_tri_index, SIGNAL(changed()), this, SLOT(on_draw_tri_index()));
+
+		_action_light_on = _menu_render->addAction("Light On");
+		_action_light_on->setCheckable(true);
+		_action_light_on->setChecked(false);
+		connect(_action_light_on, SIGNAL(changed()), this, SLOT(on_light_on_off()));
 }
 
 void HMesh::on_open_file()
 {
 	_file_name = QFileDialog::getOpenFileName(this,
 		tr("Open File"), this->_prev_path,
-		tr("Mesh Files(*.ply *.tris);;"
+		tr("Mesh Files(*.ply *.tris *._tris);"
 		"All Files(*.*)"));
 	_prev_path = _file_name;
 	_file_ext = _file_name.mid(_file_name.lastIndexOf(".") + 1);
@@ -183,9 +193,9 @@ void HMesh::on_psimp() {
 		argv[i] = new char[strlen(arg_list[i].toLocal8Bit().data()) + 1];
 		memcpy(argv[i], arg_list[i].toLocal8Bit().data(), strlen(arg_list[i].toLocal8Bit().data()) + 1);
 	}
-	extern int psimp_entry(int, char**, bool);
+	//extern int psimp_entry(int, char**, bool);
 	cout << endl;
-	psimp_entry(arg_list.count(), argv, false);
+	//psimp_entry(arg_list.count(), argv, false);
 
 	QString pure_name = _file_name.mid(_file_name.lastIndexOf("/") + 1);
 	pure_name = pure_name.mid(0, pure_name.lastIndexOf("."));
@@ -202,8 +212,8 @@ void HMesh::on_mc() {
 	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
 
 	QMCDialog mcDialog(this);
-	connect(&mcDialog, SIGNAL(mcParams(string, double)), 
-			_hglwidget, SLOT(setDrawMC(string, double)));
+	connect(&mcDialog, SIGNAL(mcParams(string, double, int*)), 
+			_hglwidget, SLOT(setDrawMC(string, double, int*)));
 	mcDialog.exec();
 
 	//_hglwidget->setDrawMC("D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat", 100.5);
@@ -216,8 +226,8 @@ void HMesh::on_mcsimp() {
 	//"D:/volsets/CT_128x128x53_char/CT_128x128x53_char.dat"
 
 	QMCSimpDialog mcsimpDialog(this);
-	connect(&mcsimpDialog, SIGNAL(mcsimpParams(string, double, double, unsigned int)), 
-			_hglwidget, SLOT(setDrawMCSimp(string, double, double, unsigned int)));
+	connect(&mcsimpDialog, SIGNAL(mcsimpParams(string, double, int*, double, unsigned int)), 
+			_hglwidget, SLOT(setDrawMCSimp(string, double, int*, double, unsigned int)));
 	int return_code = mcsimpDialog.exec();
 	if(return_code == QDialog::Rejected) {
 		return;

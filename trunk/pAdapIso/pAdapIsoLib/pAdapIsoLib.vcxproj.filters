@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="nvtimer.h" />
+    <ClInclude Include="p_adap_iso.h" />
+    <ClInclude Include="..\..\HMesh\HMesh\tri_soup_stream.h" />
+    <ClInclude Include="..\..\hsimpkit\common_types.h" />
+    <ClInclude Include="..\..\hsimpkit\data_type.h" />
+    <ClInclude Include="..\..\hsimpkit\mc.h" />
+    <ClInclude Include="..\..\hsimpkit\qio.h" />
+    <ClInclude Include="..\..\hsimpkit\vol_set.h" />
+    <ClInclude Include="..\..\hsimpkit\trivial.h" />
+    <ClInclude Include="padap_dbg.h">
+      <Filter>cuda files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="child_config.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda_helper.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="iso_gen.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="mt.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="octree_build.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="octree_face.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="p_adap_iso.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="octree_edge.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="edge_iso_gen.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuPrintf.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="dbg_help.cu">
+      <Filter>cuda files</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\HMesh\HMesh\tri_soup_stream.cpp" />
+    <ClCompile Include="..\..\hsimpkit\qio.cpp" />
+    <ClCompile Include="..\..\hsimpkit\vol_set.cpp" />
+    <ClCompile Include="..\..\hsimpkit\trivial.cpp" />
+    <ClCompile Include="iso_math.cu">
+      <Filter>cuda files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="cuda files">
+      <UniqueIdentifier>{5b1e3f2b-6270-4b8a-8ef4-ddfb1165994c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cuPrintf.cuh">
+      <Filter>cuda files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

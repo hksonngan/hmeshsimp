@@ -1,4 +1,4 @@
-/* random.h */
+/* random number genertion, dragged from web */
 
 #ifndef __U_RANDOM_USED_BY_HT__
 #define __U_RANDOM_USED_BY_HT__

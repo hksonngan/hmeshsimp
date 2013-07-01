@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply;../;../libgfx/include;../mixkit/src"
+				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply;../;../libgfx/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -103,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply;../;../libgfx/include;../mixkit/src"
+				AdditionalIncludeDirectories="&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;./;./ply;../;../libgfx/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -635,6 +635,22 @@
 			</File>
 			<File
 				RelativePath=".\mcsimp_types.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mt.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mt2.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mt2.h"
 				>
 			</File>
 			<File

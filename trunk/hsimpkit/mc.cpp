@@ -4,6 +4,8 @@
 
 #include "mc.h"
 
+#define ABS(v) ((v)>=0? (v): -(v))
+
 namespace MC {
 
 /*

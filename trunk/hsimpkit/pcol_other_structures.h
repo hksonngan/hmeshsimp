@@ -17,6 +17,7 @@
 #define FACE_INVALID MAX_CHAR
 
 
+// The vertex pair class stored in the priority queue
 /* The pairs stored in the priority queue should always point to the valid vertices, such that the
 abandoned pairs should be freed. Note that the pair_heap only stores a pointer to the real struct, 
 and the 'adjacent_col_pairs' field also stores a pointer to the real 'CollapsablePair' structure
@@ -74,6 +75,7 @@ public:
 	HVertex	new_vertex;
 };
 
+// The face type that are used in pair collapse
 /* Like the pairs, the vertex indices always point
    to the valid vertices, so the indices may be
    changed along the collapse. But if it is invalidated,

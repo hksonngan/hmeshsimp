@@ -4,9 +4,8 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __HASH_DEF__
 #define __HASH_DEF__
@@ -60,7 +59,6 @@ typedef unordered_set<HFaceIndex, HFaceIndexHash, HFaceIndexEqual> HFaceIndexSet
 /* -- hash -- */
 
 /* the hash functor */
-/* !!this name is a little improper, will change it or not */ 
 class HTripleHash
 {
 public:

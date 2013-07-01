@@ -4,7 +4,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 
@@ -16,7 +16,7 @@
 enum WhichSide
 { Side1, Side2 };
 
-/* calculate face formula */
+// class used to calculate face formula
 class HFaceFormula
 {
 public:
@@ -42,7 +42,7 @@ public:
 	float _a, _b, _c, _d;
 };
 
-/* quadric error matrix */
+// quadric error matrix class
 template<class FloatType>
 class HQEMatrix
 {
@@ -154,6 +154,7 @@ HQEMatrix<FloatType>& HQEMatrix<FloatType>::operator*= (FloatType f)
 	return *this;
 }
 
+// calculate a triangle normal
 inline HNormal triangleNormal(HVertex &v1, HVertex &v2, HVertex &v3) {
 	HNormal e1, e2, nm;	
 

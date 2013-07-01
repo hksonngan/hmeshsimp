@@ -29,9 +29,8 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  * 
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __LRU_CACHE__
 #define __LRU_CACHE__
@@ -146,7 +145,7 @@ private:
 	bool		cfile;
 	ifstream	*fin;
 	ifstream	fin_obj;
-	streampos	start_pos;
+	long        start_pos;
 	FILE		*fp;
 	fpos_t		start_pos_c;
 

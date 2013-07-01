@@ -1,3 +1,12 @@
+/*
+ *  Qt Main Window For HMesh Gui Executable
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
+
 #ifndef HMESH_H
 #define HMESH_H
 
@@ -6,6 +15,7 @@
 #include "hGLWidget.h"
 #include "dialog/qslimdialog.h"
 
+// Qt Main Window For HMesh Gui Executable
 class HMesh : public QMainWindow
 {
 	Q_OBJECT
@@ -49,6 +59,8 @@ private:
 			QActionGroup* _color_group;
 				QAction* _action_vert_color;
 				QAction* _action_face_color;
+		QAction* _action_draw_tri_index;
+		QAction* _action_light_on;
 
 public slots:
 	void on_open_file();
@@ -64,6 +76,9 @@ public slots:
 	
 	void on_vert_color() { _hglwidget->colorMode(VERT_COLOR); _hglwidget->update(); }
 	void on_face_color() { _hglwidget->colorMode(FACE_COLOR); _hglwidget->update(); }
+
+	void on_draw_tri_index() { _hglwidget->setDrawTriIndex(); _hglwidget->update(); }
+	void on_light_on_off() {  _hglwidget->setLightOnOff(); _hglwidget->update(); }
 };
 
 #endif // HMESH_H

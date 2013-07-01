@@ -104,6 +104,15 @@ void ply_read_file(char* filename)
     return;
   }
 
+  /* check the endian mode */
+  SYSTEM_ENDIAN_MODE = getSystemEndianMode();
+  if (ply->file_type == PLY_BINARY_BE/* binary PLY file, big endian */) {
+    FILE_ENDIAN_MODE = H_BIG_ENDIAN;
+  }
+  else if (ply->file_type == PLY_BINARY_LE/* binary PLY file, little endian */) {
+    FILE_ENDIAN_MODE = H_LITTLE_ENDIAN;
+  }
+
   for (i = 0; i < nelems; i++) {
 
     /* get the description of the first element */
@@ -139,7 +148,9 @@ void ply_read_file(char* filename)
 	    // modified by houtao
         //vlist[j] = (Vertex *) malloc (sizeof (Vertex));
 		vlist[j].other_props = NULL;
-        ply_get_element (ply, (void *) &vlist[j]);
+		// modified by ht
+        //ply_get_element (ply, (void *) &vlist[j]);
+		ply_get_element (ply, reinterpret_cast<void*>(vlist+j));
       }
     }
     else if (equal_strings ("face", elem_name)) {

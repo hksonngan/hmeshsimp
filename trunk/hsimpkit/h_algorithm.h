@@ -1,10 +1,10 @@
 /*
- *  Algorithm
+ *  Some Algorithms Implemented
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __H_ALGORITHM__
@@ -213,6 +213,7 @@ void merge_sorted_arr(
 	}
 };
 
+/* merge unsorted array */
 template<class ElemType, class ContainerType>
 void merge_arr(
 	ContainerType &arr1, int arr1_count, 
@@ -224,6 +225,7 @@ void merge_arr(
 	merge_sorted_arr<ElemType, ContainerType>(arr1, arr1_count, arr2, arr2_count, dst);
 }
 
+// Insertion Sort
 template<class ElemType, class ContainerType>
 inline void insertion_sort(ContainerType &arr, int n) {
 

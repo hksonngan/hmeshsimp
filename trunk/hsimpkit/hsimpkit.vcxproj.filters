@@ -1,0 +1,307 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="math">
+      <UniqueIdentifier>{bde497c0-cf65-4e76-bbd0-0d4b5601867a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ply">
+      <UniqueIdentifier>{edb1d6bf-d702-4e48-987e-6ae598737cf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file_io">
+      <UniqueIdentifier>{e5a31513-95c4-46d7-8829-3f50b9d317e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vertex_clustering">
+      <UniqueIdentifier>{181be8ee-1cb5-4990-a985-2e840b6b4512}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="spatial_division">
+      <UniqueIdentifier>{7a4dee65-1424-4b5f-bb7d-ebcdfe3f5b2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data_structures&amp;algorithms">
+      <UniqueIdentifier>{665f96f4-dc37-45d1-9c7f-161c5484020e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{dd8a25aa-2087-4218-82e9-d773411d68d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="edge_collapse">
+      <UniqueIdentifier>{9479c407-3397-4696-8216-052b6dc7bf2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="edge_collapse\MixKit">
+      <UniqueIdentifier>{5f4d687a-6b2a-4f54-ba7e-53923b367745}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="patching_simp">
+      <UniqueIdentifier>{0d7003d9-9f44-43d7-ad3d-3694a6fed229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mc_simp">
+      <UniqueIdentifier>{2cf83096-45d5-4c77-9f08-d4adefdc9ba3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="math\chapill_vec3.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\chapill_vec4.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\mat44.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="ply\ply_inc.h">
+      <Filter>ply</Filter>
+    </ClInclude>
+    <ClInclude Include="ply_stream.h">
+      <Filter>file_io</Filter>
+    </ClInclude>
+    <ClInclude Include="qio.h">
+      <Filter>file_io</Filter>
+    </ClInclude>
+    <ClInclude Include="tri_soup_stream.h">
+      <Filter>file_io</Filter>
+    </ClInclude>
+    <ClInclude Include="vertex_cluster.h">
+      <Filter>vertex_clustering</Filter>
+    </ClInclude>
+    <ClInclude Include="spatial_division.h">
+      <Filter>spatial_division</Filter>
+    </ClInclude>
+    <ClInclude Include="spatial_division2.h">
+      <Filter>spatial_division</Filter>
+    </ClInclude>
+    <ClInclude Include="double_heap.h">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="h_algorithm.h">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="h_dynamarray.h">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="h_esort.h">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="hash_def.h">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="lru_cache.h">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="random.h">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="common_def.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common_types.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="data_type.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="h_aug_time.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="h_math.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="h_time.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="os_dependent.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="trivial.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\mixmsg.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\MxBlock.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\MxDynBlock.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\MxHeap.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\MxMat3.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\MxMat4.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\MxQMetric3.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="MixKit\stdmix.h">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="grid_patch.h">
+      <Filter>patching_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="id_map_stream.h">
+      <Filter>patching_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="mem_stream.h">
+      <Filter>patching_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_patch.h">
+      <Filter>patching_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="patching_simp.h">
+      <Filter>patching_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="mc.h">
+      <Filter>mc_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="mc_simp.h">
+      <Filter>mc_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="mcsimp_types.h">
+      <Filter>mc_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="vol_set.h">
+      <Filter>mc_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="mt.h">
+      <Filter>mc_simp</Filter>
+    </ClInclude>
+    <ClInclude Include="io_common.h">
+      <Filter>file_io</Filter>
+    </ClInclude>
+    <ClInclude Include="lru_vertex.h">
+      <Filter>patching_simp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ply\ply_additional.cpp">
+      <Filter>ply</Filter>
+    </ClCompile>
+    <ClCompile Include="ply\ply_read.cpp">
+      <Filter>ply</Filter>
+    </ClCompile>
+    <ClCompile Include="ply\plyfile.cpp">
+      <Filter>ply</Filter>
+    </ClCompile>
+    <ClCompile Include="ply_stream.cpp">
+      <Filter>file_io</Filter>
+    </ClCompile>
+    <ClCompile Include="qio.cpp">
+      <Filter>file_io</Filter>
+    </ClCompile>
+    <ClCompile Include="tri_soup_stream.cpp">
+      <Filter>file_io</Filter>
+    </ClCompile>
+    <ClCompile Include="ooc_vertex_clustering.cpp">
+      <Filter>vertex_clustering</Filter>
+    </ClCompile>
+    <ClCompile Include="oocsimp.cpp">
+      <Filter>vertex_clustering</Filter>
+    </ClCompile>
+    <ClCompile Include="vertex_cluster.cpp">
+      <Filter>vertex_clustering</Filter>
+    </ClCompile>
+    <ClCompile Include="spatial_division.cpp">
+      <Filter>spatial_division</Filter>
+    </ClCompile>
+    <ClCompile Include="spatial_division2.cpp">
+      <Filter>spatial_division</Filter>
+    </ClCompile>
+    <ClCompile Include="random.c">
+      <Filter>data_structures&amp;algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="getopt.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="h_math.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="os_dependent.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="trivial.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="ecol_iterative_quadric.cpp">
+      <Filter>edge_collapse</Filter>
+    </ClCompile>
+    <ClCompile Include="pcol_iterative.cpp">
+      <Filter>edge_collapse</Filter>
+    </ClCompile>
+    <ClCompile Include="MixKit\mixmsg.cxx">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="MixKit\MxHeap.cxx">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="MixKit\MxMat3-jacobi.cxx">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="MixKit\MxMat4-jacobi.cxx">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="MixKit\MxQMetric3.cxx">
+      <Filter>edge_collapse\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="grid_patch.cpp">
+      <Filter>patching_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh_patch.cpp">
+      <Filter>patching_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="patching_simp.cpp">
+      <Filter>patching_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="psimp_entry.cpp">
+      <Filter>patching_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="mc.cpp">
+      <Filter>mc_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="mc_simp.cpp">
+      <Filter>mc_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="mc_table.cpp">
+      <Filter>mc_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="mcsimp_types.cpp">
+      <Filter>mc_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="vol_set.cpp">
+      <Filter>mc_simp</Filter>
+    </ClCompile>
+    <ClCompile Include="esorttest.cpp" />
+    <ClCompile Include="merge_arr_test.cpp" />
+    <ClCompile Include="oo_test.cpp" />
+    <ClCompile Include="partition_test.cpp" />
+    <ClCompile Include="sort_test.cpp" />
+    <ClCompile Include="mt.cpp">
+      <Filter>mc_simp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="ply\ply.h">
+      <Filter>ply</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="ooc_vertex_clustering.h">
+      <Filter>vertex_clustering</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="oocsimp.h">
+      <Filter>vertex_clustering</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="ecol_iterative_quadric.h">
+      <Filter>edge_collapse</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="pcol_iterative.h">
+      <Filter>edge_collapse</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="pcol_other_structures.h">
+      <Filter>edge_collapse</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="pcol_vertex.h">
+      <Filter>edge_collapse</Filter>
+    </CustomBuildStep>
+  </ItemGroup>
+</Project>

@@ -12,7 +12,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 
@@ -112,11 +112,13 @@ public:
 /* external radixable record interface */
 class hERadixRecord : public hERecord, public hRadixRecord {};
 
-/* a class acting as the value stored in the heap
-	   the 'index' acts as a index to the container of
-	   ERadixRecordType, 'container' acts as a container
-	   which contains one just-loaded records from every
-	   patches */
+/* 
+  a class acting as the value stored in the heap
+  the 'index' acts as a index to the container of
+  ERadixRecordType, 'container' acts as a container
+  which contains one just-loaded records from every
+  patches 
+*/
 template<class ERadixRecordType>
 class HeapableIndex {
 public:
@@ -132,8 +134,10 @@ public:
 template<class ERadixRecordType>
 ERadixRecordType* HeapableIndex<ERadixRecordType>::container;
 
-/* external sort common operations 
-   'ERadixRecordType' must be a derivative of hERadixRecord */
+/* 
+  external sort common operations 
+  'ERadixRecordType' must be a derivative of hERadixRecord 
+*/
 template<class ERadixRecordType>
 class hESortCommon {
 public:
@@ -167,14 +171,12 @@ private:
 	char	name_buf[500];
 	string	dir_name;
 };
-	
 
 /* ======================== $ IMPLEMENTATION $ ========================= */
 
 /* hIRadixSort */
 template<class ContainerType> 
 hIRadixSort<ContainerType>::hIRadixSort() {
-
 	index = NULL;
 	index_count = 0;
 	bucket = NULL;
@@ -183,7 +185,6 @@ hIRadixSort<ContainerType>::hIRadixSort() {
 
 template<class ContainerType> 
 hIRadixSort<ContainerType>::~hIRadixSort() {
-
 	if (index) {
 		delete[] index;
 	}
@@ -195,7 +196,6 @@ hIRadixSort<ContainerType>::~hIRadixSort() {
 
 template<class ContainerType> 
 bool hIRadixSort<ContainerType>::operator() (ContainerType arr, int arr_count) {
-
 	int i;
 
 	if (index_count < arr_count) {

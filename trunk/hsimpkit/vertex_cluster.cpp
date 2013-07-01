@@ -12,8 +12,8 @@
 /* --HVertexCluster-- */
 
 HVertex& HVertexCluster::
-			calcRepresentativeVertex(RepCalcPolicy p, float c_max_x, float c_min_x, float c_max_y, 
-										float c_min_y, float c_max_z, float c_min_z) {
+	calcRepresentativeVertex(RepCalcPolicy p, float c_max_x, float c_min_x, float c_max_y, 
+								float c_min_y, float c_max_z, float c_min_z) {
 
 	/* if the qem is not invertible, 
 	   it won't modify the input vertex */
