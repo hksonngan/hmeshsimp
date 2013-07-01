@@ -90,7 +90,7 @@ bool HGridPatch::patchToPly(const char* dir_path, const HTriple<uint> grid_index
 	}
 
 	closeForRead();
-	id_map.clear();
+	//id_map.clear();
 
 	return true;
 }

@@ -14,4 +14,6 @@
 
 using std::string;
 
-bool pAdaptiveIso(const string& filename, int startDepth, float errorThresh, ___OUT string& errorStr);
+bool pAdaptiveIso(
+	const string& filename, const int startDepth, const float errorThresh, 
+	const float isovalue, ___OUT string& info);

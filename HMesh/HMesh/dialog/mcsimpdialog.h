@@ -1,3 +1,12 @@
+/*
+ *  Qt Dialog for On-the-fly Simplification of Marching Cubes Iso-surfaces
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
+
 #ifndef QMCSIMPDIALOG_H
 #define QMCSIMPDIALOG_H
 
@@ -9,6 +18,7 @@
 class QString;
 using std::string;
 
+// Qt Dialog for On-the-fly Simplification of Marching Cubes Iso-surfaces
 class QMCSimpDialog : public QDialog, public Ui::MCSimpDialog 
 {
 	Q_OBJECT
@@ -21,7 +31,8 @@ private:
 	void validateInput();
 
 signals:
-	void mcsimpParams(string filename, double isovalue, double deimateRate, unsigned int maxNewTri);	
+	void mcsimpParams(string filename, double isovalue, 
+        int* sampleStride, double deimateRate, unsigned int maxNewTri);	
 
 public slots:
 	void onAccept();
@@ -36,7 +47,10 @@ private:
 	QDataFormat dataFormat;
 	double isoValue;
 	double decimateRate;
+    int sampleStride[3];
 	QRegExpValidator *numValidator;
+    QRegExpValidator *floatValidator;
+    QRegExpValidator *uintValidator;
 };
 
 #endif

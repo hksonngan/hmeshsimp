@@ -1,7 +1,11 @@
-/***********************************************
- author : houtao
- spec   : qt opengl widget for displaying meshes
-***********************************************/
+/*
+ *  Qt OpenGL Widget For Displaying Meshes
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
 
 #ifndef H_GL_WIDGET
 #define H_GL_WIDGET
@@ -26,10 +30,12 @@ using std::string;
 
 enum PrimitiveMode { SMOOTH, FLAT, FLAT_LINES, WIREFRAME };
 enum ColorMode { VERT_COLOR, FACE_COLOR };
-enum DrawWhich { NONE, DRAW_PLY, DRAW_TRIS, DRAW_QSLIM, DRAW_MC_TRIS, DRAW_H_INDEXED_MESH };
+enum DrawWhich { 
+	NONE, DRAW_PLY, DRAW_TRIS, DRAW_QSLIM, DRAW_MC_TRIS, 
+	DRAW_H_INDEXED_MESH, DRAW_VERB_INDEXED_MESH };
 
-class hGlWidget : public QGLWidget
-{
+// Qt OpenGL Widget For Displaying Meshes
+class hGlWidget : public QGLWidget {
 	Q_OBJECT
 
 protected:
@@ -55,12 +61,19 @@ private:
 	void drawPly();
 	void drawIndexedMesh();
 	void setLights();
+	void setColor();
 	void setMaterial();
 	void applyTransform();
+    void clearAllModels();
+	void showText(float x, float y, float z, char *text);
+	void showNum(float x, float y, float z, int n);
+	void getMCTrisMaxMin();
+	HVertex getTriIndexTextPos(HVertex v1, HVertex v2, HVertex v3);
 
 public slots:
-	void setDrawMCSimp(string filename, double isovalue, double deimateRate, unsigned int maxNewTri);
-	bool setDrawMC(string filename, double isovalue);
+	void setDrawMCSimp(string filename, double isovalue, 
+        int* sampleStride, double deimateRate, unsigned int maxNewTri);
+	bool setDrawMC(string filename, double isovalue, int* sampleStride);
 
 public:
 	hGlWidget();
@@ -72,16 +85,18 @@ public:
 
 	void primitiveMode(PrimitiveMode m) { _primitive_mode = m; }
 	void colorMode(ColorMode m) { _color_mode = m; }
+	void setDrawTriIndex();
+	void setLightOnOff();
 
 private:
 	// variables concerning drawing objects
-	//bool _draw_qslim;
-	//bool _draw_ply;
-	//bool _draw_tris;
 	DrawWhich _drawWhich;
 
 	PrimitiveMode	_primitive_mode;
 	ColorMode		_color_mode;
+	bool			_draw_tri_index;
+	bool			_draw_all_tri_index;
+	bool			_light_on;
 
 	// info about bounding box
 	float _max_x, _min_x;
@@ -102,11 +117,13 @@ private:
 	vector<HNormal>	fnormals;
 
 	TriangleSoupContainer	_tris_container;
-	vector<TRIANGLE>		_mc_tris;
+	vector<float>           _mc_tris;
 	vector<HVertex>			vertVec;
 	vector<HFace>			faceVec;
 	unsigned int			numvert;
 	unsigned int			numface;
+	vector<float>			vertVecVerb;
+	vector<int>				faceVecVerb;
 };
 
 #endif

@@ -1,5 +1,5 @@
 #include "ply_stream.h"
-#include "ply.h"
+#include "ply/ply.h"
 #include "trivial.h"
 
 PlyStream::PlyStream()

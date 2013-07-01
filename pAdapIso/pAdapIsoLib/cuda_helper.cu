@@ -14,36 +14,23 @@
 
 using std::string;
 
-#ifndef MIN
-#define MIN(a,b) (a) < (b) ? (a) : (b)
-#endif
-#ifndef MAX
-#define MAX(a,b) (a) > (b) ? (a) : (b)
-#endif
-
 // This will output the proper CUDA error strings in the event that a CUDA host call returns an error
-inline void __checkCudaErrors(cudaError err, const char *file, const int line )
+inline void checkCudaErrors(cudaError err, const char *file, const int line)
 {
     if(cudaSuccess != err)
     {
 		std::ostringstream stringStream;
 		stringStream << file << "(line " << line << ") : CUDA Runtime API error " 
 			<< (int)err << ": " << cudaGetErrorString(err) << ".\n";
-		std::cerr << stringStream.str();
+		//std::cerr << stringStream.str();
 		throw stringStream.str();
     }
 
 	return;
 }
 
-inline void checkCudaErrors(cudaError err)  {
-	__checkCudaErrors (err, __FILE__, __LINE__);
-}
-
 // This will output the proper error string when calling cudaGetLastError
-#define getLastCudaError(msg)      __getLastCudaError (msg, __FILE__, __LINE__)
-
-inline void __getLastCudaError(const char *errorMessage, const char *file, const int line )
+inline void getLastCudaError(const char *errorMessage, const char *file, const int line)
 {
     cudaError_t err = cudaGetLastError();
     if (cudaSuccess != err)
@@ -87,7 +74,7 @@ inline int _ConvertSMVer2Cores(int major, int minor)
 int gpuDeviceInit(int devID)
 {
     int deviceCount;
-    checkCudaErrors(cudaGetDeviceCount(&deviceCount));
+    checkCudaErrors(cudaGetDeviceCount(&deviceCount), __FILE__, __LINE__);
 
     if (deviceCount == 0)
     {
@@ -108,7 +95,7 @@ int gpuDeviceInit(int devID)
     }
 
     cudaDeviceProp deviceProp;
-    checkCudaErrors( cudaGetDeviceProperties(&deviceProp, devID) );
+    checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID), __FILE__, __LINE__);
 
     if (deviceProp.major < 1)
     {
@@ -116,7 +103,7 @@ int gpuDeviceInit(int devID)
         exit(-1);                                                  
     }
     
-    checkCudaErrors( cudaSetDevice(devID) );
+    checkCudaErrors(cudaSetDevice(devID), __FILE__, __LINE__);
     printf("gpuDeviceInit() CUDA Device [%d]: \"%s\n", devID, deviceProp.name);
 
     return devID;
@@ -181,7 +168,6 @@ int gpuGetMaxGflopsDeviceId()
     return max_perf_device;
 }
 
-
 // Initialization code to find the best CUDA Device
 int findCudaDevice(/*int argc, const char **argv*/)
 {
@@ -211,9 +197,9 @@ int findCudaDevice(/*int argc, const char **argv*/)
     //{
         // Otherwise pick the device with highest Gflops/s
         devID = gpuGetMaxGflopsDeviceId();
-        checkCudaErrors( cudaSetDevice( devID ) );
-        checkCudaErrors( cudaGetDeviceProperties(&deviceProp, devID) );
-        printf("GPU Device %d: \"%s\" with compute capability %d.%d\n\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
+        checkCudaErrors(cudaSetDevice(devID), __FILE__, __LINE__);
+        checkCudaErrors(cudaGetDeviceProperties(&deviceProp, devID), __FILE__, __LINE__);
+		printf("#GPU Device %d: \"%s\" with compute capability %d.%d\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
     //}
     return devID;
 }

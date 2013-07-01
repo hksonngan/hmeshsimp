@@ -1,12 +1,11 @@
 /*
- *  Some trivial operations
+ *  Some Trivial But Very Commonly Used Operations
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __TRIVIAL__
 #define __TRIVIAL__
@@ -20,22 +19,24 @@ using std::string;
 enum EndianOrder { H_BIG_ENDIAN, H_LITTLE_ENDIAN };
 
 // trim the extention of the file name and append some str
-extern void trimExtAndAppend(char *src, char *dst, char *app);
+void trimExtAndAppend(char *src, char *dst, char *app);
 
 // get file name without extension and directory path
-extern string getFilename(const char *filepath);
+string getFilename(const char *filepath);
 
 // get file name with extension
-extern string getExtFilename(const char *filepath);
+string getExtFilename(const char *filepath);
 
-extern string getFileExtension(const char *filepath);
+string getFileExtension(const char *filepath);
+
+string getNextWordBetweenSpace(const int pos, const string& str);
 
 // get the system endian mode
-extern EndianOrder getSystemEndianMode();
+EndianOrder getSystemEndianMode();
 
-extern char* getTime();
+char* getTime();
 
-extern void stringToCstr(string &str, char* cstr);
+void stringToCstr(string &str, char* cstr);
 
 // switch bytes for a variable
 inline void switchBytes(char* ptr, int size)
@@ -50,6 +51,6 @@ inline void switchBytes(char* ptr, int size)
 	}
 }
 
-extern char* getPlyBinaryFormat();
+char* getPlyBinaryFormat();
 
 #endif //__TRIVIAL__

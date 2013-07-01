@@ -1,7 +1,12 @@
 /*
- *  dragged from the web
- *  a similar implementation as in <unistd.h> of UNIX
- *    -ht
+ *  Get the Option Parameter from Command Line
+ *    - Dragged from the web
+ *    - A similar implementation as in <unistd.h> of UNIX
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef GETOPT_H_

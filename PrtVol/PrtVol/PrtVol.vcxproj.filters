@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\hsimpkit\vol_set.cpp" />
+    <ClCompile Include="..\..\hsimpkit\qio.cpp" />
+    <ClCompile Include="..\..\hsimpkit\trivial.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\hsimpkit\vol_set.h" />
+    <ClInclude Include="..\..\hsimpkit\double_heap.h" />
+    <ClInclude Include="..\..\hsimpkit\mc.h" />
+    <ClInclude Include="..\..\hsimpkit\qio.h" />
+    <ClInclude Include="..\..\hsimpkit\trivial.h" />
+  </ItemGroup>
+</Project>

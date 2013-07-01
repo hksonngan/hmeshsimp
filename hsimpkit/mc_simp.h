@@ -13,7 +13,6 @@
 
 #include <string>
 #include <vector>
-#define ARRAY_USE	1 // use hash as face and vertex array
 #include "pcol_iterative.h"
 #include "ecol_iterative_quadric.h"
 #include "data_type.h"
@@ -23,55 +22,74 @@
 
 using std::string;
 using std::vector;
+using std::ofstream;
 
 typedef Byte *pByte;
 
+// A Class that contains on-the-fly simplification
+// And Marching Cubes generation
 class MCSimp {
 private:
-	PairCollapse*	pcol;
-	double			isovalue;
-	VolumeSet		volSet;
-	VertexIndexMap	vertexMap;
+	PairCollapse*	_m_pcol;
+	double			_m_isovalue;
+	VolumeSet		_m_vol_set;
+	VertexIndexMap	_vertex_map;
 
 	// used for polygonization of cubes
-	HVertex			vertlist[12];
-	InterpOnWhich	onWhich[12];
-	unsigned int	vertIndex[12];
+	HVertex			_m_vert_list[12];
+	InterpOnWhich	_m_on_which[12];
+	unsigned int	_m_vert_index[12];
 	
-	// used for decimation
-	unsigned int	genVertCount;
-	unsigned int	genFaceCount;
-	unsigned int	newFaceCount;
-	const double	initDecimateRate;
+	// used for decimation/oocgen
+	unsigned int	_m_gen_vert_count;
+	unsigned int	_m_gen_face_count;
+	unsigned int	_m_new_face_count;
+	const double	_m_init_decimate_rate;
 
-	vector<HVertex>	verts;
-	vector<HFace>	faces;
+	//vector<HVertex>	_m_verts;
+	//vector<HFace>	faces;
 
-	string			INFO;
+	// for oocgen
+	void (MCSimp::*_m_final_vert_hook)(const uint &, const HVertex &);
+	ofstream		_m_vert_fout;
+	// vertices that are finalized but haven't been output
+	IndexVertexMap	_m_final_unput_verts;
+	// the index of the vertex that should be output next
+	unsigned int	_m_next_out_vert_index;
+
+	string			_m_info;
 
 public:
 	MCSimp(double _initDecimateRate = 0.5);
 	~MCSimp();
 
-	VolumeSet* getVolSet() { return &volSet; }
-	unsigned int getGenFaceCount() { return genFaceCount; }
-	unsigned int getGenVertCount() { return genVertCount; }
+	VolumeSet* getVolSet() { return &_m_vol_set; }
+	unsigned int getGenFaceCount() { return _m_gen_face_count; }
+	unsigned int getGenVertCount() { return _m_gen_vert_count; }
 
-	bool genIsosurfaces(string filename, double _isovalue, vector<TRIANGLE> &tris);
+	bool genIsosurfaces(string filename, double _isovalue, 
+        int *sampleStride, vector<float> &tris, VolumeSet *paraVolSet = NULL);
+	bool genIsosurfacesMT(string filename, double _isovalue, 
+		int *sampleStride, vector<float> &tris, VolumeSet *paraVolSet = NULL);
 	bool genCollapse(
-			string filename, double _isovalue, double decimateRate, 
-			unsigned int maxNewTri, unsigned int &nvert, unsigned int &nface);
+		string filename, double _isovalue, double decimateRate, 
+		int *sampleStride, unsigned int maxNewTri, unsigned int &nvert, 
+        unsigned int &nface, VolumeSet *paraVolSet = NULL);
+	bool oocIndexedGen(string input_file, string output_file, double _isovalue);
 	void toIndexedMesh(HVertex *vertArr, HFace *faceArr);
+	void toIndexedMesh(vector<float>& vertArr, vector<int>& faceArr);
 
-	string& info() { return INFO; }
-	void addInfo(const string &str) { INFO += str; }
-	void clearInfo() { INFO = ""; }
+	const std::string& info() { return _m_info; }
+	void addInfo(const string &str) { _m_info += str; }
+	void clearInfo() { _m_info = ""; }
 
 private:
 	XYZ vertexInterp(XYZ p1, XYZ p2, double valp1, double valp2, InterpOnWhich& onWhich);
-	void polygonise(const UINT4& gridIndex, const GRIDCELL& grid);
+	int polygonise(const UINT4& gridIndex, const GRIDCELL& grid, HFace *face);
 	inline unsigned int getVertIndex(const HVertex &v);
-	void finalizeVert(const uint &index, const HVertex &v);
+
+	void genColFinalVertHook(const uint &index, const HVertex &v);
+	void oocGenFinalVertHook(const uint &index, const HVertex &v);
 
 	inline bool rightMost(const UINT4 &cubeIndex);
 	inline bool backMost(const UINT4 &cubeIndex);
@@ -83,28 +101,28 @@ private:
 };
 
 unsigned int MCSimp::getVertIndex(const HVertex &v) {
-	VertexIndexMap::iterator iter = vertexMap.find(v);
-	if (iter == vertexMap.end()) {
+	VertexIndexMap::iterator iter = _vertex_map.find(v);
+	if (iter == _vertex_map.end()) {
 		CollapsableVertex *pcv;
-		pcol->addVertex(genVertCount, v, pcv);
+		_m_pcol->addVertex(_m_gen_vert_count, v, pcv);
 		pcv->unfinal();
-		vertexMap[v] = genVertCount ++;
-		return genVertCount - 1;
+		_vertex_map[v] = _m_gen_vert_count ++;
+		return _m_gen_vert_count - 1;
 	} else {
 		return iter->second;
 	}
 }
 
 bool MCSimp::rightMost(const UINT4 &cubeIndex) {
-	return cubeIndex.s[0] == volSet.volumeSize.s[0] - 2;
+	return _m_vol_set.rightMost(cubeIndex);
 }
 
 bool MCSimp::backMost(const UINT4 &cubeIndex) {
-	return cubeIndex.s[1] == volSet.volumeSize.s[1] - 2;
+	return _m_vol_set.backMost(cubeIndex);
 }
 
 bool MCSimp::downMost(const UINT4 &cubeIndex) {
-	return cubeIndex.s[2] == volSet.volumeSize.s[2] - 2;
+	return _m_vol_set.downMost(cubeIndex);
 }
 
 bool MCSimp::rightBackMost(const UINT4 &cubeIndex) {

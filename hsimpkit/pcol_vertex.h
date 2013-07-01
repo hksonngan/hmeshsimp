@@ -21,14 +21,14 @@
 #include "MixKit/MxQMetric3.h"
 
 
-#define UNREFER			0	// interior unreferred vertex mark
-#define REFERRED		1	// interior referred vertex mark
+#define UNREFER         0    // interior unreferred vertex mark
+#define REFERRED        1    // interior referred vertex mark
 /* below used when simplifying a patch of a mesh */
-#define INTERIOR_BOUND	2	// interior boundary (must be referred) vertex mark
-#define EXTERIOR		3	// exterior boundary (must be referred) vertex mark
+#define INTERIOR_BOUND  2    // interior boundary (must be referred) vertex mark
+#define EXTERIOR        3    // exterior boundary (must be referred) vertex mark
 /* below used for incremental simplifying */
-#define UNFINAL			4	// unfinalized vertices
-#define FINAL			5	// finalized vertices (the succeeding faces won't reference the vertex)
+#define UNFINAL         4    // unfinalized vertices
+#define FINAL           5    // finalized vertices (the succeeding faces won't reference the vertex)
 
 using std::list;
 
@@ -37,9 +37,10 @@ typedef HDynamArray<CollapsablePair*> pair_arr;
 typedef HDynamArray<uint> face_arr;
 typedef HDynamArray<uint> vert_arr;
 //typedef HQEMatrix<float> q_matrix;
-typedef MxQuadric3 q_matrix;
+//typedef MxQuadric3 q_matrix;
 
-/* out-of-core version */
+// a vertex type used for pair collapse
+/* out-of-core version ?? */
 class CollapsedVertex: public HVertex {
 public:
 	uint	new_id;		// the id after the collapse
@@ -64,7 +65,8 @@ public:
 	bool finalized() const { return mark == FINAL; }
 };
 
-/* in-core version */
+// a vertex type used for pair collapse with linkage information
+/* in-core version ?? */
 class CollapsableVertex: public CollapsedVertex {
 public:
 	inline CollapsableVertex();
@@ -110,23 +112,11 @@ adjacent_col_pairs(0)
 
 }
 
-/* edge collapse vertex with quadric error matrix */
-class QuadricVertex: public CollapsableVertex {
-public:
-
-public:
-	q_matrix	quadrics;	// quadric error matrix
-};
-
+// unused
 class HierarchyVertex: public CollapsableVertex {
 public:
 	face_list	alter_faces;	// faces need to alter when the vertex expand/contract
 	face_list	removed_faces;	// faces need to remove/insert when the vertex expand/contract
-};
-
-class HierarchyQuadricVertex: public HierarchyVertex {
-public:
-	q_matrix	quadrics;	// quadric error matrix
 };
 
 #endif //__PCOL_VERTEX__

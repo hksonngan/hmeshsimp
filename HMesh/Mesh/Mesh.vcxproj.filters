@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{b84de73d-4701-4115-a173-42a2e4ddc4a3}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{c94861e9-54fe-4f03-b069-51c5707a1631}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Header Files\ext">
+      <UniqueIdentifier>{5f1a94d5-5898-4ac2-9f47-52367df4aca2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ext">
+      <UniqueIdentifier>{82965b78-e794-4892-80ca-9a726a524163}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ext\Tetgen.h">
+      <Filter>Header Files\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\triangle.h">
+      <Filter>Header Files\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="meshdrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ext\Predicates.cpp">
+      <Filter>Source Files\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\Tetgen.cpp">
+      <Filter>Source Files\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\triangle.cpp">
+      <Filter>Source Files\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="meshdrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\GeneratedFiles;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;.\;..\Mesh;..\IcesopCore;..\..\hsimpkit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;..\..\libgfx\include;&quot;..\..\glew-1.8.0\include&quot;"
+				AdditionalIncludeDirectories=".\GeneratedFiles;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;.\;..\Mesh;..\IcesopCore;..\..\hsimpkit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;..\..\libgfx\include;&quot;..\..\glew-1.8.0\include&quot;;..\..\MeshGen\;&quot;..\..\glut-3.7.6-bin&quot;"
 				PreprocessorDefinitions=",UNICODE,WIN32,QT_LARGEFILE_SUPPORT;QT_NO_DEBUG,NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB"
 				RuntimeLibrary="2"
 				TreatWChar_tAsBuiltInType="false"
@@ -55,9 +55,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib $(OutDir)\IcesopCore.lib $(OutDir)\Mesh.lib $(OutDir)\hsimpkit.lib $(OutDir)\libgfx.lib ..\..\glew-1.8.0\lib\glew32.lib"
+				AdditionalDependencies="qtmain.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib opengl32.lib glu32.lib $(OutDir)\IcesopCore.lib $(OutDir)\Mesh.lib $(OutDir)\hsimpkit.lib $(OutDir)\libgfx.lib $(OutDir)\MeshGen.lib ..\..\glew-1.8.0\lib\glew32.lib glut32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="$(QTDIR)\lib"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;..\..\glut-3.7.6-bin&quot;"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 			/>
@@ -110,7 +110,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\GeneratedFiles;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;.\;..\Mesh;..\IcesopCore;..\..\hsimpkit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;..\..\libgfx\include;&quot;..\..\glew-1.8.0\include&quot;"
+				AdditionalIncludeDirectories=".\GeneratedFiles;&quot;$(QTDIR)\include&quot;;&quot;.\GeneratedFiles\$(ConfigurationName)&quot;;&quot;$(QTDIR)\include\qtmain&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;;&quot;$(QTDIR)\include\QtOpenGL&quot;;.\;..\Mesh;..\IcesopCore;..\..\hsimpkit;&quot;$(EIGEN_DIR)&quot;;&quot;$(BOOST_DIR)&quot;;..\..\libgfx\include;&quot;..\..\glew-1.8.0\include&quot;;..\..\MeshGen\;&quot;..\..\glut-3.7.6-bin&quot;"
 				PreprocessorDefinitions=",UNICODE,WIN32,QT_LARGEFILE_SUPPORT;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB"
 				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="false"
@@ -127,9 +127,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib QtOpenGLd4.lib opengl32.lib glu32.lib $(OutDir)\IcesopCore.lib $(OutDir)\Mesh.lib $(OutDir)\hsimpkit.lib $(OutDir)\libgfx.lib ..\..\glew-1.8.0\lib\glew32.lib"
+				AdditionalDependencies="qtmaind.lib QtCored4.lib QtGuid4.lib QtOpenGLd4.lib opengl32.lib glu32.lib $(OutDir)\IcesopCore.lib $(OutDir)\Mesh.lib $(OutDir)\hsimpkit.lib $(OutDir)\MeshGen.lib $(OutDir)\libgfx.lib ..\..\glew-1.8.0\lib\glew32.lib glut32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				AdditionalLibraryDirectories="$(QTDIR)\lib"
+				AdditionalLibraryDirectories="&quot;$(QTDIR)\lib&quot;;&quot;..\..\glut-3.7.6-bin&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 			/>
@@ -178,7 +178,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing hGlWidget.h..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -189,7 +189,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing hGlWidget.h..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -208,7 +208,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -219,7 +219,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Moc&apos;ing $(InputFileName)..."
-						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
+						CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 						AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 						Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 					/>
@@ -265,7 +265,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Moc&apos;ing mcdialog.h..."
-							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot;&#x0D;&#x0A;"
+							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 							Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 						/>
@@ -276,7 +276,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Moc&apos;ing mcdialog.h..."
-							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot;&#x0D;&#x0A;"
+							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 							Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 						/>
@@ -321,7 +321,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Moc&apos;ing mcsimpdialog.h..."
-							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot;&#x0D;&#x0A;"
+							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 							Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 						/>
@@ -332,7 +332,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Moc&apos;ing mcsimpdialog.h..."
-							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot;&#x0D;&#x0A;"
+							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 							Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 						/>
@@ -377,7 +377,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Moc&apos;ing qslimdialog.h..."
-							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot;&#x0D;&#x0A;"
+							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 							Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 						/>
@@ -388,7 +388,7 @@
 						<Tool
 							Name="VCCustomBuildTool"
 							Description="Moc&apos;ing qslimdialog.h..."
-							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;  &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot;&#x0D;&#x0A;"
+							CommandLine="&quot;$(QTDIR)\bin\moc.exe&quot;   -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB  &quot;-I.\GeneratedFiles&quot; &quot;-I$(QTDIR)\include&quot; &quot;-I.\GeneratedFiles\$(ConfigurationName)\.&quot; &quot;-I$(QTDIR)\include\qtmain&quot; &quot;-I$(QTDIR)\include\QtCore&quot; &quot;-I$(QTDIR)\include\QtGui&quot; &quot;-I$(QTDIR)\include\QtOpenGL&quot; &quot;-I.&quot; &quot;-I.\..\Mesh&quot; &quot;-I.\..\IcesopCore&quot; &quot;-I.\..\..\hsimpkit&quot; &quot;-I$(EIGEN_DIR)\.&quot; &quot;-I$(BOOST_DIR)\.&quot; &quot;-I.\..\..\libgfx\include&quot; &quot;-I.\..\..\glew-1.8.0\include&quot; &quot;-I.\..\..\MeshGen&quot; &quot;-I.\..\..\glut-3.7.6-bin&quot; &quot;$(InputPath)&quot; -o &quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;$(QTDIR)\bin\moc.exe&quot;;$(InputPath)"
 							Outputs="&quot;.\GeneratedFiles\$(ConfigurationName)\moc_$(InputName).cpp&quot;"
 						/>

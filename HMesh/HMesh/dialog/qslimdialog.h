@@ -1,3 +1,12 @@
+/*
+ *  Qt Dialog for QSlim (nearly deprecated)
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
+
 #ifndef QSLIMDIALOG_H
 #define QSLIMDIALOG_H
 
@@ -8,6 +17,7 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 
+// Qt Dialog for QSlim (nearly deprecated)
 class QSlimDialog : public QDialog
 {
 	Q_OBJECT

@@ -1,12 +1,11 @@
 /*
- *  Augmented timing
+ *  Augmented Timing Class
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __H_AUG_TIME__
 #define __H_AUG_TIME__
@@ -19,6 +18,7 @@ using std::ostream;
 
 #define BUF_SIZE 500
 
+// Augmented Timing Class
 class HAugTime {
 public:
 	HAugTime() {

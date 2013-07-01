@@ -1,10 +1,10 @@
 /*
- *	A timer
+ *	A Timer (deprecated)
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __H_TIME__
@@ -15,6 +15,7 @@
 
 #define BUF_SIZE 50
 
+// A Timer Class (deprecated)
 class HTime
 {
 public:

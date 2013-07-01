@@ -1,12 +1,10 @@
 /*
  *  Dynamic array, enlarged * 2 everytime.
- *  For detailed analysis, please refer to 
- *	amortized analysis chapters in CLRS
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __H_DYNAM_ARRAY__
@@ -19,6 +17,7 @@
 using std::ostream;
 using std::endl;
 
+// Dynamic array, enlarged * 2 everytime.
 template<class ElemType>
 class HDynamArray {
 public:

@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hsimpkit", "..\hsimpkit\hsi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hoocsimp", "hoocsimp.vcproj", "{7559FAB3-E460-42BB-8F3C-98976F1DEF52}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgfx", "..\libgfx\vc6\libgfx\libgfx.vcproj", "{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{7559FAB3-E460-42BB-8F3C-98976F1DEF52}.Debug|Win32.Build.0 = Debug|Win32
 		{7559FAB3-E460-42BB-8F3C-98976F1DEF52}.Release|Win32.ActiveCfg = Release|Win32
 		{7559FAB3-E460-42BB-8F3C-98976F1DEF52}.Release|Win32.Build.0 = Release|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Debug|Win32.Build.0 = Debug|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Release|Win32.ActiveCfg = Release|Win32
+		{448B4D05-BE88-4D44-9BAD-1ADA8D56CEC6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

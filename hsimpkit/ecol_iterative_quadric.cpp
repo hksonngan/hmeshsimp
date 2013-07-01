@@ -43,6 +43,7 @@ bool QuadricEdgeCollapse::addFace(const uint & index, const HFace& face) {
 void QuadricEdgeCollapse::collectPairs() {
 	int i, j;
 	vert_arr starVertices;
+	face_arr _faces;
 
 	//for (i = 0; i < vertices.count(); i ++) {
 
@@ -68,13 +69,24 @@ void QuadricEdgeCollapse::collectPairs() {
 
 	_for_loop(vertices, ECVertexMap) {
 		i = _retrieve_index();
+		if (v(i).exterior())
+			continue;
+
 		collectStarVertices(i, &starVertices);
 		for (j = 0; j < starVertices.count(); j ++)
 			// add specific edge only once
 			// never collapse the exterior vertices
-			if (i < starVertices[j] && !v(i).exterior() && !v(starVertices[j]).exterior()) {
+			if (i < starVertices[j] && !v(starVertices[j]).exterior()) {
 				CollapsablePair *new_pair = new CollapsablePair(i, starVertices[j]);
 				addCollapsablePair(new_pair);
+
+				// add boundary constraint
+				if (boundary_weight > 0) {
+					collectEdgeFaces(i, starVertices[j], _faces);
+					// is the boundary edge
+					if (_faces.count() == 1)
+						addDiscontinuityConstraint(i, starVertices[j], _faces[0]);
+				}
 			}
 	}
 }

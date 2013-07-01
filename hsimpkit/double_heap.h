@@ -1,16 +1,6 @@
 /*
  *  A maximum/minimum heap with an array as a container
  *
- *  Constructor:
- *    DoubleHeap(
- *      int _size, // initial volume of the heap
- *      int _type // 1 : max heap 2 : min heap
- *    );
- *
- *  The element type T should overload
- *  operator '<' for max heap,
- *           '>' for min heap
- *
  *  Author: Ht
  *  Email : waytofall91 at gmail dot com
  */
@@ -29,6 +19,20 @@ using std::ostream;
 enum HeapType {
 	MaxHeap, MinHeap
 };
+
+/*
+ *  A maximum/minimum heap with an array as a container
+ *
+ *  Constructor:
+ *    DoubleHeap(
+ *      int _size, // initial volume of the heap
+ *      int _type // 1 : max heap 2 : min heap
+ *    );
+ *
+ *  The element type T should overload
+ *  operator '<' for max heap,
+ *           '>' for min heap
+ */
 
 template<class T>
 class DoubleHeap

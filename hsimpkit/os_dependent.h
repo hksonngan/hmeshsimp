@@ -1,13 +1,14 @@
 /*
  *  This file defines some operating system dependent
- *  functions invoked by some of the os independent codes, 
+ *  functions invoked by some of the OS independent codes, 
  *  which should be written separately on different operating
  *  systems.
+ *  Currently it only contains Windows platform implementation
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __OS_DEPENDENT__

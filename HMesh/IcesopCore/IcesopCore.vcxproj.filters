@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\tinyxml">
+      <UniqueIdentifier>{0ffe0f09-9d29-4281-847a-68b234f64a2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\io">
+      <UniqueIdentifier>{4c937657-85d9-4574-9704-375d86b5f5b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{db2627df-6d9d-4cc0-a05a-1bb824c47643}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\datastructures">
+      <UniqueIdentifier>{e6cd99b7-b87e-465d-8f00-5d980babdc41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\math">
+      <UniqueIdentifier>{84e3b142-db57-48e8-995e-762e07257bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\tinyxml">
+      <UniqueIdentifier>{314df96d-fb3d-4488-8a0c-967f9009cf81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\io">
+      <UniqueIdentifier>{89cdf138-4c31-4c1d-b3e6-0d1212144b71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{0c7e4f85-1690-482b-a1ae-c5e1ce5b7fa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\datastructures">
+      <UniqueIdentifier>{c32cb8b8-8bbb-4f81-a537-af8e978b41d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\math">
+      <UniqueIdentifier>{89844f46-3f30-482d-9a81-31a4f3098cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinystr.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxml.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxmlerror.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxmlparser.cpp">
+      <Filter>Source Files\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\exception.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="datastructures\bounds.cpp">
+      <Filter>Source Files\datastructures</Filter>
+    </ClCompile>
+    <ClCompile Include="datastructures\matrix.cpp">
+      <Filter>Source Files\datastructures</Filter>
+    </ClCompile>
+    <ClCompile Include="math\equation.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\puremath.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml\tinystr.h">
+      <Filter>Header Files\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml\tinyxml.h">
+      <Filter>Header Files\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\exception.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\basecollection.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\baseelement.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\baseindexs.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\basematerial.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\basemesh.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\basenode.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\baseselection.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\bounds.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\geometryset.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\matrix.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="datastructures\point.h">
+      <Filter>Header Files\datastructures</Filter>
+    </ClInclude>
+    <ClInclude Include="math\mathlib.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="datastructures\point.inl">
+      <Filter>Header Files\datastructures</Filter>
+    </None>
+  </ItemGroup>
+</Project>

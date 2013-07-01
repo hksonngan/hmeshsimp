@@ -29,7 +29,7 @@ bool HMeshPatch::openForWrite(const char* vert_name, const char* face_name) {
 		cerr << "#ERROR: " << vert_name << " vertex file open for write failed" << endl;
 		return false;
 	}
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// count of vertices
 	WRITE_UINT(vert_out, n);
 	// count of interior boundary vertices
@@ -43,7 +43,7 @@ bool HMeshPatch::openForWrite(const char* vert_name, const char* face_name) {
 		cerr << "#ERROR: " << face_name << " face file open for write failed" << endl;
 		return false;
 	}
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// count of faces
 	WRITE_UINT(face_out, n);
 #endif
@@ -70,7 +70,7 @@ bool HMeshPatch::closeForWrite() {
 	interior_bound.clear();
 	std::sort(interior.pointer(0), interior.pointer(0) + interior.count());
 
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 	vert_out << endl;
 #endif
 
@@ -81,7 +81,7 @@ bool HMeshPatch::closeForWrite() {
 
 		// write the vertex id
 		WRITE_UINT(vert_out, n);
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 		vert_out << endl;
 #endif
 		if (!vert_out.good()) {
@@ -92,7 +92,7 @@ bool HMeshPatch::closeForWrite() {
 		// in case of duplication
 		for (; i < interior.count() && interior[i] == n; i ++);
 	}
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 	vert_out << endl;
 #endif
 	interior.freeSpace();
@@ -111,7 +111,7 @@ bool HMeshPatch::closeForWrite() {
 
 		// write the vertex
 		idv.write(vert_out);
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 		vert_out << endl;
 #endif
 		if (!vert_out.good()) {
@@ -123,11 +123,11 @@ bool HMeshPatch::closeForWrite() {
 		for (; i < exterior.count() && exterior[i] == idv; i ++);
 	}
 
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 	vert_out << endl;
 #endif
 
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// write the counts
 	vert_out.seekp(0);
 	WRITE_UINT(vert_out, vert_count);
@@ -143,7 +143,7 @@ bool HMeshPatch::closeForWrite() {
 
 	/* write face count */
 
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	face_out.seekp(0);
 	WRITE_UINT(face_out, face_count);
 #endif
@@ -164,7 +164,7 @@ bool HMeshPatch::openForRead(const char* vert_name, const char* face_name) {
 		cerr << "#ERROR: " << vert_name << " vertex file open for read failed" << endl;
 		return false;
 	}
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// count of vertices
 	READ_UINT(vert_in, vert_count);
 	// count of interior boundary vertices
@@ -185,7 +185,7 @@ bool HMeshPatch::openForRead(const char* vert_name, const char* face_name) {
 		cerr << "#ERROR: " << face_name << " face file open for read failed" << endl;
 		return false;
 	}
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// count of faces
 	READ_UINT(face_in, face_count);
 #else
@@ -234,6 +234,8 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 	for (i = 0; i < interior_count; i ++) {
 		if (!nextInteriorBound(orig_id))
 			return false;
+		//// I think here we should use the 'local id' so that
+		//// the id_map can be cleared in this function
 		interior_bound.push_back(orig_id);
 		(pcol->v(id_map[orig_id])).markv(INTERIOR_BOUND);
 	}
@@ -257,6 +259,8 @@ bool HMeshPatch::readPatch(char *vert_patch, char *face_patch, PairCollapse *pco
 		f_internal.k = id_map[f.k];
 		pcol->addFace(f_internal);
 	}
+
+	//// should I clear the id_map here ??
 
 	closeForRead();
 
@@ -321,7 +325,7 @@ bool HIBTriangles::openIBTFileForWrite(const char* dir_path) {
 	stringToCstr(str, buf);
 
 	ibt_out.open(buf, fstream::binary | fstream::out);
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// count of triangles
 	WRITE_UINT(ibt_out, n);
 #endif
@@ -333,7 +337,7 @@ bool HIBTriangles::openIBTFileForWrite(const char* dir_path) {
 
 bool HIBTriangles::closeIBTFileForWrite() {
 
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// write the count of triangles to the beginning of the file
 	ibt_out.seekp(0);
 	WRITE_UINT(ibt_out, face_count);
@@ -359,7 +363,7 @@ bool HIBTriangles::openIBTFileForRead(const char* dir_path) {
 	stringToCstr(str, buf);
 
 	ibt_in.open(buf, fstream::binary | fstream::in);
-#ifdef WRITE_PATCH_BINARY
+#ifdef WRITE_FILE_BINARY
 	// count of triangles
 	READ_UINT(ibt_in, face_count);
 #else

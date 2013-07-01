@@ -1,0 +1,58 @@
+1 分片简化
+解决方案在patchingsimp文件夹下。可执行文件放在release文件夹下，可以使用run.bat运行。运行方式为命令行，命令行参数主要为：
+  -t 简化后模型顶点个数
+  -x 分片时，包围盒x方向分割个数
+  -y 分片时，包围盒y方向分割个数
+  -z 分片时，包围盒z方向分割个数
+最后是要简化模型的路径。
+简化的结果放在可执行文件所在目录下的 [输入文件名]_patches/[输入文件名]_psimp_bin.ply 文件中。
+
+
+2 即时简化（边生成边简化）
+解决方案放在HMesh文件夹下，可执行文件在release文件夹下。GUI界面，HMesh里面包含了打开模型、使用Marching Cubes生成等值面和边生成边简化等功能。
+Marching Cubes功能在菜单 Surface Xtract -> Marching Cubes 下，参数比较易懂，下面的sample stride是在各个方向上对体素的采样粒度，就是将几个体素合在一起生成。
+即时简化功能在菜单 Surface Xtract -> MC Simplification 下，参数比较易懂，论文中也有说明：
+  Decimate Rate：简化率，简化模型面片个数占原模型百分比
+  Buffer Size：每次简化之前生成的等值面的个数。缓存大小设置的越大，简化质量越高，但程序占用内存也越大，执行时间越长；反之的则简化质量越低，占用内存越小，执行时间越短。
+
+  
+3 并行等值面生成
+解决方案放在pAdapIso文件夹下，可执行文件在release文件夹下。命令行执行，可以使用run.bat运行，参数在params.txt文件中指定，分别是：
+  file name 文件名
+  start depth 开始遍历的层次
+  error thresh 错误阈值
+  iso value 等值面的数据值
+输出文件放在可执行文件所在目录下的 [输入文件名].rawtris 中，这个文件就是直接把结果数组以二进制形式写入文件中，它可以使用HMesh打开。
+
+
+前两个项目的hsimpkit工程引用到了eigen和boost库，这两个库在svn文件夹的根目录下有。将它们解压到某个盘下，并在windows环境变量中配置好它们的路径。
+比如：
+  BOOST_DIR = D:\boost_1_49_0
+  EIGEN_DIR = D:\eigen
+
+第三个项目使用到了CUDA，我开发的时候使用的版本是CUDA 5.0。
+
+
+所有项目文件均为vs2010格式。
+
+
+** 在编译项目的时候，一个需要特别注意的事情是，分片简化和即时简化都用到了边收缩简化功能（见edge_collapse/pcol_iterative.ｈ），
+但他们在PairCollapse类中对于顶点和面数组所使用的数据结构不同。分片简化使用了动态数组，而即时简化使用哈希表。见pcol_iterative.ｈ中开头的宏定义：
+
+	#define ARRAY_NORMAL	0
+	#define ARRAY_USE_HASH	1
+
+	//#define ARRAY_USE	ARRAY_USE_HASH
+	#define ARRAY_USE	ARRAY_NORMAL
+
+	#ifdef ARRAY_USE
+		#if ARRAY_USE < 0 || ARRAY_USE > 1
+			#error invalid value for ARRAY_USE macro 	
+		#endif
+	#else
+		#define ARRAY_USE	ARRAY_NORMAL
+	#endif
+
+如果定义ARRAY_USE宏值为ARRAY_NORMAL，则编译的时候PairCollapse类使用动态数组，如果定义为ARRAY_USE_HASH，则使用哈希表。
+因此需要在编译两个工程的时候在pcol_iterative.ｈ文件中分别对ARRAY_USE宏使用不同定义。
+这给编译带来了麻烦，且两个简化功能不能在一个可执行文件中共存。但暂时不想改动了。

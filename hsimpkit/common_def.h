@@ -1,12 +1,11 @@
 /*
- *  Common Defs
+ *  Common Definitions
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __H_COMMON_DEF__
 #define __H_COMMON_DEF__

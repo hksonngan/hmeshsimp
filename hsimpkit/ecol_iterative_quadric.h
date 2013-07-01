@@ -8,7 +8,6 @@
  *  Copyright (C) Ht. All rights reserved.
  */
 
-
 #ifndef __ITERATIVE_QUADRIC_EDGE_COLLAPSE__
 #define __ITERATIVE_QUADRIC_EDGE_COLLAPSE__
 
@@ -39,8 +38,23 @@
 typedef MxQuadric3 Quadric;
 typedef unordered_map<uint, Quadric> QuadMap;
 
-class QuadricEdgeCollapse: public PairCollapse {
+/* edge collapse vertex with quadric error matrix */
+class QuadricVertex: public CollapsableVertex {
+public:
 
+public:
+	Quadric	quadrics;	// quadric error matrix
+};
+
+// unused
+class HierarchyQuadricVertex: public HierarchyVertex {
+public:
+	Quadric	quadrics;	// quadric error matrix
+};
+
+// Class that performs iterative edge collapse using quadric error metrics
+class QuadricEdgeCollapse: public PairCollapse 
+{
 public:
 
 	////////////////////////////////////////
@@ -136,7 +150,6 @@ void QuadricEdgeCollapse::addFaceQuadric(const HFace& face) {
 }
 
 void QuadricEdgeCollapse::addDiscontinuityConstraint(uint vert1, uint vert2, uint face_id) {
-
 	Vec3 org(v(vert1).x, v(vert1).y, v(vert1).z), 
 		dest(v(vert2).x, v(vert2).y, v(vert2).z);
 	Vec3 e = dest - org;

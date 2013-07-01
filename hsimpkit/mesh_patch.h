@@ -4,9 +4,8 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
-
 
 #ifndef __H_MESH_PATCH__
 #define __H_MESH_PATCH__
@@ -46,7 +45,7 @@ using std::list;
 
 enum TargetOption { TARGET_FACE, TARGET_VERT };
 
-/* interior boundary triangles */
+/* interior boundary triangles class */
 class HIBTriangles {
 public:
 	HIBTriangles() { face_count = 0; }
@@ -92,8 +91,8 @@ public:
 };
 
 /* a generic patch class */
-class HMeshPatch {
-
+class HMeshPatch 
+{
 public:
 
 	HMeshPatch() { vert_count = 0; face_count = 0; interior_count = 0; exterior_count = 0; }
@@ -173,7 +172,7 @@ bool HIBTriangles::addIBTriangle(const HTriple<uint> &f) {
 	WRITE_UINT(ibt_out, f.j);
 	WRITE_UINT(ibt_out, f.k);
 	face_count ++;
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 	ibt_out << endl;
 #endif
 
@@ -204,7 +203,7 @@ bool HMeshPatch::addInteriorVertex(const uint &orig_id, const HVertex &v) {
 	WRITE_BLOCK(vert_out, v.y, VERT_ITEM_SIZE);
 	WRITE_BLOCK(vert_out, v.z, VERT_ITEM_SIZE);
 	vert_count ++;
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 	vert_out << endl;
 #endif
 
@@ -234,7 +233,7 @@ bool HMeshPatch::addFace(const HTriple<uint> &f) {
 	WRITE_UINT(face_out, f.j);
 	WRITE_UINT(face_out, f.k);
 	face_count ++;
-#ifndef WRITE_PATCH_BINARY
+#ifndef WRITE_FILE_BINARY
 	face_out << endl;
 #endif
 
@@ -296,9 +295,10 @@ bool HMeshPatch::nextFace(HTriple<uint> &f) {
 }
 
 template<class VOutType, class FOutType, class IdMapStreamType>
-bool HMeshPatch::simpOutput(PairCollapse *pcol, uint vert_start_id, 
-		VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream) {
-
+bool HMeshPatch::simpOutput(
+	PairCollapse *pcol, uint vert_start_id, 
+	VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream
+){
 	int i;
 	uint valid_count = 0;
 	HTriple<uint> face;
@@ -326,6 +326,8 @@ bool HMeshPatch::simpOutput(PairCollapse *pcol, uint vert_start_id,
 
 	list<uint>::iterator iter;
 	for (iter = interior_bound.begin(); iter != interior_bound.end(); iter ++) {
+		//// I think here we should use the 'local id' so that
+		//// the id_map can be cleared in this function
 		CollapsableVertex &v = pcol->v(id_map[*iter]);
 		bound_id_stream.add(*iter, v.output_id);
 	}
@@ -347,9 +349,9 @@ bool HMeshPatch::simpOutput(PairCollapse *pcol, uint vert_start_id,
 
 template<class VOutType, class FOutType, class IdMapStreamType>
 bool HMeshPatch::pairCollapse(
-		char *vert_name, char *face_name, uint vert_start_id, uint total_verts,
-		uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream) {
-
+	char *vert_name, char *face_name, uint vert_start_id, uint total_verts,
+	uint total_target, VOutType &vout, FOutType &fout, IdMapStreamType &bound_id_stream
+){
 	QuadricEdgeCollapse ecol;
 	uint target;
 	ostringstream oss;
@@ -363,7 +365,7 @@ bool HMeshPatch::pairCollapse(
 	ecol.initialize();
 	ecol.targetVert(target);
 
-	if (!simpOutput(&ecol, vert_start_id, vout, fout, bound_id_stream));	
+	if (!simpOutput(&ecol, vert_start_id, vout, fout, bound_id_stream));
 
 	return true;
 }

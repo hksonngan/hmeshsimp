@@ -4,7 +4,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __PLY_STREAM__
@@ -41,6 +41,7 @@ static PlyProperty face_props[] = { /* list of property information for a vertex
 	1, PLY_UCHAR, PLY_UCHAR, offsetof(Face,nverts)},
 };
 
+// Ply read & write class
 class PlyStream
 {
 public:

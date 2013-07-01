@@ -1,12 +1,11 @@
 /*
  *	Triangle soup stream class
  *	Read/write triangle soup
- *	Stream file
  *
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 
 #ifndef __TRI_SOUP_STREAM__
@@ -17,6 +16,8 @@
 
 using namespace std;
 
+// Triangle soup stream class
+// Read/write triangle soup
 class TriSoupStream
 {
 public:

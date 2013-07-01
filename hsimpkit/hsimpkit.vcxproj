@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A03330D3-129A-4EB5-828C-0112EFE97B77}</ProjectGuid>
+    <RootNamespace>hSimpKit</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(EIGEN_DIR);$(BOOST_DIR);./;./ply;../;../libgfx/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(EIGEN_DIR);$(BOOST_DIR);./;./ply;../;../libgfx/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="lru_vertex.h" />
+    <ClInclude Include="math\chapill_vec3.h" />
+    <ClInclude Include="math\chapill_vec4.h" />
+    <ClInclude Include="math\mat44.h" />
+    <CustomBuildStep Include="ply\ply.h" />
+    <ClInclude Include="mt.h" />
+    <ClInclude Include="ply\ply_inc.h" />
+    <ClInclude Include="ply_stream.h" />
+    <ClInclude Include="qio.h" />
+    <ClInclude Include="tri_soup_stream.h" />
+    <CustomBuildStep Include="ooc_vertex_clustering.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="oocsimp.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="vertex_cluster.h" />
+    <ClInclude Include="spatial_division.h" />
+    <ClInclude Include="spatial_division2.h" />
+    <ClInclude Include="double_heap.h" />
+    <ClInclude Include="h_algorithm.h" />
+    <ClInclude Include="h_dynamarray.h" />
+    <ClInclude Include="h_esort.h" />
+    <ClInclude Include="hash_def.h" />
+    <ClInclude Include="lru_cache.h" />
+    <ClInclude Include="random.h" />
+    <ClInclude Include="common_def.h" />
+    <ClInclude Include="common_types.h" />
+    <ClInclude Include="data_type.h" />
+    <ClInclude Include="getopt.h" />
+    <ClInclude Include="h_aug_time.h" />
+    <ClInclude Include="h_math.h" />
+    <ClInclude Include="h_time.h" />
+    <ClInclude Include="io_common.h" />
+    <ClInclude Include="os_dependent.h" />
+    <ClInclude Include="trivial.h" />
+    <CustomBuildStep Include="ecol_iterative_quadric.h" />
+    <CustomBuildStep Include="pcol_iterative.h" />
+    <CustomBuildStep Include="pcol_other_structures.h" />
+    <CustomBuildStep Include="pcol_vertex.h" />
+    <ClInclude Include="MixKit\mixmsg.h" />
+    <ClInclude Include="MixKit\MxBlock.h" />
+    <ClInclude Include="MixKit\MxDynBlock.h" />
+    <ClInclude Include="MixKit\MxHeap.h" />
+    <ClInclude Include="MixKit\MxMat3.h" />
+    <ClInclude Include="MixKit\MxMat4.h" />
+    <ClInclude Include="MixKit\MxQMetric3.h" />
+    <ClInclude Include="MixKit\stdmix.h" />
+    <ClInclude Include="grid_patch.h" />
+    <ClInclude Include="id_map_stream.h" />
+    <ClInclude Include="mem_stream.h" />
+    <ClInclude Include="mesh_patch.h" />
+    <ClInclude Include="patching_simp.h" />
+    <ClInclude Include="mc.h" />
+    <ClInclude Include="mc_simp.h" />
+    <ClInclude Include="mcsimp_types.h" />
+    <ClInclude Include="vol_set.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mt.cpp" />
+    <ClCompile Include="ply\ply_additional.cpp" />
+    <ClCompile Include="ply\ply_read.cpp" />
+    <ClCompile Include="ply\plyfile.cpp" />
+    <ClCompile Include="ply_stream.cpp" />
+    <ClCompile Include="qio.cpp" />
+    <ClCompile Include="tri_soup_stream.cpp" />
+    <ClCompile Include="ooc_vertex_clustering.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="oocsimp.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="vertex_cluster.cpp" />
+    <ClCompile Include="spatial_division.cpp" />
+    <ClCompile Include="spatial_division2.cpp" />
+    <ClCompile Include="random.c" />
+    <ClCompile Include="getopt.c" />
+    <ClCompile Include="h_math.cpp" />
+    <ClCompile Include="os_dependent.cpp" />
+    <ClCompile Include="trivial.cpp" />
+    <ClCompile Include="ecol_iterative_quadric.cpp" />
+    <ClCompile Include="pcol_iterative.cpp" />
+    <ClCompile Include="MixKit\mixmsg.cxx" />
+    <ClCompile Include="MixKit\MxHeap.cxx" />
+    <ClCompile Include="MixKit\MxMat3-jacobi.cxx" />
+    <ClCompile Include="MixKit\MxMat4-jacobi.cxx" />
+    <ClCompile Include="MixKit\MxQMetric3.cxx" />
+    <ClCompile Include="grid_patch.cpp" />
+    <ClCompile Include="mesh_patch.cpp" />
+    <ClCompile Include="patching_simp.cpp" />
+    <ClCompile Include="psimp_entry.cpp" />
+    <ClCompile Include="mc.cpp" />
+    <ClCompile Include="mc_simp.cpp" />
+    <ClCompile Include="mc_table.cpp" />
+    <ClCompile Include="mcsimp_types.cpp" />
+    <ClCompile Include="vol_set.cpp" />
+    <ClCompile Include="esorttest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="merge_arr_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="oo_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="partition_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="sort_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

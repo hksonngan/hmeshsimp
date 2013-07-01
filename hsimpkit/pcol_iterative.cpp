@@ -105,9 +105,12 @@ bool PairCollapse::addFace(const HFace &face) {
 	v(face.j).adjacent_faces.push_back(id);
 	v(face.k).adjacent_faces.push_back(id);
 
-	v(face.i).markv(REFERRED);
-	v(face.j).markv(REFERRED);
-	v(face.k).markv(REFERRED);
+	if (!v(face.i).interior_bound() && !v(face.i).exterior())
+		v(face.i).markv(REFERRED);
+	if (!v(face.j).interior_bound() && !v(face.j).exterior())
+		v(face.j).markv(REFERRED);
+	if (!v(face.k).interior_bound() && !v(face.k).exterior())
+		v(face.k).markv(REFERRED);
 
 	valid_faces ++;
 	return true;
@@ -118,7 +121,7 @@ bool PairCollapse::addFace(const uint &index, const HFace &face) {
 	cface.set(face.i, face.j, face.k);
 
 	if (!cface.valid()) {
-		addInfo("#ERROR: duplicate verts in input face\n");
+		addInfo("#duplicate verts in input face\n");
 		return false;
 	}
 #if ARRAY_USE == ARRAY_NORMAL
@@ -348,8 +351,13 @@ bool PairCollapse::writePly(char* filename) {
 		<< "\twrite time:\t" << write_time.getElapseStr() << endl 
 		<< "\ttrue valid verts: " << valid_vert_count << endl 
 		<< "\ttrue valid faces: " << valid_face_count << endl
+#if ARRAY_USE == ARRAY_NORMAL
+		<< "\tvert map size: " << vertices.count() << endl
+		<< "\tface map size: " << faces.count() << endl
+#else
 		<< "\tvert map size: " << vertices.size() << endl
 		<< "\tface map size: " << faces.size() << endl
+#endif
 		<< endl;
 
 	addInfo(ostr.str());
@@ -373,6 +381,33 @@ void PairCollapse::toIndexedMesh(HVertex* vertArr, HFace *faceArr) {
 		CollapsableFace& cface = _retrieve_elem(faces);
 		if (cface.valid()) {
 			faceArr[valid_face_count].set(v(cface.i).output_id, v(cface.j).output_id, v(cface.k).output_id);
+			valid_face_count ++;
+		}
+	}
+}
+
+void PairCollapse::toIndexedMesh(vector<float>& vertArr, vector<int>& faceArr) {
+	uint valid_vert_count = 0;
+	_for_loop(vertices, ECVertexMap) {
+		CollapsableVertex& cvert = _retrieve_elem(vertices);	
+		if (cvert.valid(_retrieve_index()) && !cvert.unreferred()) {
+			//vertArr[valid_vert_count].Set(cvert.x, cvert.y, cvert.z);
+			vertArr[valid_vert_count * 3]     = cvert.x;
+			vertArr[valid_vert_count * 3 + 1] = cvert.y;
+			vertArr[valid_vert_count * 3 + 2] = cvert.z;
+			cvert.output_id = valid_vert_count;
+			valid_vert_count ++;
+		}
+	}
+
+	uint valid_face_count = 0;
+	_for_loop(faces, ECFaceMap) {
+		CollapsableFace& cface = _retrieve_elem(faces);
+		if (cface.valid()) {
+			//faceArr[valid_face_count].set(v(cface.i).output_id, v(cface.j).output_id, v(cface.k).output_id);
+			faceArr[valid_face_count * 3]     = v(cface.i).output_id;
+			faceArr[valid_face_count * 3 + 1] = v(cface.j).output_id;
+			faceArr[valid_face_count * 3 + 2] = v(cface.k).output_id;
 			valid_face_count ++;
 		}
 	}

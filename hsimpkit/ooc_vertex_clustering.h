@@ -4,7 +4,7 @@
  *  Author: Ht
  *  Email : waytofall916 at gmail dot com
  *
- *  Copyright (C) Ht-waytofall. All rights reserved.
+ *  Copyright (C) Ht. All rights reserved.
  */
 #ifndef __OOC_VERTEX_CLUSTERING__
 #define __OOC_VERTEX_CLUSTERING__

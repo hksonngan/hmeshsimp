@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{4962e6c0-23ec-4a69-a0d2-9ca48ab011f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ecol">
+      <UniqueIdentifier>{7c67ddd3-c885-49d6-afcf-d1b52a09607f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ecol\MixKit">
+      <UniqueIdentifier>{df8f79b9-18ce-4464-b1f9-3b3d17bf6d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libgfx">
+      <UniqueIdentifier>{f80f61f5-6137-4bfa-898a-a16111f7b427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mcsimp">
+      <UniqueIdentifier>{48d49df3-aaa7-46bf-bf71-c64ab219adb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ply">
+      <UniqueIdentifier>{40e65c41-e95f-4667-9b45-7313209b712c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\hsimpkit\common_def.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\common_types.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\data_type.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\h_algorithm.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\h_aug_time.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\h_dynamarray.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\h_math.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\io_common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\lru_cache.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\ply_stream.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\qio.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\random.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\trivial.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\ecol_iterative_quadric.h">
+      <Filter>ecol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\fnv1_inc.h">
+      <Filter>ecol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\pcol_iterative.h">
+      <Filter>ecol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\pcol_other_structures.h">
+      <Filter>ecol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\pcol_vertex.h">
+      <Filter>ecol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\mixmsg.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\MxBlock.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\MxDynBlock.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\MxHeap.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\MxMat3.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\MxMat4.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\MxQMetric3.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\MixKit\stdmix.h">
+      <Filter>ecol\MixKit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\mc.h">
+      <Filter>mcsimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\mc_simp.h">
+      <Filter>mcsimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\mcsimp_types.h">
+      <Filter>mcsimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\mt.h">
+      <Filter>mcsimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\vol_set.h">
+      <Filter>mcsimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\ply\ply.h">
+      <Filter>ply</Filter>
+    </ClInclude>
+    <ClInclude Include="..\hsimpkit\ply\ply_inc.h">
+      <Filter>ply</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_generator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\hsimpkit\h_math.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\ply_stream.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\qio.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\random.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\trivial.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\ecol_iterative_quadric.cpp">
+      <Filter>ecol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\pcol_iterative.cpp">
+      <Filter>ecol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\MixKit\mixmsg.cxx">
+      <Filter>ecol\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\MixKit\MxHeap.cxx">
+      <Filter>ecol\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\MixKit\MxMat3-jacobi.cxx">
+      <Filter>ecol\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\MixKit\MxMat4-jacobi.cxx">
+      <Filter>ecol\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\MixKit\MxQMetric3.cxx">
+      <Filter>ecol\MixKit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\geom3d.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\geom4d.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\mat2.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\mat3.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\mat4.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\quat.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\script.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\symmat3.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\symmat4.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libgfx\src\time.cxx">
+      <Filter>libgfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\mc.cpp">
+      <Filter>mcsimp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\mc_simp.cpp">
+      <Filter>mcsimp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\mc_table.cpp">
+      <Filter>mcsimp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\mcsimp_types.cpp">
+      <Filter>mcsimp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\mt.cpp">
+      <Filter>mcsimp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\vol_set.cpp">
+      <Filter>mcsimp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\ply\ply_additional.cpp">
+      <Filter>ply</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\ply\ply_read.cpp">
+      <Filter>ply</Filter>
+    </ClCompile>
+    <ClCompile Include="..\hsimpkit\ply\plyfile.cpp">
+      <Filter>ply</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh_generator.cpp" />
+  </ItemGroup>
+</Project>

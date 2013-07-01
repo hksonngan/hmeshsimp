@@ -1,9 +1,18 @@
+/*
+ *  Types Defined for MCSimp
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
+
 #ifndef __MC_SIMP_TYPES_H__
 #define __MC_SIMP_TYPES_H__
 
 #include <string>
 #include <boost/unordered_map.hpp>
-#include "fnv1_inc.h"
+#include "fnv1_modified.hpp"
 #include "common_types.h"
 
 using std::string;
@@ -43,6 +52,7 @@ using std::string;
 //using boost::unordered::unordered_map;
 //typedef unordered_map<MCVertexIndex, HVertex>
 
+// the HVertex hash functor
 class VertexHash {
 public:
 	std::size_t operator() (HVertex const& v) const {
@@ -51,7 +61,7 @@ public:
 		memcpy(buf, &v, sizeof(HVertex));
 
 		string str(buf);
-		hash::fnv_1a fnv;
+		hash_nm::fnv_1a fnv;
 		return fnv(str);
 	}
 };
@@ -60,5 +70,7 @@ using boost::unordered::unordered_map;
 typedef unordered_map<HVertex, unsigned int, VertexHash> VertexIndexMap;
 
 enum InterpOnWhich { None, Edge, Vert1, Vert2 };
+
+typedef unordered_map<unsigned int, HVertex> IndexVertexMap;
 
 #endif

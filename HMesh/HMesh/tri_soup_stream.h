@@ -1,9 +1,11 @@
 /*
-	triangle soup stream class
-	read/write triangle soup
-	stream file
-	author: ht
-*/
+ * 	Triangle Soup Stream Class
+ *
+ *  Author: Ht
+ *  Email : waytofall916 at gmail dot com
+ *
+ *  Copyright (C) Ht. All rights reserved.
+ */
 
 #ifndef __TRI_SOUP_STREAM__
 #define __TRI_SOUP_STREAM__
@@ -13,6 +15,8 @@
 
 using namespace std;
 
+// Triangle Soup Stream Class
+// Read/write triangle soup file
 class TriSoupStream
 {
 public:
